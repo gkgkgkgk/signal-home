@@ -28,6 +28,65 @@ export const styles = css`
   * {
     box-sizing: border-box;
   }
+  [hidden] {
+    display: none !important;
+  }
+  .app.immersive {
+    min-height: 100dvh;
+  }
+  .immersive main {
+    padding-top: max(24px, env(safe-area-inset-top));
+  }
+  .signal-menu {
+    color: var(--ink);
+  }
+  .menu-intro {
+    font-size: 14px;
+    line-height: 1.65;
+    color: var(--muted);
+    margin: 0 0 24px;
+  }
+  .signal-menu a,
+  .signal-menu > button {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    width: 100%;
+    padding: 18px 14px;
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    color: var(--ink);
+    background: var(--surface);
+    text-decoration: none;
+    font: inherit;
+    text-align: left;
+    margin-top: 10px;
+    min-height: 64px;
+  }
+  .signal-menu span {
+    flex: 1;
+  }
+  .signal-menu small {
+    display: block;
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 5px;
+  }
+  .menu-footnote {
+    font-size: 11px;
+    line-height: 1.7;
+    color: var(--muted);
+    margin: 24px 4px 0;
+  }
+  .sheet-custom .grid {
+    grid-template-columns: 1fr;
+  }
+  .sheet-custom .panel {
+    margin-bottom: 16px;
+  }
+  .sheet-custom .section-top small {
+    display: none;
+  }
   button,
   input,
   select {

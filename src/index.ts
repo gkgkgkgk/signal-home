@@ -16,6 +16,7 @@ import "./editor";
 import "./control";
 import "./graph";
 import "./metric";
+import "./details";
 
 const tabs = [
   { id: "home", name: "Overview", icon: "home" },
@@ -45,12 +46,16 @@ export class SignalHome extends LitElement {
     message: { state: true },
     draft: { state: true },
     rangeSide: { state: true },
+    detailEntity: { state: true },
+    menuOpen: { state: true },
   };
   static styles = styles;
   declare hass: Hass;
   private config: Config = { type: "custom:signal-home" };
   private tab = "home";
   private dark = false;
+  private detailEntity = "";
+  private menuOpen = false;
   private todos: Todo[] = [];
   private rangeSide: "low" | "high" = "low";
   private syncRoute = () => {
@@ -217,14 +222,7 @@ export class SignalHome extends LitElement {
     }
   }
   private moreInfo(entity?: string) {
-    if (entity)
-      this.dispatchEvent(
-        new CustomEvent("hass-more-info", {
-          detail: { entityId: entity },
-          bubbles: true,
-          composed: true,
-        }),
-      );
+    if (entity) this.detailEntity = entity;
   }
   private async loadTodos() {
     const entity = this.config.todo;
@@ -337,7 +335,7 @@ export class SignalHome extends LitElement {
             : "Make yourself at home",
     };
   }
-  private climate() {
+  private climate(detail = false) {
     const e = this.state(this.config.climate);
     if (!this.config.climate)
       return html`<section class="panel mint climate">
@@ -418,6 +416,7 @@ export class SignalHome extends LitElement {
         ><button
           class="icon-button"
           aria-label="Climate details"
+          ?hidden=${detail}
           @click=${() => this.moreInfo(this.config.climate)}
         >
           ${icon("arrow")}
@@ -498,7 +497,7 @@ export class SignalHome extends LitElement {
       </div>
     </section>`;
   }
-  private weather() {
+  private weather(detail = false) {
     const e = this.state(this.config.weather);
     const ready = available(e);
     const a = e?.attributes || {};
@@ -507,7 +506,7 @@ export class SignalHome extends LitElement {
     return html`<section class="panel lilac weather">
       <div class="panel-top">
         <span class="panel-label">${icon("sun")} Outside</span
-        >${this.config.weather ? html`<button class="icon-button" aria-label="Weather details" @click=${() => this.moreInfo(this.config.weather)}>${icon("arrow")}</button>` : nothing}
+        >${this.config.weather && !detail ? html`<button class="icon-button" aria-label="Weather details" @click=${() => this.moreInfo(this.config.weather)}>${icon("arrow")}</button>` : nothing}
       </div>
       <div class="weather-content">
         <div>
@@ -723,7 +722,13 @@ export class SignalHome extends LitElement {
             ? "A clear view of the things that matter."
             : "A little space for everyday essentials.";
     const summary = this.safetySummary;
-    return html`<div class=${`app ${this.dark ? "dark" : ""}`}>
+    const recovery = new URL(location.href);
+    recovery.searchParams.set("disable_km", "");
+    recovery.hash = "";
+    const sensor = this.sensors.find((s) => s.entity === this.detailEntity);
+    return html`<div
+      class=${`app ${this.dark ? "dark" : ""} ${this.config.immersive ? "immersive" : ""}`}
+    >
       <aside>
         <div class="sidebar-inner">
           <div class="brand">
@@ -756,6 +761,13 @@ export class SignalHome extends LitElement {
             >
               ${icon(this.dark ? "sun" : "moon")}
             </button>
+            <button
+              class="icon-button"
+              aria-label="Open Signal menu"
+              @click=${() => (this.menuOpen = true)}
+            >
+              ${icon("settings")}
+            </button>
           </div>
         </header>
         <div class="page-heading">
@@ -775,6 +787,78 @@ export class SignalHome extends LitElement {
         </footer>
       </main>
       ${this.nav(true)}${this.message ? html`<div class="toast" role="status">${this.message}</div>` : nothing}
+      <signal-sheet
+        .open=${this.menuOpen}
+        heading="Your place. Your way."
+        .dark=${this.dark}
+        @signal-close=${() => (this.menuOpen = false)}
+      >
+        <div class="signal-menu">
+          <p class="menu-intro">
+            Signed in as ${this.hass.user?.name || "you"}. Your home is still
+            powered by Home Assistant.
+          </p>
+          <button @click=${this.toggleAppearance}>
+            ${icon(this.dark ? "sun" : "moon")}<span
+              >${this.dark ? "Light appearance" : "Dark appearance"}<small
+                >Make yourself comfortable</small
+              ></span
+            >
+          </button>
+          <a href="/profile"
+            >${icon("home")}<span
+              >Account & sign out<small>Your profile and session</small></span
+            >${icon("arrow")}</a
+          >
+          ${
+            this.hass.user?.is_admin
+              ? html`<a href="/config/dashboard"
+                  >${icon("settings")}<span
+                    >Home Assistant settings<small
+                      >Devices, integrations, and administration</small
+                    ></span
+                  >${icon("arrow")}</a
+                >`
+              : nothing
+          }
+          <a href=${recovery.pathname + recovery.search}
+            >${icon("arrow")}<span
+              >Open standard Home Assistant<small
+                >Restore the header, sidebar, and dashboard editor</small
+              ></span
+            ></a
+          >
+          <p class="menu-footnote">
+            Need a recovery route? Add <code>?disable_km</code> to this
+            dashboard’s address. Your login and permissions stay with Home
+            Assistant.
+          </p>
+        </div>
+      </signal-sheet>
+      <signal-details
+        .hass=${this.hass}
+        .entity=${this.detailEntity}
+        .dark=${this.dark}
+        .name=${this.detailEntity === this.config.climate ? "Climate" : this.detailEntity === this.config.weather ? "Weather" : sensor?.name || ""}
+        .battery=${sensor?.battery || ""}
+        .custom=${!!this.detailEntity && [this.config.climate, this.config.weather].includes(this.detailEntity)}
+        @signal-close=${() => (this.detailEntity = "")}
+      >
+        ${
+          this.detailEntity === this.config.climate
+            ? html`<div class="sheet-custom">
+                ${this.climate(true)}${this.message ? html`<p role="status">${this.message}</p>` : nothing}${this.graphs()}
+              </div>`
+            : this.detailEntity === this.config.weather
+              ? html`<div class="sheet-custom">
+                  ${this.weather(true)}
+                  <p class="intro">
+                    Current conditions from your weather provider.
+                  </p>
+                </div>`
+              : nothing
+        }
+      </signal-details>
     </div>`;
   }
 }

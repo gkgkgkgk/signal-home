@@ -23,7 +23,8 @@ Signal is a self-contained Lovelace card with Overview, Climate, Safety, and Lis
 - Tactile switches, brightness/color/temperature sliders, fans, animated blinds, media transport/volume, scenes, selectors, number controls, and confirmed unlocking.
 - Recorded-history graphs with 6h/24h/7d views, pointer/keyboard inspection, and honest gaps when sensors go unavailable.
 - Standalone control, graph, and metric cards with visual editors, usable in ordinary HA dashboards.
-- Native Home Assistant more-info dialogs for history and detailed controls.
+- Matching device sheets: climate controls, weather forecasts, safety history, sensor graphs, and device controls. Native HA is an explicit advanced fallback.
+- Signal menu with appearance, account/sign-out, admin settings, and a standard-HA recovery link.
 - Visual entity editor and YAML configuration.
 - Reduced-motion support, labeled controls, keyboard focus, and layouts tested down to 360 pixels.
 - One bundled JavaScript file; no separate theme, fonts, CDN, telemetry, or backend integration.
@@ -88,7 +89,31 @@ Replace entity IDs with your own. Every entity field is optional; unconfigured c
 
 The appearance button stores a preference locally. **Reset appearance** restores the configured setting. This doesn't change the appearance of other Home Assistant dashboards.
 
-The card works in Sections, but its complete navigation and layout are designed for a Panel view. Keep the standard HA header available for settings and editing; kiosk mode is optional and isn't required.
+The card works in Sections, but its complete navigation and layout are designed for a Panel view.
+
+## Immersive dashboard
+
+For one navigation system, install [Kiosk Mode](https://github.com/NemesisRE/kiosk-mode) through HACS and use this **dashboard-level** setting (not inside the card):
+
+```yaml
+kiosk_mode:
+  hide_header: true
+  hide_sidebar: true
+views:
+  - title: Signal
+    path: home
+    type: panel
+    cards:
+      - type: custom:signal-home
+        immersive: true
+        # Your entity configuration goes here.
+```
+
+Kiosk Mode is optional and separately installed. `immersive: true` only adjusts Signal's viewport layout; it does not hide HA by itself. Use a Kiosk Mode version compatible with your HA version. This setup applies only to the dashboard where you add it—do not use Kiosk Mode's global query-string caching.
+
+The Signal menu's **Open standard Home Assistant** link reloads the same dashboard with `?disable_km`, restoring HA navigation and the editor. Bookmark that recovery URL. Remove the parameter to return to immersive mode. Account/sign-out opens HA's native profile; settings are shown for administrators. Authentication, sessions, permissions, and companion-app onboarding remain entirely with HA. Hiding navigation is not access control.
+
+Device details use touch-friendly bottom sheets on phones and centered dialogs on desktop. Close with the close button, Escape, browser Back, a backdrop tap, or a downward swipe on the heading. Focus stays within the native modal and returns to the trigger. **Advanced in Home Assistant** deliberately opens the native dialog for unsupported capabilities and device administration.
 
 ## Build your own dashboard
 
@@ -125,7 +150,7 @@ accent: lime
 appearance: auto
 ```
 
-Metrics open the native details dialog. Set `max` (and optionally `min`) to add a bounded meter. All standalone cards support `mint`, `lilac`, `apricot`, and `lime` accents and `auto`, `light`, or `dark` appearance. Auto follows the device/browser color preference.
+Metrics open a Signal history sheet. Set `max` (and optionally `min`) to add a bounded meter. All standalone cards support `mint`, `lilac`, `apricot`, and `lime` accents and `auto`, `light`, or `dark` appearance. Auto follows the device/browser color preference.
 
 ![Component collection in dark mode](docs/components-dark.png)
 
@@ -149,6 +174,6 @@ Source lives in `src/`. `src/demo.ts` is excluded from the production bundle. `d
 
 Signal uses the authenticated Home Assistant frontend connection. Home Assistant remains responsible for device authorization and actions. Safety cards are status displays; they do not implement alarm notifications. Device integration behavior and delayed state updates may vary.
 
-The suite covers everyday controls, climate, weather, groceries, safety, and numeric history. Camera walls, room auto-discovery, custom pop-ups, alarm-panel controls, and translations remain future work. Signal styles its own cards, not Home Assistant's settings screens or native dialogs.
+The suite covers everyday controls, climate, weather, groceries, safety, numeric history, and matching device sheets. Camera walls, room auto-discovery, alarm-panel controls, and translations remain future work. Signal styles its own interface, not Home Assistant's settings screens or native advanced dialogs.
 
 [Design notes](DESIGN.md) · [MIT license](LICENSE)

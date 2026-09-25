@@ -3,6 +3,7 @@ import { live } from "lit/directives/live.js";
 import { available, number, words, type Hass } from "./types";
 import { icon } from "./icons";
 import { widgetStyles } from "./widget-styles";
+import "./details";
 
 export interface ControlConfig {
   type: string;
@@ -10,6 +11,7 @@ export interface ControlConfig {
   name?: string;
   accent?: "mint" | "lilac" | "apricot" | "lime";
   appearance?: "auto" | "light" | "dark";
+  detail?: boolean;
 }
 export class SignalControl extends LitElement {
   static properties = {
@@ -19,6 +21,7 @@ export class SignalControl extends LitElement {
     error: { state: true },
     confirmUnlock: { state: true },
     preview: { state: true },
+    detailsOpen: { state: true },
   };
   static styles = [
     widgetStyles,
@@ -287,6 +290,7 @@ export class SignalControl extends LitElement {
   declare hass: Hass;
   private config: ControlConfig = { type: "custom:signal-control", entity: "" };
   private pending = false;
+  private detailsOpen = false;
   private error = "";
   private confirmUnlock = false;
   private preview: Record<string, number> = {};
@@ -331,13 +335,7 @@ export class SignalControl extends LitElement {
     return { columns: 12, min_columns: 9 };
   }
   private more() {
-    this.dispatchEvent(
-      new CustomEvent("hass-more-info", {
-        detail: { entityId: this.config.entity },
-        bubbles: true,
-        composed: true,
-      }),
-    );
+    this.detailsOpen = true;
   }
   private isReady() {
     const entity = this.hass?.states[this.config.entity];
@@ -442,130 +440,142 @@ export class SignalControl extends LitElement {
         .map((n: number) => Math.round(n).toString(16).padStart(2, "0"))
         .join("");
     return html`<article
-      class=${`widget ${this.config.appearance || "auto"} ${this.config.accent || "mint"} ${on ? "on" : ""}`}
-      aria-busy=${this.pending}
-    >
-      <div class="control-top">
-        <div class="entity-icon">${icon(symbol)}</div>
-        ${canToggle ? html`<button class="switch" role="switch" aria-label=${this.config.name || a.friendly_name || this.config.entity} aria-checked=${on} ?disabled=${!ready || this.pending} @click=${() => this.send(`${domain}.${on ? "turn_off" : "turn_on"}`)}><span class="thumb">${icon(on ? "check" : "power")}</span></button>` : html`<button class="icon-button" aria-label="Device details" @click=${this.more}>${icon("arrow")}</button>`}
-      </div>
-      <h2>${this.config.name || a.friendly_name || this.config.entity}</h2>
-      <div class="state-line">
-        <span class="state-dot"></span
-        >${this.pending ? "Updating…" : ready ? words(e.state) : "Unavailable"}
-      </div>
-      ${dimmable ? this.slider("Brightness", "brightness", on ? ((number(a.brightness) ?? 0) / 255) * 100 : 0, 0, 100, 1, "%", (v) => this.send(v === 0 ? "light.turn_off" : "light.turn_on", v ? { brightness_pct: Math.round(v) } : {}), !ready) : nothing}
-      ${domain === "light" && colors.includes("color_temp") && number(a.min_color_temp_kelvin) !== undefined && number(a.max_color_temp_kelvin) !== undefined ? this.slider("Color temperature", "kelvin", number(a.color_temp_kelvin), Number(a.min_color_temp_kelvin), Number(a.max_color_temp_kelvin), 50, " K", (v) => this.send("light.turn_on", { color_temp_kelvin: v }), !ready) : nothing}
-      ${
-        domain === "light" &&
-        colors.some((c: string) =>
-          ["rgb", "rgbw", "rgbww", "hs", "xy"].includes(c),
-        )
-          ? html`<label class="color-control"
-              >Light color<input
-                type="color"
-                aria-label="Light color"
-                .value=${live(hex)}
-                ?disabled=${!ready || this.pending}
-                @change=${(event: Event) => {
-                  const value = (event.target as HTMLInputElement).value;
-                  void this.send("light.turn_on", {
-                    rgb_color: [1, 3, 5].map((i) =>
-                      parseInt(value.slice(i, i + 2), 16),
-                    ),
-                  });
-                }}
-            /></label>`
-          : nothing
-      }
-      ${domain === "fan" && features & 1 ? this.slider("Fan speed", "speed", number(a.percentage), 0, 100, number(a.percentage_step) || 1, "%", (v) => this.send("fan.set_percentage", { percentage: Math.round(v) }), !ready) : nothing}
-      ${
-        cover
-          ? html`<div class="cover-window" aria-hidden="true">
-                <div
-                  class="cover-blind"
-                  style=${`--closed:${100 - (number(a.current_position) ?? (e?.state === "closed" ? 0 : 100))}%`}
-                ></div>
-              </div>
-              <div class="button-row">
-                ${features & 1 ? html`<button class="action" ?disabled=${!ready || this.pending} aria-label="Open cover" @click=${() => this.send("cover.open_cover")}>${icon("up")}</button>` : nothing}${features & 8 ? html`<button class="action secondary" ?disabled=${!ready || this.pending} aria-label="Stop cover" @click=${() => this.send("cover.stop_cover")}>${icon("stop")}</button>` : nothing}${features & 2 ? html`<button class="action" ?disabled=${!ready || this.pending} aria-label="Close cover" @click=${() => this.send("cover.close_cover")}>${icon("down")}</button>` : nothing}
-              </div>
-              ${features & 4 ? this.slider("Cover position", "cover", number(a.current_position), 0, 100, 1, "%", (v) => this.send("cover.set_cover_position", { position: Math.round(v) }), !ready) : nothing}`
-          : nothing
-      }
-      ${
-        media
-          ? html`<div class="media-meta">
-                ${a.entity_picture ? html`<img class="art" src=${a.entity_picture} alt="" loading="lazy" />` : nothing}
-                <div>
-                  <h2 class="track-title" title=${a.media_title || ""}>
-                    ${a.media_title || "Nothing playing"}
-                  </h2>
-                  <span class="subtle"
-                    >${a.media_artist || a.source || ""}</span
-                  >
-                </div>
-              </div>
-              <div class="button-row">
-                ${features & 16 ? html`<button class="action secondary" aria-label="Previous track" ?disabled=${!ready || this.pending} @click=${() => this.send("media_player.media_previous_track")}>${icon("previous")}</button>` : nothing}${features & (1 | 16384) ? html`<button class="action" aria-label=${e?.state === "playing" ? "Pause" : "Play"} ?disabled=${!ready || this.pending || (e?.state === "playing" ? !(features & 1) : !(features & 16384))} @click=${() => this.send(`media_player.${e?.state === "playing" ? "media_pause" : "media_play"}`)}>${icon(e?.state === "playing" ? "pause" : "play")}</button>` : nothing}${features & 32 ? html`<button class="action secondary" aria-label="Next track" ?disabled=${!ready || this.pending} @click=${() => this.send("media_player.media_next_track")}>${icon("next")}</button>` : nothing}
-              </div>
-              ${features & 4 ? this.slider("Volume", "volume", number(a.volume_level) === undefined ? undefined : Number(a.volume_level) * 100, 0, 100, 1, "%", (v) => this.send("media_player.volume_set", { volume_level: v / 100 }), !ready) : nothing}`
-          : nothing
-      }
-      ${["number", "input_number"].includes(domain) ? this.slider("Value", "number", number(e?.state), number(a.min) ?? 0, number(a.max) ?? 100, number(a.step) || 1, a.unit_of_measurement || "", (v) => this.send(`${domain}.set_value`, { value: v }), !ready) : nothing}
-      ${
-        ["select", "input_select"].includes(domain)
-          ? html`<select
-              class="select"
-              aria-label=${this.config.name || a.friendly_name || "Option"}
-              .value=${live(e?.state || "")}
-              ?disabled=${!ready || this.pending}
-              @change=${(event: Event) => this.send(`${domain}.select_option`, { option: (event.target as HTMLSelectElement).value })}
-            >
-              ${(a.options || []).map((option: string) => html`<option value=${option} .selected=${live(e?.state === option)}>${option}</option>`)}
-            </select>`
-          : nothing
-      }
-      ${["scene", "button", "input_button", "script"].includes(domain) ? html`<div class="button-row"><button class="action" ?disabled=${!ready || this.pending} @click=${() => this.send(`${domain}.${domain.includes("button") ? "press" : "turn_on"}`)}>${icon("play")} ${domain.includes("button") ? "Press" : domain === "scene" ? "Activate" : "Run"}</button></div>` : nothing}
-      ${
-        domain === "lock"
-          ? html`<div class="button-row">
-                <button
-                  class="action"
-                  ?disabled=${!ready || this.pending}
-                  @click=${() => (e.state === "locked" ? (this.confirmUnlock = true) : this.send("lock.lock"))}
+        class=${`widget ${this.config.appearance || "auto"} ${this.config.accent || "mint"} ${on ? "on" : ""}`}
+        aria-busy=${this.pending}
+      >
+        <div class="control-top">
+          ${
+            this.config.detail
+              ? html`<span class="entity-icon">${icon(symbol)}</span>`
+              : html`<button
+                  class="entity-icon"
+                  aria-label="Device details"
+                  @click=${this.more}
                 >
-                  ${icon("lock")} ${e?.state === "locked" ? "Unlock…" : "Lock"}
-                </button>
-              </div>
-              ${
-                this.confirmUnlock
-                  ? html`<div class="lock-confirm">
-                      <p>
-                        Unlock
-                        ${this.config.name || a.friendly_name || "this lock"}?
-                      </p>
-                      <div class="button-row">
-                        <button
-                          class="action secondary"
-                          @click=${() => (this.confirmUnlock = false)}
-                        >
-                          Cancel</button
-                        ><button
-                          class="action"
-                          ?disabled=${this.pending}
-                          @click=${() => this.send("lock.unlock")}
-                        >
+                  ${icon(symbol)}
+                </button>`
+          }
+          ${canToggle ? html`<button class="switch" role="switch" aria-label=${this.config.name || a.friendly_name || this.config.entity} aria-checked=${on} ?disabled=${!ready || this.pending} @click=${() => this.send(`${domain}.${on ? "turn_off" : "turn_on"}`)}><span class="thumb">${icon(on ? "check" : "power")}</span></button>` : !this.config.detail ? html`<button class="icon-button" aria-label="Open full controls" @click=${this.more}>${icon("arrow")}</button>` : nothing}
+        </div>
+        <h2>${this.config.name || a.friendly_name || this.config.entity}</h2>
+        <div class="state-line">
+          <span class="state-dot"></span
+          >${this.pending ? "Updating…" : ready ? words(e.state) : "Unavailable"}
+        </div>
+        ${dimmable ? this.slider("Brightness", "brightness", on ? ((number(a.brightness) ?? 0) / 255) * 100 : 0, 0, 100, 1, "%", (v) => this.send(v === 0 ? "light.turn_off" : "light.turn_on", v ? { brightness_pct: Math.round(v) } : {}), !ready) : nothing}
+        ${domain === "light" && colors.includes("color_temp") && number(a.min_color_temp_kelvin) !== undefined && number(a.max_color_temp_kelvin) !== undefined ? this.slider("Color temperature", "kelvin", number(a.color_temp_kelvin), Number(a.min_color_temp_kelvin), Number(a.max_color_temp_kelvin), 50, " K", (v) => this.send("light.turn_on", { color_temp_kelvin: v }), !ready) : nothing}
+        ${
+          domain === "light" &&
+          colors.some((c: string) =>
+            ["rgb", "rgbw", "rgbww", "hs", "xy"].includes(c),
+          )
+            ? html`<label class="color-control"
+                >Light color<input
+                  type="color"
+                  aria-label="Light color"
+                  .value=${live(hex)}
+                  ?disabled=${!ready || this.pending}
+                  @change=${(event: Event) => {
+                    const value = (event.target as HTMLInputElement).value;
+                    void this.send("light.turn_on", {
+                      rgb_color: [1, 3, 5].map((i) =>
+                        parseInt(value.slice(i, i + 2), 16),
+                      ),
+                    });
+                  }}
+              /></label>`
+            : nothing
+        }
+        ${domain === "fan" && features & 1 ? this.slider("Fan speed", "speed", number(a.percentage), 0, 100, number(a.percentage_step) || 1, "%", (v) => this.send("fan.set_percentage", { percentage: Math.round(v) }), !ready) : nothing}
+        ${
+          cover
+            ? html`<div class="cover-window" aria-hidden="true">
+                  <div
+                    class="cover-blind"
+                    style=${`--closed:${100 - (number(a.current_position) ?? (e?.state === "closed" ? 0 : 100))}%`}
+                  ></div>
+                </div>
+                <div class="button-row">
+                  ${features & 1 ? html`<button class="action" ?disabled=${!ready || this.pending} aria-label="Open cover" @click=${() => this.send("cover.open_cover")}>${icon("up")}</button>` : nothing}${features & 8 ? html`<button class="action secondary" ?disabled=${!ready || this.pending} aria-label="Stop cover" @click=${() => this.send("cover.stop_cover")}>${icon("stop")}</button>` : nothing}${features & 2 ? html`<button class="action" ?disabled=${!ready || this.pending} aria-label="Close cover" @click=${() => this.send("cover.close_cover")}>${icon("down")}</button>` : nothing}
+                </div>
+                ${features & 4 ? this.slider("Cover position", "cover", number(a.current_position), 0, 100, 1, "%", (v) => this.send("cover.set_cover_position", { position: Math.round(v) }), !ready) : nothing}`
+            : nothing
+        }
+        ${
+          media
+            ? html`<div class="media-meta">
+                  ${a.entity_picture ? html`<img class="art" src=${a.entity_picture} alt="" loading="lazy" />` : nothing}
+                  <div>
+                    <h2 class="track-title" title=${a.media_title || ""}>
+                      ${a.media_title || "Nothing playing"}
+                    </h2>
+                    <span class="subtle"
+                      >${a.media_artist || a.source || ""}</span
+                    >
+                  </div>
+                </div>
+                <div class="button-row">
+                  ${features & 16 ? html`<button class="action secondary" aria-label="Previous track" ?disabled=${!ready || this.pending} @click=${() => this.send("media_player.media_previous_track")}>${icon("previous")}</button>` : nothing}${features & (1 | 16384) ? html`<button class="action" aria-label=${e?.state === "playing" ? "Pause" : "Play"} ?disabled=${!ready || this.pending || (e?.state === "playing" ? !(features & 1) : !(features & 16384))} @click=${() => this.send(`media_player.${e?.state === "playing" ? "media_pause" : "media_play"}`)}>${icon(e?.state === "playing" ? "pause" : "play")}</button>` : nothing}${features & 32 ? html`<button class="action secondary" aria-label="Next track" ?disabled=${!ready || this.pending} @click=${() => this.send("media_player.media_next_track")}>${icon("next")}</button>` : nothing}
+                </div>
+                ${features & 4 ? this.slider("Volume", "volume", number(a.volume_level) === undefined ? undefined : Number(a.volume_level) * 100, 0, 100, 1, "%", (v) => this.send("media_player.volume_set", { volume_level: v / 100 }), !ready) : nothing}`
+            : nothing
+        }
+        ${["number", "input_number"].includes(domain) ? this.slider("Value", "number", number(e?.state), number(a.min) ?? 0, number(a.max) ?? 100, number(a.step) || 1, a.unit_of_measurement || "", (v) => this.send(`${domain}.set_value`, { value: v }), !ready) : nothing}
+        ${
+          ["select", "input_select"].includes(domain)
+            ? html`<select
+                class="select"
+                aria-label=${this.config.name || a.friendly_name || "Option"}
+                .value=${live(e?.state || "")}
+                ?disabled=${!ready || this.pending}
+                @change=${(event: Event) => this.send(`${domain}.select_option`, { option: (event.target as HTMLSelectElement).value })}
+              >
+                ${(a.options || []).map((option: string) => html`<option value=${option} .selected=${live(e?.state === option)}>${option}</option>`)}
+              </select>`
+            : nothing
+        }
+        ${["scene", "button", "input_button", "script"].includes(domain) ? html`<div class="button-row"><button class="action" ?disabled=${!ready || this.pending} @click=${() => this.send(`${domain}.${domain.includes("button") ? "press" : "turn_on"}`)}>${icon("play")} ${domain.includes("button") ? "Press" : domain === "scene" ? "Activate" : "Run"}</button></div>` : nothing}
+        ${
+          domain === "lock"
+            ? html`<div class="button-row">
+                  <button
+                    class="action"
+                    ?disabled=${!ready || this.pending}
+                    @click=${() => (e.state === "locked" ? (this.confirmUnlock = true) : this.send("lock.lock"))}
+                  >
+                    ${icon("lock")}
+                    ${e?.state === "locked" ? "Unlock…" : "Lock"}
+                  </button>
+                </div>
+                ${
+                  this.confirmUnlock
+                    ? html`<div class="lock-confirm">
+                        <p>
                           Unlock
-                        </button>
-                      </div>
-                    </div>`
-                  : nothing
-              }`
-          : nothing
-      }
-      ${this.error ? html`<p class="error" role="alert">${this.error}</p>` : nothing}
-    </article>`;
+                          ${this.config.name || a.friendly_name || "this lock"}?
+                        </p>
+                        <div class="button-row">
+                          <button
+                            class="action secondary"
+                            @click=${() => (this.confirmUnlock = false)}
+                          >
+                            Cancel</button
+                          ><button
+                            class="action"
+                            ?disabled=${this.pending}
+                            @click=${() => this.send("lock.unlock")}
+                          >
+                            Unlock
+                          </button>
+                        </div>
+                      </div>`
+                    : nothing
+                }`
+            : nothing
+        }
+        ${this.error ? html`<p class="error" role="alert">${this.error}</p>` : nothing}
+      </article>
+      ${!this.config.detail ? html`<signal-details .hass=${this.hass} .entity=${this.detailsOpen ? this.config.entity : ""} .name=${this.config.name || ""} .dark=${this.config.appearance === "dark" || (this.config.appearance !== "light" && matchMedia("(prefers-color-scheme: dark)").matches)} @signal-close=${() => (this.detailsOpen = false)}></signal-details>` : nothing}`;
   }
 }
 customElements.define("signal-control", SignalControl);

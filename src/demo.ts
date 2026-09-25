@@ -55,7 +55,7 @@ const update = () => {
 };
 const hass: Hass = {
   states,
-  user: { name: "Alex" },
+  user: { name: "Alex", is_admin: true },
   locale: { language: "en" },
   config: { unit_system: { temperature: "°F" } },
   async callService(domain, service, data) {
@@ -96,6 +96,25 @@ const hass: Hass = {
   async callWS<T>(message: Record<string, unknown>): Promise<T> {
     calls.push(message);
     if ((window as any).demo.fail) throw new Error("Simulated offline");
+    if (message.domain === "weather")
+      return {
+        response: {
+          "weather.demo": {
+            forecast: Array.from({ length: 5 }, (_, i) => ({
+              datetime: new Date(Date.now() + i * 86400000).toISOString(),
+              condition: i % 2 ? "partlycloudy" : "sunny",
+              temperature: 72 + i,
+              templow: 58 + i,
+            })),
+          },
+        },
+      } as T;
+    if (message.type === "history/history_during_period")
+      return {
+        [(message.entity_ids as string[])[0]]: [
+          { s: "off", lu: Date.now() / 1000 - 86400 },
+        ],
+      } as T;
     return { response: { "todo.demo": { items } } } as T;
   },
 };

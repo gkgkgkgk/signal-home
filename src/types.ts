@@ -5,7 +5,7 @@ export interface Entity {
 }
 export interface Hass {
   states: Record<string, Entity>;
-  user?: { name: string };
+  user?: { name: string; is_admin?: boolean };
   locale?: { language: string };
   config?: { unit_system?: { temperature?: string } };
   callService(
@@ -32,6 +32,7 @@ export interface Config {
   favorites?: string[];
   graphs?: (string | { entity: string; name?: string; hours?: number })[];
   appearance?: "light" | "dark" | "auto";
+  immersive?: boolean;
 }
 export interface Todo {
   uid: string;

@@ -2,6 +2,7 @@ import { LitElement, html, css } from "lit";
 import { available, number, words, type Hass } from "./types";
 import { widgetStyles } from "./widget-styles";
 import { icon } from "./icons";
+import "./details";
 interface MetricConfig {
   type: string;
   entity: string;
@@ -12,7 +13,11 @@ interface MetricConfig {
   max?: number;
 }
 export class SignalMetric extends LitElement {
-  static properties = { hass: { attribute: false }, config: { state: true } };
+  static properties = {
+    hass: { attribute: false },
+    config: { state: true },
+    detailsOpen: { state: true },
+  };
   static styles = [
     widgetStyles,
     css`
@@ -69,6 +74,7 @@ export class SignalMetric extends LitElement {
     `,
   ];
   declare hass: Hass;
+  private detailsOpen = false;
   private config: MetricConfig = { type: "custom:signal-metric", entity: "" };
   setConfig(c: MetricConfig) {
     if (!c.entity) throw new Error("Choose an entity.");
@@ -108,13 +114,7 @@ export class SignalMetric extends LitElement {
     return { columns: 6, min_columns: 6 };
   }
   private more() {
-    this.dispatchEvent(
-      new CustomEvent("hass-more-info", {
-        detail: { entityId: this.config.entity },
-        bubbles: true,
-        composed: true,
-      }),
-    );
+    this.detailsOpen = true;
   }
   render() {
     const e = this.hass?.states[this.config.entity];
@@ -133,33 +133,40 @@ export class SignalMetric extends LitElement {
             ),
           );
     return html`<div
-      class=${`widget ${this.config.appearance || "auto"} ${this.config.accent || "lime"}`}
-      role="button"
-      tabindex="0"
-      @click=${this.more}
-      @keydown=${(event: KeyboardEvent) => {
-        if (["Enter", " "].includes(event.key)) {
-          event.preventDefault();
-          this.more();
-        }
-      }}
-    >
-      <div class="top">
-        <h2>
-          ${this.config.name || e?.attributes.friendly_name || this.config.entity}
-        </h2>
-        <span class="symbol"
-          >${icon(e?.attributes.device_class === "humidity" ? "drop" : e?.attributes.device_class === "temperature" ? "climate" : "graph")}</span
-        >
+        class=${`widget ${this.config.appearance || "auto"} ${this.config.accent || "lime"}`}
+        role="button"
+        tabindex="0"
+        @click=${this.more}
+        @keydown=${(event: KeyboardEvent) => {
+          if (["Enter", " "].includes(event.key)) {
+            event.preventDefault();
+            this.more();
+          }
+        }}
+      >
+        <div class="top">
+          <h2>
+            ${this.config.name || e?.attributes.friendly_name || this.config.entity}
+          </h2>
+          <span class="symbol"
+            >${icon(e?.attributes.device_class === "humidity" ? "drop" : e?.attributes.device_class === "temperature" ? "climate" : "graph")}</span
+          >
+        </div>
+        <div class="metric numeric">
+          ${!ready ? "—" : numeric === undefined ? words(e.state) : new Intl.NumberFormat(this.hass?.locale?.language || undefined, { maximumFractionDigits: 1 }).format(numeric)}<small>
+            ${e?.attributes.unit_of_measurement || ""}</small
+          >
+        </div>
+        <span class="subtle">${ready ? "Tap for details" : "Unavailable"}</span
+        >${this.config.max !== undefined ? html`<div class="meter" aria-hidden="true"><span style=${`width:${percent}%`}></span></div>` : ""}
       </div>
-      <div class="metric numeric">
-        ${!ready ? "—" : numeric === undefined ? words(e.state) : new Intl.NumberFormat(this.hass?.locale?.language || undefined, { maximumFractionDigits: 1 }).format(numeric)}<small>
-          ${e?.attributes.unit_of_measurement || ""}</small
-        >
-      </div>
-      <span class="subtle">${ready ? "Tap for details" : "Unavailable"}</span
-      >${this.config.max !== undefined ? html`<div class="meter" aria-hidden="true"><span style=${`width:${percent}%`}></span></div>` : ""}
-    </div>`;
+      <signal-details
+        .hass=${this.hass}
+        .entity=${this.detailsOpen ? this.config.entity : ""}
+        .name=${this.config.name || ""}
+        .dark=${this.config.appearance === "dark" || (this.config.appearance !== "light" && matchMedia("(prefers-color-scheme: dark)").matches)}
+        @signal-close=${() => (this.detailsOpen = false)}
+      ></signal-details>`;
   }
 }
 customElements.define("signal-metric", SignalMetric);
