@@ -20,7 +20,9 @@ Signal is a self-contained Lovelace card with Overview, Climate, Safety, and Lis
 - Light, dark, and system appearance; quick toggle saved per browser.
 - Animated climate dial, single target and dual heating/cooling limits, capability-aware mode selection.
 - Live weather, grocery list with add/check-off, and named safety sensors with optional battery readings.
-- Optional light, switch, fan, scene, and other entity shortcuts.
+- Tactile switches, brightness/color/temperature sliders, fans, animated blinds, media transport/volume, scenes, selectors, number controls, and confirmed unlocking.
+- Recorded-history graphs with 6h/24h/7d views, pointer/keyboard inspection, and honest gaps when sensors go unavailable.
+- Standalone control, graph, and metric cards with visual editors, usable in ordinary HA dashboards.
 - Native Home Assistant more-info dialogs for history and detailed controls.
 - Visual entity editor and YAML configuration.
 - Reduced-motion support, labeled controls, keyboard focus, and layouts tested down to 360 pixels.
@@ -63,25 +65,69 @@ views:
         favorites:
           - light.reading_lamp
           - scene.evening
+        graphs:
+          - entity: sensor.home_temperature
+            name: Temperature
+          - sensor.home_humidity
 ```
 
 Replace entity IDs with your own. Every entity field is optional; unconfigured components show setup guidance. An unavailable sensor is explicitly marked unavailable, never reported as safe.
 
-| Option       | Meaning                                                                                        |
-| ------------ | ---------------------------------------------------------------------------------------------- |
-| `title`      | Home name, default `Home`                                                                      |
-| `greeting`   | Optional fixed greeting; otherwise follows the time of day                                     |
-| `appearance` | `auto` (default), `light`, or `dark`                                                           |
-| `climate`    | Climate entity                                                                                 |
-| `weather`    | Weather entity                                                                                 |
-| `todo`       | To-do entity supporting get/add/update items                                                   |
-| `humidity`   | Optional humidity sensor; otherwise uses climate humidity                                      |
-| `sensors`    | Binary sensor IDs, or objects with `entity`, `name`, and `battery`                             |
-| `favorites`  | Entity IDs; lights/switches/fans/input booleans toggle, scenes activate, others open more-info |
+| Option       | Meaning                                                                                    |
+| ------------ | ------------------------------------------------------------------------------------------ |
+| `title`      | Home name, default `Home`                                                                  |
+| `greeting`   | Optional fixed greeting; otherwise follows the time of day                                 |
+| `appearance` | `auto` (default), `light`, or `dark`                                                       |
+| `climate`    | Climate entity                                                                             |
+| `weather`    | Weather entity                                                                             |
+| `todo`       | To-do entity supporting get/add/update items                                               |
+| `humidity`   | Optional humidity sensor; otherwise uses climate humidity                                  |
+| `sensors`    | Binary sensor IDs, or objects with `entity`, `name`, and `battery`                         |
+| `favorites`  | Entity IDs rendered as capability-aware control cards                                      |
+| `graphs`     | Numeric sensor IDs or objects with `entity`, `name`, and `hours` (1–168); shown on Climate |
 
 The appearance button stores a preference locally. **Reset appearance** restores the configured setting. This doesn't change the appearance of other Home Assistant dashboards.
 
 The card works in Sections, but its complete navigation and layout are designed for a Panel view. Keep the standard HA header available for settings and editing; kiosk mode is optional and isn't required.
+
+## Build your own dashboard
+
+All four cards are registered in Home Assistant's card picker. Use `custom:signal-home` for the full dashboard or mix these standalone cards into a Sections view:
+
+```yaml
+type: custom:signal-control
+entity: light.reading_lamp
+name: Reading nook
+accent: mint
+appearance: auto
+```
+
+`signal-control` supports lights, switches, fans, input booleans, covers, media players, scenes, scripts, buttons, input buttons, numbers, input numbers, selects, input selects, and locks. Unsupported entities retain a details button. Controls follow advertised device capabilities. Sliders preview while dragging and send on release; service errors remain visible. Unlocking needs confirmation; locks requiring a PIN should use native details.
+
+```yaml
+type: custom:signal-graph
+entity: sensor.home_temperature
+name: Room temperature
+hours: 24
+accent: lilac
+appearance: auto
+```
+
+Graphs read Recorder history, not invented values. The configured entity must have numeric recorded history. Raw-history retention determines what is available; this card does not request long-term statistics. Dense histories are reduced for drawing while low/high values use the complete response. Graphs refresh once a minute while the page is visible.
+
+```yaml
+type: custom:signal-metric
+entity: sensor.home_humidity
+name: Humidity
+min: 0
+max: 100
+accent: lime
+appearance: auto
+```
+
+Metrics open the native details dialog. Set `max` (and optionally `min`) to add a bounded meter. All standalone cards support `mint`, `lilac`, `apricot`, and `lime` accents and `auto`, `light`, or `dark` appearance. Auto follows the device/browser color preference.
+
+![Component collection in dark mode](docs/components-dark.png)
 
 ## Development
 
@@ -95,14 +141,14 @@ npx playwright install chromium
 npm test
 ```
 
-`npm run dev` opens an interactive demo with sample entities. Demo interactions never connect to a real home. Set `CHROMIUM_PATH` to use an existing browser. Tests cover climate service payloads and bounds, unavailable states, error handling, groceries, dark-mode persistence, and responsive/reduced-motion behavior.
+`npm run dev` opens an interactive demo with sample entities; `/components.html` is the component playground. Demo interactions never connect to a real home. Set `CHROMIUM_PATH` to use an existing browser. Tests cover climate service payloads and bounds, controls, release-only slider commands, lock confirmation, recorded-history parsing/gaps/cursors, unavailable states, error handling, groceries, dark-mode persistence, and responsive/reduced-motion behavior.
 
 Source lives in `src/`. `src/demo.ts` is excluded from the production bundle. `dist/signal-home.js` is the HACS artifact. Update the package version, build, commit source plus `dist`, then create a GitHub release with the matching tag. The release workflow rebuilds and attaches the bundle.
 
-## Scope of the first release
+## Scope
 
 Signal uses the authenticated Home Assistant frontend connection. Home Assistant remains responsible for device authorization and actions. Safety cards are status displays; they do not implement alarm notifications. Device integration behavior and delayed state updates may vary.
 
-This first release focuses on climate, weather, groceries, safety, and shortcuts. Camera walls, room auto-discovery, custom pop-ups, translations, and history charts are future work.
+The suite covers everyday controls, climate, weather, groceries, safety, and numeric history. Camera walls, room auto-discovery, custom pop-ups, alarm-panel controls, and translations remain future work. Signal styles its own cards, not Home Assistant's settings screens or native dialogs.
 
 [Design notes](DESIGN.md) · [MIT license](LICENSE)

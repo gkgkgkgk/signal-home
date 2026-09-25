@@ -83,6 +83,17 @@ export class SignalEditor extends LitElement {
         @value-changed=${(event: CustomEvent) => this.change({ ...this.config, ...event.detail.value })}
       ></ha-form>
       <details>
+        <summary>History graphs</summary>
+        <p>Add numeric sensor histories to the Climate view.</p>
+        <ha-form
+          .hass=${this.hass}
+          .data=${{ graph_entities: (this.config.graphs || []).map((g) => (typeof g === "string" ? g : g.entity)) }}
+          .schema=${[{ name: "graph_entities", selector: { entity: { domain: "sensor", multiple: true } } }]}
+          .computeLabel=${() => "History sensors"}
+          @value-changed=${(event: CustomEvent) => this.change({ ...this.config, graphs: (event.detail.value.graph_entities || []).map((id: string) => (this.config.graphs || []).find((g) => (typeof g === "string" ? g : g.entity) === id) || id) })}
+        ></ha-form>
+      </details>
+      <details>
         <summary>Safety sensors</summary>
         <p>
           Add entity IDs using the selector. Optional display names and battery

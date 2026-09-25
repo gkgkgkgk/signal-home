@@ -13,6 +13,9 @@ import {
   type Todo,
 } from "./types";
 import "./editor";
+import "./control";
+import "./graph";
+import "./metric";
 
 const tabs = [
   { id: "home", name: "Overview", icon: "home" },
@@ -121,6 +124,23 @@ export class SignalHome extends LitElement {
         config.favorites.some((s) => typeof s !== "string"))
     )
       throw new Error("Favorites must be entity IDs.");
+    if (
+      config.graphs &&
+      (!Array.isArray(config.graphs) ||
+        config.graphs.some(
+          (entry) =>
+            !entry ||
+            (typeof entry !== "string" &&
+              (typeof entry.entity !== "string" ||
+                (entry.hours !== undefined &&
+                  (!Number.isFinite(entry.hours) ||
+                    entry.hours < 1 ||
+                    entry.hours > 168)))),
+        ))
+    )
+      throw new Error(
+        "Graphs need an entity ID and optional hours between 1 and 168.",
+      );
     this.config = { ...config };
     this.todoSignature = "";
     this.todoSequence++;
@@ -615,46 +635,49 @@ export class SignalHome extends LitElement {
       </div>
       <div class="favorites">
         ${this.config.favorites.map((id) => {
-          const e = this.state(id);
-          const domain = id.split(".")[0];
-          const isOn = e?.state === "on";
-          const canToggle = [
-            "light",
-            "switch",
-            "fan",
-            "input_boolean",
-          ].includes(domain);
-          return html`<button
-            class=${`favorite ${isOn ? "on" : ""}`}
-            ?disabled=${!available(e) || this.busy}
-            @click=${() => (canToggle ? this.service(domain, "toggle", { entity_id: id }) : domain === "scene" ? this.service("scene", "turn_on", { entity_id: id }) : this.moreInfo(id))}
-          >
-            ${icon(domain === "light" ? "bulb" : "power")}<strong
-              >${e?.attributes.friendly_name || id}</strong
-            ><small>${available(e) ? words(e.state) : "Unavailable"}</small>
-          </button>`;
+          return html`<signal-control
+            .hass=${this.hass}
+            .configuration=${{ type: "custom:signal-control", entity: id, appearance: this.dark ? "dark" : "light" }}
+          ></signal-control>`;
+        })}
+      </div>`;
+  }
+  private graphs() {
+    if (!this.config.graphs?.length) return nothing;
+    return html`<div class="section-top">
+        <h2>The bigger picture</h2>
+        <small>Explore your history.</small>
+      </div>
+      <div class="grid">
+        ${this.config.graphs.map((entry, index) => {
+          const graph = typeof entry === "string" ? { entity: entry } : entry;
+          return html`<signal-graph
+            .hass=${this.hass}
+            .configuration=${{ ...graph, type: "custom:signal-graph", accent: index % 2 ? "mint" : "lilac", appearance: this.dark ? "dark" : "light" }}
+          ></signal-graph>`;
         })}
       </div>`;
   }
   private content() {
     if (this.tab === "climate")
       return html`<div class="grid detail-grid">
-        ${this.climate()}
-        <div class="stack">
-          ${this.weather()}
-          <section class="panel lime">
-            <div class="panel-label">${icon("drop")} Inside humidity</div>
-            <div class="metric">
-              ${this.format(this.state(this.config.humidity)?.state ?? this.state(this.config.climate)?.attributes.current_humidity)}<small
-                >%</small
-              >
-            </div>
-            <p class="intro" style="color:inherit">
-              A little perspective on your home’s comfort.
-            </p>
-          </section>
+          ${this.climate()}
+          <div class="stack">
+            ${this.weather()}
+            <section class="panel lime">
+              <div class="panel-label">${icon("drop")} Inside humidity</div>
+              <div class="metric">
+                ${this.format(this.state(this.config.humidity)?.state ?? this.state(this.config.climate)?.attributes.current_humidity)}<small
+                  >%</small
+                >
+              </div>
+              <p class="intro" style="color:inherit">
+                A little perspective on your home’s comfort.
+              </p>
+            </section>
+          </div>
         </div>
-      </div>`;
+        ${this.graphs()}`;
     if (this.tab === "safety")
       return html`${this.safety()}
         <div class="notice" style="margin-top:20px">
@@ -769,3 +792,28 @@ registry.customCards.push({
   preview: true,
   documentationURL: "https://github.com/gkgkgkgk/signal-home",
 });
+registry.customCards.push(
+  {
+    type: "signal-control",
+    name: "Signal Control",
+    description:
+      "Tactile switches, dimmers, media, covers, fans, scenes, locks, and numeric/select controls.",
+    preview: true,
+    documentationURL: "https://github.com/gkgkgkgk/signal-home",
+  },
+  {
+    type: "signal-graph",
+    name: "Signal Graph",
+    description:
+      "Interactive recorded history with a cursor, time ranges, and honest data gaps.",
+    preview: true,
+    documentationURL: "https://github.com/gkgkgkgk/signal-home",
+  },
+  {
+    type: "signal-metric",
+    name: "Signal Metric",
+    description: "A bold sensor readout with an optional range meter.",
+    preview: true,
+    documentationURL: "https://github.com/gkgkgkgk/signal-home",
+  },
+);

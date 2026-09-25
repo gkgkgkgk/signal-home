@@ -1,5 +1,17 @@
 import { svg } from "lit";
 const paths: Record<string, string> = {
+  music:
+    "M9 18V5l12-3v13M9 7l12-3M9 18a3 3 0 1 1-3-3c1.5 0 3 1 3 3ZM21 15a3 3 0 1 1-3-3c1.5 0 3 1 3 3Z",
+  cover: "M4 3h16v18H4ZM4 7h16M4 11h16M4 15h16",
+  lock: "M7 10V7a5 5 0 0 1 10 0v3M5 10h14v11H5ZM12 14v3",
+  up: "m6 15 6-6 6 6",
+  down: "m6 9 6 6 6-6",
+  stop: "M6 6h12v12H6Z",
+  play: "m8 4 12 8-12 8Z",
+  pause: "M8 4v16M16 4v16",
+  previous: "M5 4v16M19 4 7 12l12 8Z",
+  next: "M19 4v16M5 4l12 8-12 8Z",
+  graph: "M3 3v18h18M5 16l5-6 4 3 6-8",
   home: "m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1Z",
   climate: "M9 14.5V5a3 3 0 0 1 6 0v9.5a5 5 0 1 1-6 0ZM12 9v9",
   shield: "M12 3 3 7v5c0 5 9 9 9 9s9-4 9-9V7ZM8 12l3 3 5-6",

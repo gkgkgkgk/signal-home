@@ -30,6 +30,7 @@ export interface Config {
   humidity?: string;
   sensors?: (string | SensorConfig)[];
   favorites?: string[];
+  graphs?: (string | { entity: string; name?: string; hours?: number })[];
   appearance?: "light" | "dark" | "auto";
 }
 export interface Todo {

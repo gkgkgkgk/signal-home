@@ -656,7 +656,7 @@ export const styles = css`
   }
   .favorites {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
     gap: 14px;
   }
   .favorite {
