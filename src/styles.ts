@@ -304,9 +304,9 @@ export const styles = css`
   }
   .panel .icon-button {
     border-color: currentColor;
-    width: 34px;
-    height: 34px;
-    padding: 7px;
+    width: 44px;
+    height: 44px;
+    padding: 11px;
     opacity: 0.8;
   }
   .panel .icon-button:hover {
@@ -411,6 +411,7 @@ export const styles = css`
     height: 16px;
   }
   select {
+    min-height: 44px;
     border: 1px solid currentColor;
     background: transparent;
     color: inherit;
@@ -877,7 +878,20 @@ export const styles = css`
       flex-direction: row;
       gap: 2px;
     }
+    .nav-indicator {
+      position: absolute;
+      top: 7px;
+      bottom: 7px;
+      left: 7px;
+      width: calc((100% - 20px) / 4);
+      background: var(--mint);
+      border-radius: 20px;
+      transform: translateX(calc(var(--active) * (100% + 2px)));
+      transition: transform 420ms cubic-bezier(0.22, 1.15, 0.36, 1);
+      pointer-events: none;
+    }
     .bottom-nav button {
+      position: relative;
       flex: 1;
       padding: 10px 2px;
       border-radius: 20px;
@@ -888,7 +902,7 @@ export const styles = css`
       color: inherit;
     }
     .bottom-nav button[aria-current="page"] {
-      background: var(--mint);
+      background: transparent;
       color: #233c2e;
     }
     .bottom-nav button:not([aria-current="page"]):hover {
@@ -972,7 +986,7 @@ export const styles = css`
     }
     .climate .range-tabs button {
       padding: 8px;
-      min-height: 40px;
+      min-height: 44px;
     }
     .climate .climate-foot {
       grid-column: 1/-1;

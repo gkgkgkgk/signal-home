@@ -289,8 +289,10 @@ export class SignalHome extends LitElement {
   private nav(bottom = false) {
     return html`<nav
       class=${bottom ? "bottom-nav" : ""}
+      style=${`--active: ${tabs.findIndex((t) => t.id === this.tab)}`}
       aria-label=${bottom ? "Mobile navigation" : "Dashboard navigation"}
     >
+      ${bottom ? html`<span class="nav-indicator" aria-hidden="true"></span>` : nothing}
       ${tabs.map((t) => html`<button aria-current=${this.tab === t.id ? "page" : nothing} @click=${() => this.navigate(t.id)}>${icon(t.icon)}<span>${t.name}</span></button>`)}
     </nav>`;
   }
@@ -311,7 +313,7 @@ export class SignalHome extends LitElement {
         : unknown
           ? `${unknown} sensor${unknown > 1 ? "s" : ""} unavailable`
           : all.length
-            ? "Water sensors clear"
+            ? "Sensors clear"
             : "Make yourself at home",
     };
   }
