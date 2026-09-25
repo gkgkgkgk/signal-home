@@ -1,0 +1,22 @@
+import { svg } from "lit";
+const paths: Record<string, string> = {
+  home: "m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1Z",
+  climate: "M9 14.5V5a3 3 0 0 1 6 0v9.5a5 5 0 1 1-6 0ZM12 9v9",
+  shield: "M12 3 3 7v5c0 5 9 9 9 9s9-4 9-9V7ZM8 12l3 3 5-6",
+  list: "M9 6h12M9 12h12M9 18h12M3 6h1M3 12h1M3 18h1",
+  arrow: "M5 12h14m-6-6 6 6-6 6",
+  sun: "M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5 19 19M5 19l1.5-1.5M17.5 6.5 19 5M16 12a4 4 0 1 1-8 0 4 4 0 0 1 8 0",
+  moon: "M20 14a9 9 0 0 1-10-10A9 9 0 1 0 20 14Z",
+  plus: "M12 5v14M5 12h14",
+  minus: "M5 12h14",
+  check: "m5 12 4 4L19 6",
+  drop: "M12 2S5 10 5 15a7 7 0 0 0 14 0c0-5-7-13-7-13Z",
+  close: "m6 6 12 12M6 18 18 6",
+  power: "M12 2v10M6 5a9 9 0 1 0 12 0",
+  bulb: "M9 18h6M9 21h6M8 15a7 7 0 1 1 8 0l-1 3H9Z",
+  settings: "M4 7h16M4 17h16M8 4v6M16 14v6",
+  wind: "M3 8h13a3 3 0 1 0-3-3M3 12h16a3 3 0 1 1-3 3M3 16h6a3 3 0 1 1-3 3",
+  warn: "m12 3 10 18H2ZM12 9v5M12 17v.5",
+};
+export const icon = (name: string) =>
+  svg`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d=${paths[name] || paths.home}></path></svg>`;

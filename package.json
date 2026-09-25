@@ -1,0 +1,21 @@
+{
+  "name": "signal-home",
+  "version": "0.1.0",
+  "description": "A colorful, fluid Home Assistant dashboard. Solid surfaces. Clear signals.",
+  "type": "module",
+  "license": "MIT",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "build": "tsc --noEmit && vite build",
+    "test": "playwright test"
+  },
+  "dependencies": {
+    "lit": "^3.3.1"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.55.0",
+    "prettier": "^3.9.9",
+    "typescript": "^5.9.2",
+    "vite": "^7.1.7"
+  }
+}
