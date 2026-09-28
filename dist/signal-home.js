@@ -35,10 +35,10 @@ const zt = (a) => new xt(typeof a == "string" ? a : a + "", void 0, tt), C = (a,
   for (const i of t.cssRules) e += i.cssText;
   return zt(e);
 })(a) : a;
-const { is: Ot, defineProperty: Rt, getOwnPropertyDescriptor: Ht, getOwnPropertyNames: Ut, getOwnPropertySymbols: Lt, getPrototypeOf: Nt } = Object, V = globalThis, ot = V.trustedTypes, Pt = ot ? ot.emptyScript : "", It = V.reactiveElementPolyfillSupport, I = (a, t) => a, X = { toAttribute(a, t) {
+const { is: Ot, defineProperty: Rt, getOwnPropertyDescriptor: Ht, getOwnPropertyNames: Ut, getOwnPropertySymbols: Lt, getPrototypeOf: Pt } = Object, V = globalThis, ot = V.trustedTypes, Nt = ot ? ot.emptyScript : "", Dt = V.reactiveElementPolyfillSupport, D = (a, t) => a, X = { toAttribute(a, t) {
   switch (t) {
     case Boolean:
-      a = a ? Pt : null;
+      a = a ? Nt : null;
       break;
     case Object:
     case Array:
@@ -93,13 +93,13 @@ let R = class extends HTMLElement {
     return this.elementProperties.get(t) ?? lt;
   }
   static _$Ei() {
-    if (this.hasOwnProperty(I("elementProperties"))) return;
-    const t = Nt(this);
+    if (this.hasOwnProperty(D("elementProperties"))) return;
+    const t = Pt(this);
     t.finalize(), t.l !== void 0 && (this.l = [...t.l]), this.elementProperties = new Map(t.elementProperties);
   }
   static finalize() {
-    if (this.hasOwnProperty(I("finalized"))) return;
-    if (this.finalized = !0, this._$Ei(), this.hasOwnProperty(I("properties"))) {
+    if (this.hasOwnProperty(D("finalized"))) return;
+    if (this.finalized = !0, this._$Ei(), this.hasOwnProperty(D("properties"))) {
       const e = this.properties, i = [...Ut(e), ...Lt(e)];
       for (const s of i) this.createProperty(s, e[s]);
     }
@@ -246,9 +246,9 @@ let R = class extends HTMLElement {
   firstUpdated(t) {
   }
 };
-R.elementStyles = [], R.shadowRootOptions = { mode: "open" }, R[I("elementProperties")] = /* @__PURE__ */ new Map(), R[I("finalized")] = /* @__PURE__ */ new Map(), It?.({ ReactiveElement: R }), (V.reactiveElementVersions ??= []).push("2.1.2");
-const et = globalThis, ct = (a) => a, F = et.trustedTypes, dt = F ? F.createPolicy("lit-html", { createHTML: (a) => a }) : void 0, $t = "$lit$", S = `lit$${Math.random().toFixed(9).slice(2)}$`, wt = "?" + S, Dt = `<${wt}>`, T = document, D = () => T.createComment(""), q = (a) => a === null || typeof a != "object" && typeof a != "function", it = Array.isArray, qt = (a) => it(a) || typeof a?.[Symbol.iterator] == "function", J = `[ 	
-\f\r]`, P = /<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g, ht = /-->/g, pt = />/g, M = RegExp(`>|${J}(?:([^\\s"'>=/]+)(${J}*=${J}*(?:[^ 	
+R.elementStyles = [], R.shadowRootOptions = { mode: "open" }, R[D("elementProperties")] = /* @__PURE__ */ new Map(), R[D("finalized")] = /* @__PURE__ */ new Map(), Dt?.({ ReactiveElement: R }), (V.reactiveElementVersions ??= []).push("2.1.2");
+const et = globalThis, ct = (a) => a, F = et.trustedTypes, dt = F ? F.createPolicy("lit-html", { createHTML: (a) => a }) : void 0, $t = "$lit$", S = `lit$${Math.random().toFixed(9).slice(2)}$`, wt = "?" + S, It = `<${wt}>`, T = document, I = () => T.createComment(""), q = (a) => a === null || typeof a != "object" && typeof a != "function", it = Array.isArray, qt = (a) => it(a) || typeof a?.[Symbol.iterator] == "function", J = `[ 	
+\f\r]`, N = /<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g, ht = /-->/g, pt = />/g, M = RegExp(`>|${J}(?:([^\\s"'>=/]+)(${J}*=${J}*(?:[^ 	
 \f\r"'\`<>=]|("|')|))|$)`, "g"), ut = /'/g, gt = /"/g, kt = /^(?:script|style|textarea|title)$/i, _t = (a) => (t, ...e) => ({ _$litType$: a, strings: t, values: e }), o = _t(1), H = _t(2), A = /* @__PURE__ */ Symbol.for("lit-noChange"), l = /* @__PURE__ */ Symbol.for("lit-nothing"), mt = /* @__PURE__ */ new WeakMap(), z = T.createTreeWalker(T, 129);
 function At(a, t) {
   if (!it(a) || !a.hasOwnProperty("raw")) throw Error("invalid template strings array");
@@ -256,13 +256,13 @@ function At(a, t) {
 }
 const jt = (a, t) => {
   const e = a.length - 1, i = [];
-  let s, n = t === 2 ? "<svg>" : t === 3 ? "<math>" : "", r = P;
+  let s, n = t === 2 ? "<svg>" : t === 3 ? "<math>" : "", r = N;
   for (let h = 0; h < e; h++) {
     const c = a[h];
     let d, u, p = -1, x = 0;
-    for (; x < c.length && (r.lastIndex = x, u = r.exec(c), u !== null); ) x = r.lastIndex, r === P ? u[1] === "!--" ? r = ht : u[1] !== void 0 ? r = pt : u[2] !== void 0 ? (kt.test(u[2]) && (s = RegExp("</" + u[2], "g")), r = M) : u[3] !== void 0 && (r = M) : r === M ? u[0] === ">" ? (r = s ?? P, p = -1) : u[1] === void 0 ? p = -2 : (p = r.lastIndex - u[2].length, d = u[1], r = u[3] === void 0 ? M : u[3] === '"' ? gt : ut) : r === gt || r === ut ? r = M : r === ht || r === pt ? r = P : (r = M, s = void 0);
+    for (; x < c.length && (r.lastIndex = x, u = r.exec(c), u !== null); ) x = r.lastIndex, r === N ? u[1] === "!--" ? r = ht : u[1] !== void 0 ? r = pt : u[2] !== void 0 ? (kt.test(u[2]) && (s = RegExp("</" + u[2], "g")), r = M) : u[3] !== void 0 && (r = M) : r === M ? u[0] === ">" ? (r = s ?? N, p = -1) : u[1] === void 0 ? p = -2 : (p = r.lastIndex - u[2].length, d = u[1], r = u[3] === void 0 ? M : u[3] === '"' ? gt : ut) : r === gt || r === ut ? r = M : r === ht || r === pt ? r = N : (r = M, s = void 0);
     const v = r === M && a[h + 1].startsWith("/>") ? " " : "";
-    n += r === P ? c + Dt : p >= 0 ? (i.push(d), c.slice(0, p) + $t + c.slice(p) + S + v) : c + S + (p === -2 ? h : v);
+    n += r === N ? c + It : p >= 0 ? (i.push(d), c.slice(0, p) + $t + c.slice(p) + S + v) : c + S + (p === -2 ? h : v);
   }
   return [At(a, n + (a[e] || "<?>") + (t === 2 ? "</svg>" : t === 3 ? "</math>" : "")), i];
 };
@@ -286,8 +286,8 @@ class j {
           const p = s.textContent.split(S), x = p.length - 1;
           if (x > 0) {
             s.textContent = F ? F.emptyScript : "";
-            for (let v = 0; v < x; v++) s.append(p[v], D()), z.nextNode(), c.push({ type: 2, index: ++n });
-            s.append(p[x], D());
+            for (let v = 0; v < x; v++) s.append(p[v], I()), z.nextNode(), c.push({ type: 2, index: ++n });
+            s.append(p[x], I());
           }
         }
       } else if (s.nodeType === 8) if (s.data === wt) c.push({ type: 2, index: n });
@@ -383,7 +383,7 @@ class B {
     it(this._$AH) || (this._$AH = [], this._$AR());
     const e = this._$AH;
     let i, s = 0;
-    for (const n of t) s === e.length ? e.push(i = new B(this.O(D()), this.O(D()), this, this.options)) : i = e[s], i._$AI(n), s++;
+    for (const n of t) s === e.length ? e.push(i = new B(this.O(I()), this.O(I()), this, this.options)) : i = e[s], i._$AI(n), s++;
     s < e.length && (this._$AR(i && i._$AB.nextSibling, s), e.length = s);
   }
   _$AR(t = this._$AA.nextSibling, e) {
@@ -468,7 +468,7 @@ const Gt = (a, t, e) => {
   let s = i._$litPart$;
   if (s === void 0) {
     const n = e?.renderBefore ?? null;
-    i._$litPart$ = s = new B(t.insertBefore(D(), n), n, void 0, e ?? {});
+    i._$litPart$ = s = new B(t.insertBefore(I(), n), n, void 0, e ?? {});
   }
   return s._$AI(a), s;
 };
@@ -3321,7 +3321,7 @@ class re extends k {
                       ${[25, 75, 125].map((m) => H`<line class="grid-line" x1="0" y1=${m} x2="600" y2=${m}/>`)}${x.map(
       (m) => {
         const $ = m.map(
-          (N, _) => `${_ ? "L" : "M"}${u(N).toFixed(2)},${p(N).toFixed(2)}`
+          (P, _) => `${_ ? "L" : "M"}${u(P).toFixed(2)},${p(P).toFixed(2)}`
         ).join(" ");
         return H`<path class="fill" d=${`${$} L${u(m[m.length - 1])},160 L${u(m[0])},160 Z`}/><path class="line" d=${$}/>${m.length === 1 ? H`<circle cx=${u(m[0])} cy=${p(m[0])} r="3" fill="var(--accent-ink)"/>` : l}`;
       }
@@ -3762,7 +3762,7 @@ class ce extends k {
         entity_id: this.config.climate,
         ...Mt
       });
-    }, N = Array.isArray(s.hvac_modes) ? s.hvac_modes : [];
+    }, P = Array.isArray(s.hvac_modes) ? s.hvac_modes : [];
     return o`<section
       class="panel mint climate"
       aria-label="Climate control"
@@ -3838,13 +3838,13 @@ class ce extends k {
           >${g("drop")}
           ${this.format(this.state(this.config.humidity)?.state ?? s.current_humidity)}%
           humidity</span
-        >${N.length ? o`<select
+        >${P.length ? o`<select
                 aria-label="HVAC mode"
                 .value=${U(e?.state || "")}
                 ?disabled=${!i || this.busy}
                 @change=${(_) => this.service("climate", "set_hvac_mode", { entity_id: this.config.climate, hvac_mode: _.target.value })}
               >
-                ${N.map((_) => o`<option value=${_} .selected=${U(_ === e?.state)}>${le[_] || E(_)}</option>`)}
+                ${P.map((_) => o`<option value=${_} .selected=${U(_ === e?.state)}>${le[_] || E(_)}</option>`)}
               </select>` : l}
       </div>
     </section>`;
@@ -4101,7 +4101,11 @@ class ce extends k {
                     ></span
                   >${g("arrow")}</a
                 >` : l}
-          <a href=${h.pathname + h.search}
+          <a
+            href=${h.pathname + h.search}
+            @click=${(d) => {
+      d.preventDefault(), d.stopPropagation(), window.location.assign(h.pathname + h.search);
+    }}
             >${g("arrow")}<span
               >Open standard Home Assistant<small
                 >Restore the header, sidebar, and dashboard editor</small

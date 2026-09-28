@@ -821,7 +821,15 @@ export class SignalHome extends LitElement {
                 >`
               : nothing
           }
-          <a href=${recovery.pathname + recovery.search}
+          <a
+            href=${recovery.pathname + recovery.search}
+            @click=${(event: MouseEvent) => {
+              event.preventDefault();
+              event.stopPropagation();
+              // Kiosk Mode reads its recovery flag at page load. HA otherwise
+              // intercepts same-dashboard anchors as client-side navigation.
+              window.location.assign(recovery.pathname + recovery.search);
+            }}
             >${icon("arrow")}<span
               >Open standard Home Assistant<small
                 >Restore the header, sidebar, and dashboard editor</small

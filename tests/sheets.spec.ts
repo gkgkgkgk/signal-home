@@ -1,4 +1,34 @@
 import { test, expect } from "@playwright/test";
+test("recovery link forces a fresh document even when HA intercepts anchors", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await page.evaluate(() => {
+    (window as any).oldDocument = true;
+    document.addEventListener("click", (event) => {
+      const anchor = event
+        .composedPath()
+        .find((node) => node instanceof HTMLAnchorElement) as
+        HTMLAnchorElement | undefined;
+      if (anchor) {
+        event.preventDefault();
+        history.pushState({}, "", anchor.href);
+      }
+    });
+  });
+  await page.getByRole("button", { name: "Open Signal menu" }).click();
+  await page
+    .getByRole("link", { name: /Open standard Home Assistant/ })
+    .click();
+  await expect(page).toHaveURL(/disable_km/);
+  await expect(
+    page.getByRole("button", { name: "Open Signal menu" }),
+  ).toBeVisible();
+  expect(
+    await page.evaluate(() => (window as any).oldDocument),
+  ).toBeUndefined();
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+});
 test("sheets work on LAN HTTP without secure-context crypto APIs", async ({
   page,
 }) => {
