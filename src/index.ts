@@ -4,6 +4,12 @@ import { live } from "lit/directives/live.js";
 import { styles } from "./styles";
 import { pocketStyles } from "./pocket-styles";
 import { ImmersiveChrome } from "./immersive-chrome";
+import {
+  appearanceModes,
+  homeHour,
+  isDark,
+  type Appearance,
+} from "./appearance";
 import { icon } from "./icons";
 import {
   available,
@@ -52,12 +58,19 @@ export class SignalHome extends LitElement {
     menuOpen: { state: true },
     narrow: { state: true },
     contentScrolled: { state: true },
+    appearance: { state: true },
+    completedTodos: { state: true },
+    undoItem: { state: true },
   };
   static styles = [styles, pocketStyles];
   declare hass: Hass;
   private config: Config = { type: "custom:signal-home" };
   private tab = "home";
   private dark = false;
+  private appearance: Appearance = "auto";
+  private completedTodos: Todo[] = [];
+  private completionTimes: Record<string, number> = {};
+  private undoItem?: Todo;
   private detailEntity = "";
   private menuOpen = false;
   private contentScrolled = false;
@@ -107,7 +120,7 @@ export class SignalHome extends LitElement {
   private todoLoading = false;
   private media = window.matchMedia("(prefers-color-scheme: dark)");
   private get appearanceKey() {
-    return `signal-home-appearance:${this.config.title || "Home"}`;
+    return `signal-home-appearance-v2:${this.config.title || "Home"}`;
   }
   private applyAppearance = () => {
     let saved: string | null = null;
@@ -117,8 +130,15 @@ export class SignalHome extends LitElement {
       /* Private browser storage may be unavailable. */
     }
     const preference = saved || this.config.appearance || "auto";
-    this.dark =
-      preference === "dark" || (preference === "auto" && this.media.matches);
+    this.appearance = appearanceModes.includes(preference as Appearance)
+      ? (preference as Appearance)
+      : "auto";
+    this.dark = isDark(
+      this.appearance,
+      this.media.matches,
+      new Date(),
+      this.hass?.config?.time_zone,
+    );
   };
   connectedCallback() {
     super.connectedCallback();
@@ -129,10 +149,12 @@ export class SignalHome extends LitElement {
     window.addEventListener("popstate", this.syncRoute);
     window.addEventListener("hashchange", this.syncRoute);
     this.media.addEventListener("change", this.applyAppearance);
+    document.addEventListener("visibilitychange", this.applyAppearance);
     this.phone.addEventListener("change", this.resize);
     this.resize();
     this.applyAppearance();
     this.clock = setInterval(() => {
+      this.applyAppearance();
       this.requestUpdate();
       if (this.config.todo) void this.loadTodos();
     }, 60000);
@@ -145,6 +167,7 @@ export class SignalHome extends LitElement {
     window.removeEventListener("popstate", this.syncRoute);
     window.removeEventListener("hashchange", this.syncRoute);
     this.media.removeEventListener("change", this.applyAppearance);
+    document.removeEventListener("visibilitychange", this.applyAppearance);
     this.phone.removeEventListener("change", this.resize);
     clearInterval(this.clock);
     clearTimeout(this.timer);
@@ -193,6 +216,21 @@ export class SignalHome extends LitElement {
     this.todoSignature = "";
     this.todoSequence++;
     this.todos = [];
+    this.completedTodos = [];
+    this.undoItem = undefined;
+    try {
+      this.completionTimes = JSON.parse(
+        localStorage.getItem(this.completionKey) || "{}",
+      );
+    } catch {
+      this.completionTimes = {};
+    }
+    if (
+      !this.completionTimes ||
+      typeof this.completionTimes !== "object" ||
+      Array.isArray(this.completionTimes)
+    )
+      this.completionTimes = {};
     this.applyAppearance();
   }
   static getConfigElement() {
@@ -217,6 +255,7 @@ export class SignalHome extends LitElement {
     return { columns: "full", min_columns: 12 };
   }
   protected updated(changed: PropertyValues) {
+    if (changed.has("hass")) this.applyAppearance();
     this.syncChrome();
     if (
       (changed.has("hass") || changed.has("config")) &&
@@ -243,8 +282,12 @@ export class SignalHome extends LitElement {
   }
   private notify(text: string) {
     this.message = text;
+    this.undoItem = undefined;
     clearTimeout(this.timer);
-    this.timer = setTimeout(() => (this.message = ""), 4500);
+    this.timer = setTimeout(() => {
+      this.message = "";
+      this.undoItem = undefined;
+    }, 8000);
   }
   private async service(
     domain: string,
@@ -280,11 +323,26 @@ export class SignalHome extends LitElement {
         type: "call_service",
         domain: "todo",
         service: "get_items",
-        service_data: { entity_id: entity, status: ["needs_action"] },
+        service_data: { entity_id: entity },
         return_response: true,
       });
       if (sequence === this.todoSequence) {
-        this.todos = result.response?.[entity]?.items || [];
+        const items = result.response?.[entity]?.items;
+        if (!Array.isArray(items)) throw new Error("Missing list response");
+        this.todos = items.filter((item) => item.status === "needs_action");
+        this.completedTodos = items.filter(
+          (item) => item.status === "completed",
+        );
+        const ids = new Set(this.completedTodos.map((item) => item.uid));
+        for (const id of Object.keys(this.completionTimes))
+          if (!ids.has(id)) delete this.completionTimes[id];
+        for (const item of items) {
+          if (item.status !== "completed")
+            delete this.completionTimes[item.uid];
+          else if (!Number.isFinite(this.completionTimes[item.uid]))
+            this.completionTimes[item.uid] = Date.now();
+        }
+        this.saveCompletionTimes();
         this.todoError = "";
       }
     } catch {
@@ -294,17 +352,59 @@ export class SignalHome extends LitElement {
       this.todoLoading = false;
     }
   }
-  private async complete(item: Todo) {
+  private get completionKey() {
+    return `signal-completed:${this.config.todo || ""}`;
+  }
+  private saveCompletionTimes() {
+    try {
+      localStorage.setItem(
+        this.completionKey,
+        JSON.stringify(this.completionTimes),
+      );
+    } catch {
+      /* Optional fallback timestamps, never task contents. */
+    }
+  }
+  private completedAt(item: Todo) {
+    const recorded = item.completed ? Date.parse(item.completed) : NaN;
+    return Number.isFinite(recorded)
+      ? recorded
+      : this.completionTimes[item.uid] || Date.now();
+  }
+  private async complete(item: Todo, restore = false) {
     if (this.busy) return;
+    const entity = this.config.todo;
     this.busy = true;
+    this.todoSequence++;
     try {
       await this.hass.callService("todo", "update_item", {
-        entity_id: this.config.todo,
+        entity_id: entity,
         item: item.uid,
-        status: "completed",
+        status: restore ? "needs_action" : "completed",
       });
-      this.todos = this.todos.filter((t) => t.uid !== item.uid);
-      this.notify("Checked off. Nicely done.");
+      if (entity !== this.config.todo) return;
+      if (restore) {
+        delete this.completionTimes[item.uid];
+        this.completedTodos = this.completedTodos.filter(
+          (t) => t.uid !== item.uid,
+        );
+        if (!this.todos.some((t) => t.uid === item.uid))
+          this.todos = [
+            ...this.todos,
+            { ...item, status: "needs_action", completed: null },
+          ];
+        this.notify("Back on your list.");
+      } else {
+        this.completionTimes[item.uid] = Date.now();
+        this.todos = this.todos.filter((t) => t.uid !== item.uid);
+        this.completedTodos = [
+          { ...item, status: "completed", completed: new Date().toISOString() },
+          ...this.completedTodos.filter((t) => t.uid !== item.uid),
+        ];
+        this.notify("Checked off.");
+        this.undoItem = item;
+      }
+      this.saveCompletionTimes();
     } catch {
       this.notify("Couldn’t update the list. Try again.");
     } finally {
@@ -329,20 +429,15 @@ export class SignalHome extends LitElement {
       this.busy = false;
     }
   }
-  private toggleAppearance() {
-    this.dark = !this.dark;
+  private chooseAppearance(mode: Appearance) {
+    if (!appearanceModes.includes(mode)) return;
     try {
-      localStorage.setItem(this.appearanceKey, this.dark ? "dark" : "light");
+      localStorage.setItem(this.appearanceKey, mode);
     } catch {
       /* Optional preference storage. */
     }
-  }
-  private resetAppearance() {
-    try {
-      localStorage.removeItem(this.appearanceKey);
-    } catch {}
+    this.config = { ...this.config, appearance: mode };
     this.applyAppearance();
-    this.notify("Using the dashboard’s appearance setting.");
   }
   private navigate(id: string) {
     if (id !== this.tab) history.pushState(history.state, "", `#signal/${id}`);
@@ -625,7 +720,49 @@ export class SignalHome extends LitElement {
               </div>`
       }
       ${detail && this.config.todo ? html`<form class="todo-form" @submit=${this.addTodo}><input aria-label="New grocery item" placeholder="Add something good…" maxlength="255" .value=${this.draft} @input=${(e: Event) => (this.draft = (e.target as HTMLInputElement).value)} /><button aria-label="Add grocery item" ?disabled=${this.busy || !this.draft.trim()}>${icon("plus")}</button></form>` : html`<button class="text-button" @click=${() => this.navigate("lists")}>${this.todos.length ? `${this.todos.length} things on your list` : "Open your list"} ${icon("arrow")}</button>`}
+      ${detail && !this.todoError ? this.completedList() : nothing}
     </section>`;
+  }
+  private completedList() {
+    if (!this.completedTodos.length) return nothing;
+    const cutoff = Date.now() - 86400000;
+    const sorted = [...this.completedTodos].sort(
+      (a, b) => this.completedAt(b) - this.completedAt(a),
+    );
+    const recent = sorted.filter((item) => this.completedAt(item) > cutoff);
+    const older = sorted.filter((item) => this.completedAt(item) <= cutoff);
+    const rows = (items: Todo[]) =>
+      items.map(
+        (item) =>
+          html`<div class="todo-row completed-row">
+            <button
+              class="check-button"
+              aria-label=${`Restore ${item.summary}`}
+              ?disabled=${this.busy}
+              @click=${() => this.complete(item, true)}
+            >
+              <span class="check-box">${icon("check")}</span></button
+            ><span>${item.summary}</span>
+          </div>`,
+      );
+    return html`<div class="completed-list">
+      <h3>Recently completed <span>${recent.length}</span></h3>
+      <p>
+        Tap a check to put it back. After 24 hours, items move to Older
+        completed.
+      </p>
+      ${this.config.completed_retention_days ? html`<p>HA automatically deletes timestamped completed items after ${this.config.completed_retention_days} days. Restore anything you still need before then.</p>` : nothing}
+      ${rows(recent)}
+      ${
+        older.length
+          ? html`<details>
+              <summary>Older completed · ${older.length}</summary>
+              ${rows(older)}
+            </details>`
+          : nothing
+      }
+      ${sorted.some((item) => !item.completed || !Number.isFinite(Date.parse(item.completed))) ? html`<small>For items without a completion time, the 24 hours starts when this device first sees them completed.</small>` : nothing}
+    </div>`;
   }
   private safety() {
     if (!this.sensors.length)
@@ -864,33 +1001,21 @@ export class SignalHome extends LitElement {
     </div>`;
   }
   private appHeader(time: Date) {
+    const hour = homeHour(time, this.hass.config?.time_zone);
+    const greeting = `Good ${hour < 12 ? "morning" : hour < 18 ? "afternoon" : "evening"}.`;
     return html`<header
       class=${`app-header ${this.contentScrolled ? "scrolled" : ""}`}
     >
-      <div class="eyebrow">
-        ${
-          this.narrow
-            ? html`<span class="header-title"
-                >${this.tab === "home" ? this.config.title || "Home" : tabs.find((t) => t.id === this.tab)?.name}</span
-              >`
-            : html`${this.config.title || "Home"}<span
-                  style="color:var(--muted);font-weight:400"
-                >
-                  / ${tabs.find((t) => t.id === this.tab)?.name}</span
-                >`
-        }
+      <div class="header-context">
+        <span class="header-title"
+          >${this.config.header_label || greeting}</span
+        >
+        <span class="header-subtitle"
+          >${this.config.title || "Home"} ·
+          ${time.toLocaleDateString(this.hass.locale?.language || undefined, { weekday: "short", month: "short", day: "numeric", timeZone: this.hass.config?.time_zone })}</span
+        >
       </div>
       <div class="header-right">
-        <span class="date"
-          >${time.toLocaleDateString(this.hass.locale?.language || undefined, { weekday: "short", month: "short", day: "numeric" })}</span
-        >
-        <button
-          class="icon-button"
-          aria-label=${this.dark ? "Switch to light mode" : "Switch to dark mode"}
-          @click=${this.toggleAppearance}
-        >
-          ${icon(this.dark ? "sun" : "moon")}
-        </button>
         <button
           class="icon-button"
           aria-label="Open Signal menu"
@@ -905,10 +1030,7 @@ export class SignalHome extends LitElement {
     if (!this.hass)
       return html`<div class="notice" role="status">Connecting to home…</div>`;
     const time = new Date();
-    const hour = time.getHours();
-    const welcome =
-      this.config.greeting ||
-      `Good ${hour < 12 ? "morning" : hour < 18 ? "afternoon" : "evening"}.`;
+    const welcome = this.config.greeting || "Home, at a glance.";
     const title =
       this.tab === "home"
         ? welcome
@@ -963,10 +1085,10 @@ export class SignalHome extends LitElement {
         <footer class="footer">
           <span
             >Signal Home <span style="opacity:.5">/</span> made for living</span
-          ><button @click=${this.resetAppearance}>Reset appearance</button>
+          >
         </footer>
       </main>
-      ${this.nav(true)}${this.message ? html`<div class="toast" role="status">${this.message}</div>` : nothing}
+      ${this.nav(true)}${this.message ? html`<div class="toast" role="status"><span>${this.message}</span>${this.undoItem ? html`<button ?disabled=${this.busy} @click=${() => this.undoItem && this.complete(this.undoItem, true)}>Undo</button>` : nothing}</div>` : nothing}
       <signal-sheet
         .open=${this.menuOpen}
         heading="Your place. Your way."
@@ -978,13 +1100,24 @@ export class SignalHome extends LitElement {
             Signed in as ${this.hass.user?.name || "you"}. Your home is still
             powered by Home Assistant.
           </p>
-          <button @click=${this.toggleAppearance}>
-            ${icon(this.dark ? "sun" : "moon")}<span
-              >${this.dark ? "Light appearance" : "Dark appearance"}<small
-                >Make yourself comfortable</small
-              ></span
+          <label class="appearance-setting"
+            >Appearance
+            <select
+              aria-label="Appearance"
+              .value=${this.appearance}
+              @change=${(event: Event) => this.chooseAppearance((event.target as HTMLSelectElement).value as Appearance)}
             >
-          </button>
+              <option value="auto">Auto · day / night</option>
+              <option value="system">System · device default</option>
+              <option value="dark">Dark</option>
+              <option value="light">Light</option>
+            </select>
+            <small
+              >Auto: light 7am–7pm, dark overnight
+              (${this.hass.config?.time_zone || "device time"}). Saved on this
+              device.</small
+            >
+          </label>
           <a href="/profile"
             >${icon("home")}<span
               >Account & sign out<small>Your profile and session</small></span

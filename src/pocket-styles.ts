@@ -1,5 +1,104 @@
 import { css } from "lit";
 export const pocketStyles = css`
+  .header-context {
+    min-width: 0;
+    flex: 1;
+  }
+  .header-title {
+    display: block;
+    font-size: 17px;
+    font-weight: 650;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .header-subtitle {
+    display: block;
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .appearance-setting {
+    display: grid;
+    gap: 10px;
+    padding: 16px 0;
+    font-weight: 600;
+  }
+  .appearance-setting select {
+    min-height: 48px;
+    border-radius: 14px;
+    border: 1px solid var(--line);
+    padding: 12px;
+    background: var(--surface);
+    color: var(--ink);
+    font: inherit;
+    width: 100%;
+    max-width: none;
+  }
+  .appearance-setting small {
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+  .completed-list {
+    margin-top: 24px;
+    border-top: 1px solid #51352025;
+    padding-top: 18px;
+  }
+  .completed-list h3 {
+    font-size: 16px;
+    margin: 0;
+  }
+  .completed-list h3 span {
+    font-size: 12px;
+    font-weight: 400;
+    margin-left: 8px;
+  }
+  .completed-list p,
+  .completed-list > small {
+    font-size: 12px;
+    line-height: 1.5;
+  }
+  .completed-row > span {
+    text-decoration: line-through;
+    opacity: 0.7;
+  }
+  .completed-row .check-box {
+    display: grid;
+    place-items: center;
+    background: #513520;
+    color: #f7cfac;
+  }
+  .completed-row svg {
+    width: 15px;
+    height: 15px;
+  }
+  .completed-list summary {
+    cursor: pointer;
+    min-height: 48px;
+    align-content: center;
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .toast {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+  .toast button {
+    background: transparent;
+    border: 0;
+    color: inherit;
+    font: inherit;
+    font-weight: 700;
+    text-decoration: underline;
+    min-height: 44px;
+    padding: 0 8px;
+  }
   /* Light catches edges; opaque materials retain their own color in both themes. */
   .panel,
   .sensor {
@@ -311,7 +410,25 @@ export const pocketStyles = css`
       --signal-top-padding: max(10px, env(safe-area-inset-top));
     }
     header.scrolled {
-      box-shadow: 0 10px 16px -12px #00000045;
+      box-shadow: 0 1px 0 color-mix(in srgb, var(--line) 45%, transparent);
+    }
+    header::after {
+      content: "";
+      position: absolute;
+      inset: 100% 0 auto;
+      height: 24px;
+      background: linear-gradient(
+        to bottom,
+        var(--paper),
+        color-mix(in srgb, var(--paper) 65%, transparent) 35%,
+        transparent
+      );
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 180ms ease;
+    }
+    header.scrolled::after {
+      opacity: 1;
     }
     header .eyebrow {
       min-width: 0;
@@ -430,6 +547,7 @@ export const pocketStyles = css`
     .pocket-tile,
     .home-signal,
     header,
+    header::after,
     .nav-indicator {
       transition: none !important;
     }

@@ -17,12 +17,12 @@ Signal is a self-contained Lovelace card with Overview, Climate, Safety, and Lis
 
 ## Features
 
-- Light, dark, and system appearance; quick toggle saved per browser.
+- Settings-only appearance: Auto (light 7am–7pm, dark overnight in HA's home time zone), System, Dark, or Light; saved per browser/device. Auto is the default.
 - Phone-first overview: current room temperature, weather, groceries, and home status in whole-tile touch targets. A reserved bottom dock never covers scrolling content.
-- A pinned mobile header keeps the page title and menu accessible while the greeting and cards scroll underneath. A quiet shadow appears only when scrolled; the opaque background matches the system bars.
+- A pinned mobile header shows a greeting (or custom address/nickname), date and home label. Content fades beneath its scrolling edge; the opaque background matches the system bars.
 - Opaque, softly sculpted surfaces, springy press feedback, and detail sheets that enter from the tapped control. Spacious full controls remain on desktop.
 - Animated climate dial, single target and dual heating/cooling limits, capability-aware mode selection.
-- Live weather, grocery list with add/check-off, and named safety sensors with optional battery readings.
+- Live weather, shared grocery list with add/check-off/Undo, recently completed tasks, recoverable Older completed after 24 hours, and named safety sensors with optional battery readings.
 - Tactile switches, brightness/color/temperature sliders, fans, animated blinds, media transport/volume, scenes, selectors, number controls, and confirmed unlocking.
 - Recorded-history graphs with 6h/24h/7d views, pointer/keyboard inspection, and honest gaps when sensors go unavailable.
 - Standalone control, graph, and metric cards with visual editors, usable in ordinary HA dashboards.
@@ -81,7 +81,9 @@ Replace entity IDs with your own. Every entity field is optional; unconfigured c
 | ------------ | ------------------------------------------------------------------------------------------ |
 | `title`      | Home name, default `Home`                                                                  |
 | `greeting`   | Optional fixed greeting; otherwise follows the time of day                                 |
-| `appearance` | `auto` (default), `light`, or `dark`                                                       |
+| `appearance` | `auto` (default; 7am–7pm light), `system`, `light`, or `dark`                              |
+| `header_label` | Optional persistent address/nickname; otherwise a greeting                           |
+| `completed_retention_days` | Optional cleanup notice; use `7` only after installing the seven-day HA automation below |
 | `climate`    | Climate entity                                                                             |
 | `weather`    | Weather entity                                                                             |
 | `todo`       | To-do entity supporting get/add/update items                                               |
@@ -90,7 +92,13 @@ Replace entity IDs with your own. Every entity field is optional; unconfigured c
 | `favorites`  | Entity IDs rendered as capability-aware control cards                                      |
 | `graphs`     | Numeric sensor IDs or objects with `entity`, `name`, and `hours` (1–168); shown on Climate |
 
-The appearance button stores a preference locally. **Reset appearance** restores the configured setting. This doesn't change the appearance of other Home Assistant dashboards.
+Choose appearance in Signal's settings menu. Auto uses HA's configured time zone (device time if unavailable); System follows the device's light/dark preference. Changes apply on the next minute or app resume. Old sun/moon-button preferences are retired so this release starts from the configured/default mode. Preferences do not change other HA dashboards. Standalone cards retain their own appearance configuration.
+
+## Shared lists and retention
+
+To-do items belong to the configured HA entity, not the user/browser: everyone using that entity shares check-offs and restores. Signal retrieves both active and completed items. **Undo** appears immediately after a check-off; completed rows remain tappable to restore. After 24 hours they move into the collapsed **Older completed** section, not the trash. A provider's completion timestamp is authoritative. For providers without timestamps, the recent/older grouping uses first-seen time on that browser and may differ between devices; it never authorizes deletion.
+
+For permanent deletion after seven days, install [the optional HA cleanup automation](examples/completed-cleanup.yaml), replace `todo.your_list` with your list, and set `completed_retention_days: 7` on the card to show the retention notice. **This automation permanently deletes items** on its hourly run after seven days. It works while the app is closed, requires a provider supplying completion timestamps, rechecks each item before deletion, and skips missing/invalid timestamps. Restoring an item protects it from cleanup; completing it again starts a new retention period. The frontend itself never automatically deletes tasks. Without this automation, older completed items remain recoverable indefinitely.
 
 The card works in Sections, but its complete navigation and layout are designed for a Panel view.
 
@@ -114,7 +122,7 @@ views:
 
 Kiosk Mode is optional and separately installed. `immersive: true` adjusts Signal's viewport layout and matches the surrounding page/status-bar colors to Signal; it does not hide HA by itself. Use a Kiosk Mode version compatible with your HA version. This setup applies only to the dashboard where you add it—do not use Kiosk Mode's global query-string caching.
 
-In immersive mode, Signal temporarily supplies the root theme colors read by the Android and iOS companion apps and sends HA's [`theme-update` message](https://developers.home-assistant.io/docs/frontend/external-bus/#theme-update) through the existing app bridge. Browser theme-color metadata follows too. The colors track Signal's light/dark toggle and are released when you leave the dashboard or use recovery. Your saved HA theme and server-wide default are not changed. This matches the native frame; it does not force fullscreen, hide system indicators, or change native edge-to-edge settings. Actual system-bar behavior depends on the companion app and OS version.
+In immersive mode, Signal temporarily supplies the root theme colors read by the Android and iOS companion apps and sends HA's [`theme-update` message](https://developers.home-assistant.io/docs/frontend/external-bus/#theme-update) through the existing app bridge. Browser theme-color metadata follows too. The colors track Signal's selected appearance mode and are released when you leave the dashboard or use recovery. Your saved HA theme and server-wide default are not changed. This matches the native frame; it does not force fullscreen, hide system indicators, or change native edge-to-edge settings. Actual system-bar behavior depends on the companion app and OS version.
 
 The Signal menu's **Open standard Home Assistant** link reloads the same dashboard with `?disable_km`, restoring HA navigation and the editor. Bookmark that recovery URL. Remove the parameter to return to immersive mode. Account/sign-out opens HA's native profile; settings are shown for administrators. Authentication, sessions, permissions, and companion-app onboarding remain entirely with HA. Hiding navigation is not access control.
 

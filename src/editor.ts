@@ -51,12 +51,14 @@ export class SignalEditor extends LitElement {
     const schema = [
       { name: "title", selector: { text: {} } },
       { name: "greeting", selector: { text: {} } },
+      { name: "header_label", selector: { text: {} } },
       {
         name: "appearance",
         selector: {
           select: {
             options: [
-              { value: "auto", label: "Follow system" },
+              { value: "auto", label: "Auto · light 7am–7pm, dark overnight" },
+              { value: "system", label: "System · device default" },
               { value: "light", label: "Light" },
               { value: "dark", label: "Dark" },
             ],
@@ -73,7 +75,9 @@ export class SignalEditor extends LitElement {
     return html`<p>
         <strong>Welcome to Signal.</strong> Select your entities below. For the
         full experience, use this card in a <strong>Panel</strong> view.
-        Appearance can also be changed with the dashboard’s sun/moon button.
+        Appearance can also be changed in Signal's settings menu. The header
+        label can be a home nickname or address; leave it empty for a time-based
+        greeting.
       </p>
       <ha-form
         .hass=${this.hass}

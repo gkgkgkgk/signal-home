@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { setAppearance } from "../scripts/appearance.mjs";
 test("recovery link forces a fresh document even when HA intercepts anchors", async ({
   page,
 }) => {
@@ -212,7 +213,7 @@ for (const width of [360, 390, 768, 1440])
     await page.setViewportSize({ width, height: 844 });
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto("/");
-    await page.getByRole("button", { name: "Switch to dark mode" }).click();
+    await setAppearance(page, "dark");
     await page
       .getByRole("button", { name: "Climate details", exact: true })
       .click();

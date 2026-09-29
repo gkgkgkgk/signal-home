@@ -10,7 +10,7 @@ export interface Hass {
   states: Record<string, Entity>;
   user?: { name: string; is_admin?: boolean };
   locale?: { language: string };
-  config?: { unit_system?: { temperature?: string } };
+  config?: { unit_system?: { temperature?: string }; time_zone?: string };
   callService(
     domain: string,
     service: string,
@@ -27,20 +27,23 @@ export interface Config {
   type: string;
   title?: string;
   greeting?: string;
+  header_label?: string;
   climate?: string;
   weather?: string;
   todo?: string;
+  completed_retention_days?: number;
   humidity?: string;
   sensors?: (string | SensorConfig)[];
   favorites?: string[];
   graphs?: (string | { entity: string; name?: string; hours?: number })[];
-  appearance?: "light" | "dark" | "auto";
+  appearance?: "light" | "dark" | "auto" | "system";
   immersive?: boolean;
 }
 export interface Todo {
   uid: string;
   summary: string;
   status: string;
+  completed?: string | null;
 }
 export const available = (e?: Entity): e is Entity =>
   !!e && !["unknown", "unavailable"].includes(e.state);

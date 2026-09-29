@@ -1,0 +1,52 @@
+# Paste into a new HA automation's YAML editor. Select YOUR list below.
+# Permanently deletes ONLY timestamped completed items older than 7 days.
+# Runs hourly, including when no Signal browser is open. Missing/invalid
+# timestamps are intentionally preserved. Do not use remove_completed_items.
+alias: Signal - completed groceries cleanup
+description: Permanently remove completed groceries after seven days; keep undated items.
+mode: single
+triggers:
+  - trigger: time_pattern
+    minutes: "17"
+conditions:
+  - condition: template
+    value_template: "{{ states(todo_entity) not in ['unknown', 'unavailable'] }}"
+variables:
+  todo_entity: todo.your_list
+actions:
+  - action: todo.get_items
+    target:
+      entity_id: "{{ todo_entity }}"
+    data:
+      status: completed
+    response_variable: completed_list
+  - repeat:
+      for_each: "{{ completed_list.get(todo_entity, {}).get('items', []) }}"
+      sequence:
+        - if:
+            - condition: template
+              value_template: >-
+                {% set stamp = as_timestamp(repeat.item.get('completed'), none) %}
+                {{ repeat.item.get('status') == 'completed' and repeat.item.get('uid')
+                   and stamp is not none and stamp <= as_timestamp(now()) - 604800 }}
+          then:
+            # Re-read before deleting: a restored/re-completed task must survive.
+            - action: todo.get_items
+              target:
+                entity_id: "{{ todo_entity }}"
+              response_variable: current_list
+            - if:
+                - condition: template
+                  value_template: >-
+                    {% set matches = current_list.get(todo_entity, {}).get('items', [])
+                       | selectattr('uid', 'equalto', repeat.item.uid) | list %}
+                    {% set current = matches[0] if matches else {} %}
+                    {% set stamp = as_timestamp(current.get('completed'), none) %}
+                    {{ current.get('status') == 'completed' and stamp is not none
+                       and stamp <= as_timestamp(now()) - 604800 }}
+              then:
+                - action: todo.remove_item
+                  target:
+                    entity_id: "{{ todo_entity }}"
+                  data:
+                    item: "{{ repeat.item.uid }}"

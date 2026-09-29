@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { setAppearance } from "../scripts/appearance.mjs";
 
 for (const dark of [false, true]) {
   test(`phone header stays pinned and opaque in ${dark ? "dark" : "light"} mode`, async ({
@@ -6,12 +7,11 @@ for (const dark of [false, true]) {
   }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto("/");
-    if (dark)
-      await page.getByRole("button", { name: "Switch to dark mode" }).click();
+    if (dark) await setAppearance(page, "dark");
     const header = page.locator("signal-home .app-header");
     const main = page.locator("signal-home main");
     const dock = page.getByRole("navigation", { name: "Mobile navigation" });
-    await expect(header).toContainText("Our place");
+    await expect(header).toContainText("Good");
     const top = (await header.boundingBox())!.y;
     const dockTop = (await dock.boundingBox())!.y;
     await expect(header).not.toHaveClass(/scrolled/);
@@ -36,7 +36,7 @@ for (const dark of [false, true]) {
     ).toBeFocused();
     expect(await main.evaluate((el) => el.scrollTop)).toBe(position);
     await dock.getByRole("button", { name: "Safety", exact: true }).click();
-    await expect(header).toContainText("Safety");
+    await expect(header).not.toContainText("Safety");
     await expect(header).not.toHaveClass(/scrolled/);
     expect(await main.evaluate((el) => el.scrollTop)).toBe(0);
   });
@@ -52,7 +52,7 @@ test("small phones, long names, reduced motion, and desktop retain usable header
     const card = document.querySelector("signal-home") as any;
     card.setConfig({
       ...card.config,
-      title: "Our very long family home name",
+      header_label: "Our very long family home name",
       immersive: true,
     });
   });
@@ -83,5 +83,5 @@ test("small phones, long names, reduced motion, and desktop retain usable header
   await expect
     .poll(() => header.evaluate((el) => getComputedStyle(el).position))
     .toBe("static");
-  await expect(header).toContainText("/ Overview");
+  await expect(header).toContainText("Our very long family home name");
 });

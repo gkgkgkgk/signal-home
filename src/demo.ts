@@ -74,7 +74,16 @@ const hass: Hass = {
     }
     if (domain === "todo") {
       if (service === "update_item")
-        items = items.filter((i) => i.uid !== data.item);
+        items = items.map((i) =>
+          i.uid === data.item
+            ? {
+                ...i,
+                status: data.status as string,
+                completed:
+                  data.status === "completed" ? new Date().toISOString() : null,
+              }
+            : i,
+        );
       if (service === "add_item")
         items = [
           ...items,
@@ -84,7 +93,10 @@ const hass: Hass = {
             status: "needs_action",
           },
         ];
-      states[id] = { ...states[id], state: String(items.length) };
+      states[id] = {
+        ...states[id],
+        state: String(items.filter((i) => i.status === "needs_action").length),
+      };
     }
     if (domain === "light")
       states[id] = {
@@ -126,7 +138,7 @@ card.setConfig({
   weather: "weather.demo",
   todo: "todo.demo",
   humidity: "sensor.humidity",
-  appearance: "auto",
+  appearance: "light",
   sensors: [
     {
       entity: "binary_sensor.kitchen",
@@ -148,6 +160,15 @@ card.setConfig({
 (window as any).demo = {
   calls,
   fail: false,
+  setItems(next: Todo[]) {
+    items = next;
+    states["todo.demo"] = {
+      ...states["todo.demo"],
+      state: String(items.filter((i) => i.status === "needs_action").length),
+    };
+    update();
+    void card.loadTodos();
+  },
   setState(id: string, value: string) {
     states[id] = { ...states[id], state: value };
     update();

@@ -1,4 +1,5 @@
 import { test, expect, type Page } from "@playwright/test";
+import { setAppearance } from "../scripts/appearance.mjs";
 
 async function chrome(page: Page) {
   return page.evaluate(() => {
@@ -63,7 +64,7 @@ test("native chrome follows light/dark without changing HA theme or issuing serv
     bottom: "#f4f3ee",
     meta: "#f4f3ee",
   });
-  await page.getByRole("button", { name: "Switch to dark mode" }).click();
+  await setAppearance(page, "dark");
   await expect.poll(async () => (await chrome(page)).messages.length).toBe(2);
   expect(await chrome(page)).toMatchObject({
     top: "#1a2320",
@@ -143,7 +144,7 @@ test("HA theme updates underneath Signal survive cleanup; no notification loop",
     )!.content = "#123456";
   });
   await expect.poll(async () => (await chrome(page)).meta).toBe("#f4f3ee");
-  await page.getByRole("button", { name: "Switch to dark mode" }).click();
+  await setAppearance(page, "dark");
   await expect.poll(async () => (await chrome(page)).messages.length).toBe(2);
   await page.evaluate(() => {
     const card = document.querySelector("signal-home") as any;
@@ -161,6 +162,6 @@ test("ordinary cards leave native chrome alone; missing native bridge is safe", 
     card.setConfig({ ...card.config, immersive: true });
   });
   await expect.poll(async () => (await chrome(page)).top).toBe("#f4f3ee");
-  await page.getByRole("button", { name: "Switch to dark mode" }).click();
+  await setAppearance(page, "dark");
   expect((await chrome(page)).top).toBe("#1a2320");
 });

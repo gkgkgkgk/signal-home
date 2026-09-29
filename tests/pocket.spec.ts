@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { setAppearance } from "../scripts/appearance.mjs";
 test.beforeEach(async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/");
@@ -117,7 +118,7 @@ for (const width of [320, 360, 390, 430, 760])
   }) => {
     await page.setViewportSize({ width, height: 740 });
     await page.emulateMedia({ reducedMotion: "reduce" });
-    await page.getByRole("button", { name: "Switch to dark mode" }).click();
+    await setAppearance(page, "dark");
     expect(
       await page.evaluate(
         () => document.documentElement.scrollWidth <= innerWidth,

@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { setAppearance } from "../scripts/appearance.mjs";
 test("climate range actions preserve other limit and respect bounds", async ({
   page,
 }) => {
@@ -130,11 +131,9 @@ test("dark preference persists and unavailable safety never claims clear", async
   page,
 }) => {
   await page.goto("/");
-  await page.getByRole("button", { name: "Switch to dark mode" }).click();
+  await setAppearance(page, "dark");
   await page.reload();
-  await expect(
-    page.getByRole("button", { name: "Switch to light mode" }),
-  ).toBeVisible();
+  await expect(page.locator("signal-home .app")).toHaveClass(/dark/);
   expect(
     await page
       .getByRole("heading", { name: "Home feels good." })
