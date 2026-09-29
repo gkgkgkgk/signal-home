@@ -67,13 +67,40 @@ await page.waitForTimeout(450);
 await page.screenshot({ path: "docs/sheet-desktop-dark.png" });
 await page.getByRole("button", { name: "Close details" }).click();
 await page.setViewportSize({ width: 390, height: 844 });
-await page.getByRole("navigation", { name: "Mobile navigation" }).getByRole("button", { name: "Lists", exact: true }).click();
-await page.evaluate(() => window.demo.setItems([
-  { uid: "1", summary: "Fresh lemons", status: "needs_action" },
-  { uid: "2", summary: "Oat milk", status: "completed", completed: new Date(Date.now() - 3600000).toISOString() },
-  { uid: "3", summary: "Coffee beans", status: "completed", completed: new Date(Date.now() - 2 * 86400000).toISOString() },
-]));
+await page
+  .getByRole("navigation", { name: "Mobile navigation" })
+  .getByRole("button", { name: "Lists", exact: true })
+  .click();
+await page.evaluate(() =>
+  window.demo.setItems([
+    { uid: "1", summary: "Fresh lemons", status: "needs_action" },
+    {
+      uid: "2",
+      summary: "Oat milk",
+      status: "completed",
+      completed: new Date(Date.now() - 3600000).toISOString(),
+    },
+    {
+      uid: "3",
+      summary: "Coffee beans",
+      status: "completed",
+      completed: new Date(Date.now() - 2 * 86400000).toISOString(),
+    },
+  ]),
+);
 await page.getByRole("button", { name: "Restore Oat milk" }).waitFor();
 await page.waitForTimeout(400);
 await page.screenshot({ path: "docs/completed-mobile-dark.png" });
+await page
+  .getByRole("button", { name: "Delete Oat milk", exact: true })
+  .click();
+await page.waitForTimeout(400);
+await page.screenshot({ path: "docs/delete-mobile-dark.png" });
+await page.getByRole("button", { name: "Keep item", exact: true }).click();
+await setAppearance(page, "light");
+await page
+  .getByRole("button", { name: "Delete Oat milk", exact: true })
+  .click();
+await page.waitForTimeout(400);
+await page.screenshot({ path: "docs/delete-mobile-light.png" });
 await browser.close();

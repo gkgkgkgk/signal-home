@@ -130,7 +130,9 @@ test("failed restore retains the completed item and reports the error", async ({
 }) => {
   await page.goto("/#signal/lists");
   await page.getByRole("button", { name: "Complete Oat milk" }).click();
-  await expect(page.getByRole("button", { name: "Restore Oat milk" })).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Restore Oat milk" }),
+  ).toBeEnabled();
   await page.evaluate(() => ((window as any).demo.fail = true));
   await page.getByRole("button", { name: "Restore Oat milk" }).click();
   await expect(page.getByRole("status")).toContainText("Couldn’t update");

@@ -1,5 +1,103 @@
 import { css } from "lit";
 export const pocketStyles = css`
+  .groceries {
+    overflow-anchor: none;
+  }
+  .todo-label {
+    flex: 1;
+    min-width: 0;
+    padding: 12px 0;
+  }
+  .todo-trash {
+    width: 44px;
+    height: 44px;
+    flex-shrink: 0;
+    display: grid;
+    place-items: center;
+    border: 0;
+    border-radius: 14px;
+    background: transparent;
+    color: inherit;
+    opacity: 0.65;
+    transition:
+      background 160ms ease,
+      opacity 160ms ease,
+      transform 160ms ease;
+  }
+  .todo-trash svg {
+    width: 18px;
+    height: 18px;
+  }
+  .todo-trash:not(:disabled):hover,
+  .todo-trash:focus-visible {
+    background: #51352012;
+    opacity: 1;
+  }
+  .todo-trash:not(:disabled):active {
+    background: #51352020;
+    transform: scale(0.9);
+  }
+  .delete-confirmation {
+    color: var(--ink);
+  }
+  .delete-symbol {
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 16px;
+    color: #9c342c;
+    background: #f9d8d1;
+  }
+  .delete-symbol svg {
+    width: 24px;
+    height: 24px;
+  }
+  .delete-confirmation p {
+    font-size: 14px;
+    line-height: 1.55;
+    color: var(--muted);
+  }
+  .delete-confirmation .delete-item {
+    color: var(--ink);
+    font-size: 21px;
+    font-weight: 650;
+    line-height: 1.3;
+    overflow-wrap: anywhere;
+    margin: 18px 0 8px;
+  }
+  .delete-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 24px;
+  }
+  .delete-actions button {
+    min-height: 48px;
+    flex: 1;
+    padding: 10px 14px;
+    border-radius: 16px;
+    border: 1px solid var(--line);
+    background: transparent;
+    color: var(--ink);
+    font-size: 13px;
+    font-weight: 650;
+  }
+  .delete-actions .delete-accept {
+    background: #a53730;
+    border-color: #a53730;
+    color: #fff7f3;
+  }
+  .delete-confirmation .delete-error {
+    color: #a53730;
+  }
+  .dark .delete-actions .delete-accept {
+    background: #f6a99d;
+    border-color: #f6a99d;
+    color: #4a1c19;
+  }
+  .dark .delete-confirmation .delete-error {
+    color: #f6a99d;
+  }
   .header-context {
     min-width: 0;
     flex: 1;

@@ -22,7 +22,7 @@ Signal is a self-contained Lovelace card with Overview, Climate, Safety, and Lis
 - A pinned mobile header shows a greeting (or custom address/nickname), date and home label. Content fades beneath its scrolling edge; the opaque background matches the system bars.
 - Opaque, softly sculpted surfaces, springy press feedback, and detail sheets that enter from the tapped control. Spacious full controls remain on desktop.
 - Animated climate dial, single target and dual heating/cooling limits, capability-aware mode selection.
-- Live weather, shared grocery list with add/check-off/Undo, recently completed tasks, recoverable Older completed after 24 hours, and named safety sensors with optional battery readings.
+- Live weather, shared grocery list with add/check-off/Undo, smooth task transitions, recently completed tasks, recoverable Older completed after 24 hours, confirmed permanent deletion, and named safety sensors with optional battery readings.
 - Tactile switches, brightness/color/temperature sliders, fans, animated blinds, media transport/volume, scenes, selectors, number controls, and confirmed unlocking.
 - Recorded-history graphs with 6h/24h/7d views, pointer/keyboard inspection, and honest gaps when sensors go unavailable.
 - Standalone control, graph, and metric cards with visual editors, usable in ordinary HA dashboards.
@@ -95,6 +95,10 @@ Replace entity IDs with your own. Every entity field is optional; unconfigured c
 Choose appearance in Signal's settings menu. Auto uses HA's configured time zone (device time if unavailable); System follows the device's light/dark preference. Changes apply on the next minute or app resume. Old sun/moon-button preferences are retired so this release starts from the configured/default mode. Preferences do not change other HA dashboards. Standalone cards retain their own appearance configuration.
 
 ## Shared lists and retention
+
+Each active or completed task has a touch-friendly trash button. A small confirmation shows the exact item and warns that deletion affects everyone. **Keep item**, Escape, or Back dismisses it without a change. **Delete permanently** removes only the selected item's UID through HA's `todo.remove_item` service; there is no undo for deletion. Failed requests keep the confirmation open for retry. The trash button is disabled for unavailable lists or providers without deletion support.
+
+Check-offs and restores ease out and back in, with neighboring rows sliding into place. Changes appear only after HA accepts them; refreshes wait until the transition finishes. Reduced-motion preferences skip these animations.
 
 To-do items belong to the configured HA entity, not the user/browser: everyone using that entity shares check-offs and restores. Signal retrieves both active and completed items. **Undo** appears immediately after a check-off; completed rows remain tappable to restore. After 24 hours they move into the collapsed **Older completed** section, not the trash. A provider's completion timestamp is authoritative. For providers without timestamps, the recent/older grouping uses first-seen time on that browser and may differ between devices; it never authorizes deletion.
 

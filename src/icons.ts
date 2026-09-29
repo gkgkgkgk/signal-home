@@ -1,5 +1,6 @@
 import { svg } from "lit";
 const paths: Record<string, string> = {
+  trash: "M4 7h16M9 7V4h6v3M6 7l1 14h10l1-14M10 11v6M14 11v6",
   music:
     "M9 18V5l12-3v13M9 7l12-3M9 18a3 3 0 1 1-3-3c1.5 0 3 1 3 3ZM21 15a3 3 0 1 1-3-3c1.5 0 3 1 3 3Z",
   cover: "M4 3h16v18H4ZM4 7h16M4 11h16M4 15h16",

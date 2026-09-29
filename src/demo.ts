@@ -73,6 +73,8 @@ const hass: Hass = {
       states[id] = { ...states[id], attributes };
     }
     if (domain === "todo") {
+      if (service === "remove_item")
+        items = items.filter((item) => item.uid !== data.item);
       if (service === "update_item")
         items = items.map((i) =>
           i.uid === data.item

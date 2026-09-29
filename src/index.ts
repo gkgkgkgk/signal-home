@@ -1,6 +1,8 @@
 import { LitElement, html, nothing, type PropertyValues } from "lit";
 import { keyed } from "lit/directives/keyed.js";
 import { live } from "lit/directives/live.js";
+import { repeat } from "lit/directives/repeat.js";
+import type { SignalSheet } from "./sheet";
 import { styles } from "./styles";
 import { pocketStyles } from "./pocket-styles";
 import { ImmersiveChrome } from "./immersive-chrome";
@@ -61,6 +63,8 @@ export class SignalHome extends LitElement {
     appearance: { state: true },
     completedTodos: { state: true },
     undoItem: { state: true },
+    deleteTarget: { state: true },
+    deleteError: { state: true },
   };
   static styles = [styles, pocketStyles];
   declare hass: Hass;
@@ -71,6 +75,11 @@ export class SignalHome extends LitElement {
   private completedTodos: Todo[] = [];
   private completionTimes: Record<string, number> = {};
   private undoItem?: Todo;
+  private deleteTarget?: { item: Todo; entity: string };
+  private deleteError = "";
+  private todoMutating = false;
+  private todoRefreshPending = false;
+  private todoOrder = new Map<string, number>();
   private detailEntity = "";
   private menuOpen = false;
   private contentScrolled = false;
@@ -217,7 +226,9 @@ export class SignalHome extends LitElement {
     this.todoSequence++;
     this.todos = [];
     this.completedTodos = [];
+    this.todoOrder.clear();
     this.undoItem = undefined;
+    this.closeDelete();
     try {
       this.completionTimes = JSON.parse(
         localStorage.getItem(this.completionKey) || "{}",
@@ -313,7 +324,12 @@ export class SignalHome extends LitElement {
   }
   private async loadTodos() {
     const entity = this.config.todo;
-    if (!entity || !this.hass || this.todoLoading) return;
+    if (!entity || !this.hass) return;
+    if (this.todoMutating || this.todoLoading) {
+      this.todoRefreshPending = true;
+      return;
+    }
+    this.todoRefreshPending = false;
     this.todoLoading = true;
     const sequence = ++this.todoSequence;
     try {
@@ -329,6 +345,7 @@ export class SignalHome extends LitElement {
       if (sequence === this.todoSequence) {
         const items = result.response?.[entity]?.items;
         if (!Array.isArray(items)) throw new Error("Missing list response");
+        this.todoOrder = new Map(items.map((item, index) => [item.uid, index]));
         this.todos = items.filter((item) => item.status === "needs_action");
         this.completedTodos = items.filter(
           (item) => item.status === "completed",
@@ -350,6 +367,8 @@ export class SignalHome extends LitElement {
         this.todoError = "Your list couldn’t be loaded. Tap to retry.";
     } finally {
       this.todoLoading = false;
+      if (this.todoRefreshPending && !this.todoMutating && this.isConnected)
+        void this.loadTodos();
     }
   }
   private get completionKey() {
@@ -371,10 +390,159 @@ export class SignalHome extends LitElement {
       ? recorded
       : this.completionTimes[item.uid] || Date.now();
   }
+  private motionRows() {
+    return Array.from(
+      this.renderRoot.querySelectorAll<HTMLElement>("[data-todo-motion]"),
+    ).filter((row) => row.getClientRects().length);
+  }
+  /** Commit only after HA accepts the change; keep refreshes out of the transition. */
+  private async moveTodo(
+    uid: string,
+    commit: () => void,
+    entity: string,
+    focused = false,
+  ) {
+    const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const rows = this.motionRows();
+    const outgoing = rows.find((row) => row.dataset.todoUid === uid);
+    if (outgoing && !reduced) {
+      await outgoing
+        .animate(
+          [
+            { opacity: 1, transform: "none" },
+            { opacity: 0, transform: "translateX(10px) scale(.98)" },
+          ],
+          { duration: 150, easing: "ease-in", fill: "forwards" },
+        )
+        .finished.catch(() => {});
+    }
+    if (entity !== this.config.todo || !this.isConnected) return;
+    const before = new Map(
+      rows.map((row) => [
+        row.dataset.todoMotion!,
+        row.getBoundingClientRect().top,
+      ]),
+    );
+    commit();
+    await this.updateComplete;
+    const next = this.motionRows();
+    const animations: Animation[] = [];
+    if (!reduced)
+      for (const row of next) {
+        const previous = before.get(row.dataset.todoMotion!);
+        const moved = row.dataset.todoUid === uid;
+        const delta =
+          previous === undefined || moved
+            ? 12
+            : previous - row.getBoundingClientRect().top;
+        if (!delta && !moved) continue;
+        animations.push(
+          row.animate(
+            [
+              {
+                transform: `translateY(${delta}px)`,
+                opacity: previous === undefined || moved ? 0 : 1,
+              },
+              { transform: "none", opacity: 1 },
+            ],
+            { duration: 300, easing: "cubic-bezier(.2,.8,.2,1)" },
+          ),
+        );
+      }
+    await Promise.all(
+      animations.map((animation) => animation.finished.catch(() => {})),
+    );
+    // A keyboard action must not strand focus when its row changes sections.
+    // Do not steal focus from a modal or a different tab opened in the meantime.
+    if (
+      focused &&
+      this.tab === "lists" &&
+      !this.deleteTarget &&
+      !this.menuOpen &&
+      !this.detailEntity
+    ) {
+      const destination = next.find((row) => row.dataset.todoUid === uid);
+      const button =
+        destination?.querySelector<HTMLButtonElement>(".check-button");
+      // Wait until the caller re-enables the controls, without opening a mobile keyboard.
+      requestAnimationFrame(() => {
+        if (button?.isConnected && !button.disabled)
+          button.focus({ preventScroll: true });
+        else if (this.tab === "lists")
+          this.renderRoot
+            .querySelector<HTMLButtonElement>(
+              '[aria-label="Refresh groceries"]',
+            )
+            ?.focus({ preventScroll: true });
+      });
+    }
+  }
+  private closeDelete() {
+    if (this.deleteTarget)
+      this.renderRoot
+        .querySelector<SignalSheet>("#delete-sheet")
+        ?.requestClose();
+  }
+  private askDelete(item: Todo) {
+    if (this.busy || !this.config.todo || !this.canDeleteTodo) return;
+    this.deleteError = "";
+    this.deleteTarget = { item, entity: this.config.todo };
+  }
+  private async deleteTodo() {
+    const target = this.deleteTarget;
+    if (
+      !target ||
+      this.busy ||
+      target.entity !== this.config.todo ||
+      !this.canDeleteTodo
+    )
+      return;
+    this.busy = true;
+    this.todoMutating = true;
+    this.todoSequence++;
+    try {
+      await this.hass.callService("todo", "remove_item", {
+        entity_id: target.entity,
+        item: target.item.uid,
+      });
+      if (target.entity !== this.config.todo || !this.isConnected) return;
+      await this.moveTodo(
+        target.item.uid,
+        () => {
+          this.todos = this.todos.filter(
+            (item) => item.uid !== target.item.uid,
+          );
+          this.completedTodos = this.completedTodos.filter(
+            (item) => item.uid !== target.item.uid,
+          );
+          delete this.completionTimes[target.item.uid];
+          this.saveCompletionTimes();
+          this.notify("Permanently deleted.");
+        },
+        target.entity,
+      );
+      if (this.deleteTarget === target) this.closeDelete();
+    } catch {
+      if (this.deleteTarget === target)
+        this.deleteError =
+          "Couldn’t delete this item. Check your connection and try again.";
+      else this.notify("Couldn’t delete this item. Try again.");
+    } finally {
+      this.busy = false;
+      this.todoMutating = false;
+      if (this.todoRefreshPending && this.isConnected) void this.loadTodos();
+    }
+  }
   private async complete(item: Todo, restore = false) {
     if (this.busy) return;
     const entity = this.config.todo;
+    const active = this.shadowRoot?.activeElement;
+    const focused =
+      !!active?.matches(":focus-visible") &&
+      active.closest<HTMLElement>("[data-todo-uid]")?.dataset.todoUid ===
+        item.uid;
     this.busy = true;
+    this.todoMutating = true;
     this.todoSequence++;
     try {
       await this.hass.callService("todo", "update_item", {
@@ -383,32 +551,49 @@ export class SignalHome extends LitElement {
         status: restore ? "needs_action" : "completed",
       });
       if (entity !== this.config.todo) return;
-      if (restore) {
-        delete this.completionTimes[item.uid];
-        this.completedTodos = this.completedTodos.filter(
-          (t) => t.uid !== item.uid,
-        );
-        if (!this.todos.some((t) => t.uid === item.uid))
-          this.todos = [
-            ...this.todos,
-            { ...item, status: "needs_action", completed: null },
-          ];
-        this.notify("Back on your list.");
-      } else {
-        this.completionTimes[item.uid] = Date.now();
-        this.todos = this.todos.filter((t) => t.uid !== item.uid);
-        this.completedTodos = [
-          { ...item, status: "completed", completed: new Date().toISOString() },
-          ...this.completedTodos.filter((t) => t.uid !== item.uid),
-        ];
-        this.notify("Checked off.");
-        this.undoItem = item;
-      }
-      this.saveCompletionTimes();
+      await this.moveTodo(
+        item.uid,
+        () => {
+          if (restore) {
+            delete this.completionTimes[item.uid];
+            this.completedTodos = this.completedTodos.filter(
+              (t) => t.uid !== item.uid,
+            );
+            if (!this.todos.some((t) => t.uid === item.uid))
+              this.todos = [
+                ...this.todos,
+                { ...item, status: "needs_action", completed: null },
+              ].sort(
+                (a, b) =>
+                  (this.todoOrder.get(a.uid) ?? Infinity) -
+                  (this.todoOrder.get(b.uid) ?? Infinity),
+              );
+            this.notify("Back on your list.");
+          } else {
+            this.completionTimes[item.uid] = Date.now();
+            this.todos = this.todos.filter((t) => t.uid !== item.uid);
+            this.completedTodos = [
+              {
+                ...item,
+                status: "completed",
+                completed: new Date().toISOString(),
+              },
+              ...this.completedTodos.filter((t) => t.uid !== item.uid),
+            ];
+            this.notify("Checked off.");
+            this.undoItem = item;
+          }
+          this.saveCompletionTimes();
+        },
+        entity!,
+        focused,
+      );
     } catch {
       this.notify("Couldn’t update the list. Try again.");
     } finally {
       this.busy = false;
+      this.todoMutating = false;
+      if (this.todoRefreshPending && this.isConnected) void this.loadTodos();
     }
   }
   private async addTodo(event: Event) {
@@ -682,6 +867,38 @@ export class SignalHome extends LitElement {
       </div>
     </section>`;
   }
+  private get canDeleteTodo() {
+    const state = this.hass.states[this.config.todo || ""];
+    return (
+      available(state) && !!(Number(state?.attributes.supported_features) & 2)
+    );
+  }
+  private todoRow(item: Todo, completed = false) {
+    return html`<div
+      class=${`todo-row ${completed ? "completed-row" : ""}`}
+      data-todo-uid=${item.uid}
+      data-todo-motion=${`row:${item.uid}`}
+    >
+      <button
+        class="check-button"
+        ?disabled=${this.busy}
+        aria-label=${`${completed ? "Restore" : "Complete"} ${item.summary}`}
+        @click=${() => this.complete(item, completed)}
+      >
+        <span class="check-box">${completed ? icon("check") : nothing}</span>
+      </button>
+      <span class="todo-label">${item.summary}</span>
+      <button
+        class="todo-trash"
+        ?disabled=${this.busy || !this.canDeleteTodo}
+        aria-label=${`Delete ${item.summary}`}
+        title="Delete permanently"
+        @click=${() => this.askDelete(item)}
+      >
+        ${icon("trash")}
+      </button>
+    </div>`;
+  }
   private grocery(detail = false) {
     return html`<section class="panel apricot groceries">
       <div class="panel-top">
@@ -700,18 +917,10 @@ export class SignalHome extends LitElement {
             : html`<div class="list-preview">
                 ${
                   this.todos.length
-                    ? (detail ? this.todos : this.todos.slice(0, 2)).map(
-                        (item) =>
-                          html`<div class="todo-row">
-                            <button
-                              class="check-button"
-                              ?disabled=${this.busy}
-                              aria-label=${`Complete ${item.summary}`}
-                              @click=${() => this.complete(item)}
-                            >
-                              <span class="check-box"></span></button
-                            ><span>${item.summary}</span>
-                          </div>`,
+                    ? repeat(
+                        detail ? this.todos : this.todos.slice(0, 2),
+                        (item) => item.uid,
+                        (item) => this.todoRow(item),
                       )
                     : html`<div class="empty">
                         ${this.todoLoading ? "Loading your list…" : "All caught up. Room for something good."}
@@ -719,7 +928,7 @@ export class SignalHome extends LitElement {
                 }
               </div>`
       }
-      ${detail && this.config.todo ? html`<form class="todo-form" @submit=${this.addTodo}><input aria-label="New grocery item" placeholder="Add something good…" maxlength="255" .value=${this.draft} @input=${(e: Event) => (this.draft = (e.target as HTMLInputElement).value)} /><button aria-label="Add grocery item" ?disabled=${this.busy || !this.draft.trim()}>${icon("plus")}</button></form>` : html`<button class="text-button" @click=${() => this.navigate("lists")}>${this.todos.length ? `${this.todos.length} things on your list` : "Open your list"} ${icon("arrow")}</button>`}
+      ${detail && this.config.todo ? html`<form class="todo-form" data-todo-motion="form" @submit=${this.addTodo}><input aria-label="New grocery item" placeholder="Add something good…" maxlength="255" .value=${this.draft} @input=${(e: Event) => (this.draft = (e.target as HTMLInputElement).value)} /><button aria-label="Add grocery item" ?disabled=${this.busy || !this.draft.trim()}>${icon("plus")}</button></form>` : html`<button class="text-button" @click=${() => this.navigate("lists")}>${this.todos.length ? `${this.todos.length} things on your list` : "Open your list"} ${icon("arrow")}</button>`}
       ${detail && !this.todoError ? this.completedList() : nothing}
     </section>`;
   }
@@ -732,31 +941,27 @@ export class SignalHome extends LitElement {
     const recent = sorted.filter((item) => this.completedAt(item) > cutoff);
     const older = sorted.filter((item) => this.completedAt(item) <= cutoff);
     const rows = (items: Todo[]) =>
-      items.map(
-        (item) =>
-          html`<div class="todo-row completed-row">
-            <button
-              class="check-button"
-              aria-label=${`Restore ${item.summary}`}
-              ?disabled=${this.busy}
-              @click=${() => this.complete(item, true)}
-            >
-              <span class="check-box">${icon("check")}</span></button
-            ><span>${item.summary}</span>
-          </div>`,
+      repeat(
+        items,
+        (item) => item.uid,
+        (item) => this.todoRow(item, true),
       );
     return html`<div class="completed-list">
-      <h3>Recently completed <span>${recent.length}</span></h3>
-      <p>
+      <h3 data-todo-motion="completed-heading">
+        Recently completed <span>${recent.length}</span>
+      </h3>
+      <p data-todo-motion="completed-help">
         Tap a check to put it back. After 24 hours, items move to Older
         completed.
       </p>
-      ${this.config.completed_retention_days ? html`<p>HA automatically deletes timestamped completed items after ${this.config.completed_retention_days} days. Restore anything you still need before then.</p>` : nothing}
+      ${this.config.completed_retention_days ? html`<p data-todo-motion="retention">HA automatically deletes timestamped completed items after ${this.config.completed_retention_days} days. Restore anything you still need before then.</p>` : nothing}
       ${rows(recent)}
       ${
         older.length
           ? html`<details>
-              <summary>Older completed · ${older.length}</summary>
+              <summary data-todo-motion="older-heading">
+                Older completed · ${older.length}
+              </summary>
               ${rows(older)}
             </details>`
           : nothing
@@ -1154,6 +1359,50 @@ export class SignalHome extends LitElement {
             dashboard’s address. Your login and permissions stay with Home
             Assistant.
           </p>
+        </div>
+      </signal-sheet>
+      <signal-sheet
+        id="delete-sheet"
+        .compact=${true}
+        .open=${!!this.deleteTarget}
+        heading="Delete permanently?"
+        .dark=${this.dark}
+        @signal-close=${() => {
+          const deleted =
+            this.deleteTarget &&
+            ![...this.todos, ...this.completedTodos].some(
+              (item) => item.uid === this.deleteTarget!.item.uid,
+            );
+          this.deleteTarget = undefined;
+          this.deleteError = "";
+          if (deleted && this.tab === "lists")
+            this.renderRoot
+              .querySelector<HTMLButtonElement>(
+                '[aria-label="Refresh groceries"]',
+              )
+              ?.focus({ preventScroll: true });
+        }}
+      >
+        <div class="delete-confirmation">
+          <div class="delete-symbol" aria-hidden="true">${icon("trash")}</div>
+          <p class="delete-item">${this.deleteTarget?.item.summary}</p>
+          <p>
+            This removes the item from the shared list for everyone. It can’t be
+            undone.
+          </p>
+          ${this.deleteError ? html`<p class="delete-error" role="alert">${this.deleteError}</p>` : nothing}
+          <div class="delete-actions">
+            <button ?disabled=${this.busy} @click=${this.closeDelete}>
+              Keep item
+            </button>
+            <button
+              class="delete-accept"
+              ?disabled=${this.busy}
+              @click=${this.deleteTodo}
+            >
+              ${this.busy ? "Deleting…" : "Delete permanently"}
+            </button>
+          </div>
         </div>
       </signal-sheet>
       <signal-details

@@ -7,6 +7,7 @@ export class SignalSheet extends LitElement {
     open: { type: Boolean },
     heading: { type: String },
     dark: { type: Boolean },
+    compact: { type: Boolean },
   };
   static styles = css`
     :host {
@@ -39,6 +40,20 @@ export class SignalSheet extends LitElement {
     }
     dialog::backdrop {
       background: #101e18a3;
+    }
+    dialog.compact {
+      position: fixed;
+      inset: 0;
+      margin: auto;
+      width: min(420px, calc(100vw - 32px));
+      border: 1px solid var(--line);
+      border-radius: 28px;
+    }
+    dialog.compact .handle {
+      display: none;
+    }
+    dialog.compact h2 {
+      font-size: 22px;
     }
     header {
       display: flex;
@@ -123,6 +138,7 @@ export class SignalSheet extends LitElement {
   open = false;
   heading = "Details";
   dark = false;
+  compact = false;
   // A history marker, not a security token. HA commonly runs on HTTP LAN URLs.
   private sheetId = `signal-sheet-${Date.now()}-${Math.random().toString(36).slice(2)}`;
   private closing = false;
@@ -258,7 +274,7 @@ export class SignalSheet extends LitElement {
   render() {
     return html`<dialog
       @keydown=${this.trapTab}
-      class=${this.dark ? "dark" : ""}
+      class=${[this.dark ? "dark" : "", this.compact ? "compact" : ""].filter(Boolean).join(" ")}
       aria-labelledby="sheet-heading"
       @cancel=${(e: Event) => {
         e.preventDefault();
