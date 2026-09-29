@@ -111,7 +111,9 @@ views:
         # Your entity configuration goes here.
 ```
 
-Kiosk Mode is optional and separately installed. `immersive: true` only adjusts Signal's viewport layout; it does not hide HA by itself. Use a Kiosk Mode version compatible with your HA version. This setup applies only to the dashboard where you add it—do not use Kiosk Mode's global query-string caching.
+Kiosk Mode is optional and separately installed. `immersive: true` adjusts Signal's viewport layout and matches the surrounding page/status-bar colors to Signal; it does not hide HA by itself. Use a Kiosk Mode version compatible with your HA version. This setup applies only to the dashboard where you add it—do not use Kiosk Mode's global query-string caching.
+
+In immersive mode, Signal temporarily supplies the root theme colors read by the Android and iOS companion apps and sends HA's [`theme-update` message](https://developers.home-assistant.io/docs/frontend/external-bus/#theme-update) through the existing app bridge. Browser theme-color metadata follows too. The colors track Signal's light/dark toggle and are released when you leave the dashboard or use recovery. Your saved HA theme and server-wide default are not changed. This matches the native frame; it does not force fullscreen, hide system indicators, or change native edge-to-edge settings. Actual system-bar behavior depends on the companion app and OS version.
 
 The Signal menu's **Open standard Home Assistant** link reloads the same dashboard with `?disable_km`, restoring HA navigation and the editor. Bookmark that recovery URL. Remove the parameter to return to immersive mode. Account/sign-out opens HA's native profile; settings are shown for administrators. Authentication, sessions, permissions, and companion-app onboarding remain entirely with HA. Hiding navigation is not access control.
 

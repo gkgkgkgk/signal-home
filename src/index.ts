@@ -3,6 +3,7 @@ import { keyed } from "lit/directives/keyed.js";
 import { live } from "lit/directives/live.js";
 import { styles } from "./styles";
 import { pocketStyles } from "./pocket-styles";
+import { ImmersiveChrome } from "./immersive-chrome";
 import { icon } from "./icons";
 import {
   available,
@@ -58,6 +59,23 @@ export class SignalHome extends LitElement {
   private dark = false;
   private detailEntity = "";
   private menuOpen = false;
+  private chrome = new ImmersiveChrome();
+  private chromePath = "";
+  private get immersive() {
+    return (
+      !!this.config.immersive &&
+      !new URLSearchParams(location.search).has("disable_km")
+    );
+  }
+  private syncChrome = () => {
+    if (
+      this.isConnected &&
+      this.immersive &&
+      location.pathname === this.chromePath
+    )
+      this.chrome.sync(this.dark, this.hass?.auth?.external);
+    else this.chrome.release();
+  };
   private phone = window.matchMedia("(max-width: 760px)");
   private narrow = this.phone.matches;
   private resize = () => {
@@ -99,6 +117,9 @@ export class SignalHome extends LitElement {
   };
   connectedCallback() {
     super.connectedCallback();
+    this.chromePath = location.pathname;
+    window.addEventListener("location-changed", this.syncChrome);
+    window.addEventListener("popstate", this.syncChrome);
     this.syncRoute();
     window.addEventListener("popstate", this.syncRoute);
     window.addEventListener("hashchange", this.syncRoute);
@@ -113,6 +134,9 @@ export class SignalHome extends LitElement {
   }
   disconnectedCallback() {
     super.disconnectedCallback();
+    window.removeEventListener("location-changed", this.syncChrome);
+    window.removeEventListener("popstate", this.syncChrome);
+    this.chrome.release();
     window.removeEventListener("popstate", this.syncRoute);
     window.removeEventListener("hashchange", this.syncRoute);
     this.media.removeEventListener("change", this.applyAppearance);
@@ -188,6 +212,7 @@ export class SignalHome extends LitElement {
     return { columns: "full", min_columns: 12 };
   }
   protected updated(changed: PropertyValues) {
+    this.syncChrome();
     if (
       (changed.has("hass") || changed.has("config")) &&
       this.config.todo &&
@@ -863,7 +888,7 @@ export class SignalHome extends LitElement {
     recovery.hash = "";
     const sensor = this.sensors.find((s) => s.entity === this.detailEntity);
     return html`<div
-      class=${`app ${this.dark ? "dark" : ""} ${this.config.immersive && !new URLSearchParams(location.search).has("disable_km") ? "immersive" : ""} ${this.tab === "home" ? "overview-page" : ""}`}
+      class=${`app ${this.dark ? "dark" : ""} ${this.immersive ? "immersive" : ""} ${this.tab === "home" ? "overview-page" : ""}`}
     >
       <aside>
         <div class="sidebar-inner">

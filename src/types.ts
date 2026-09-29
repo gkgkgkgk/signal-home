@@ -4,6 +4,9 @@ export interface Entity {
   attributes: Record<string, any>;
 }
 export interface Hass {
+  auth?: {
+    external?: { fireMessage(message: { type: "theme-update" }): void };
+  };
   states: Record<string, Entity>;
   user?: { name: string; is_admin?: boolean };
   locale?: { language: string };
