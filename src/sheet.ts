@@ -128,6 +128,7 @@ export class SignalSheet extends LitElement {
   private closing = false;
   private closeRequested = false;
   private startY = 0;
+  private entryTransform = "translateY(24px) scale(.96)";
   private trapTab(event: KeyboardEvent) {
     if (event.key !== "Tab") return;
     const focusable: HTMLElement[] = [];
@@ -185,12 +186,42 @@ export class SignalSheet extends LitElement {
       const dialog = this.renderRoot.querySelector("dialog")!;
       if (this.open && !dialog.open) {
         this.closeRequested = false;
+        let trigger = document.activeElement;
+        while (trigger?.shadowRoot?.activeElement)
+          trigger = trigger.shadowRoot.activeElement;
+        const source = trigger?.getBoundingClientRect();
         dialog.showModal();
+        const destination = dialog.getBoundingClientRect();
+        if (source && source.width && source.height) {
+          const x = Math.max(
+            -48,
+            Math.min(
+              48,
+              (source.x +
+                source.width / 2 -
+                destination.x -
+                destination.width / 2) *
+                0.18,
+            ),
+          );
+          const y = Math.max(
+            -64,
+            Math.min(
+              64,
+              (source.y +
+                source.height / 2 -
+                destination.y -
+                destination.height / 2) *
+                0.18,
+            ),
+          );
+          this.entryTransform = `translate(${x}px,${y}px) scale(.96)`;
+        }
         history.pushState({ ...history.state, signalSheet: this.sheetId }, "");
         if (!matchMedia("(prefers-reduced-motion: reduce)").matches)
           dialog.animate(
             [
-              { opacity: 0, transform: "translateY(35px) scale(.98)" },
+              { opacity: 0, transform: this.entryTransform },
               { opacity: 1, transform: "none" },
             ],
             { duration: 280, easing: "cubic-bezier(.16,1,.3,1)" },
@@ -213,7 +244,7 @@ export class SignalSheet extends LitElement {
         .animate(
           [
             { opacity: 1, transform: "none" },
-            { opacity: 0, transform: "translateY(20px)" },
+            { opacity: 0, transform: this.entryTransform },
           ],
           { duration: 140, easing: "ease-in" },
         )

@@ -2,6 +2,7 @@ import { LitElement, html, nothing, type PropertyValues } from "lit";
 import { keyed } from "lit/directives/keyed.js";
 import { live } from "lit/directives/live.js";
 import { styles } from "./styles";
+import { pocketStyles } from "./pocket-styles";
 import { icon } from "./icons";
 import {
   available,
@@ -48,19 +49,29 @@ export class SignalHome extends LitElement {
     rangeSide: { state: true },
     detailEntity: { state: true },
     menuOpen: { state: true },
+    narrow: { state: true },
   };
-  static styles = styles;
+  static styles = [styles, pocketStyles];
   declare hass: Hass;
   private config: Config = { type: "custom:signal-home" };
   private tab = "home";
   private dark = false;
   private detailEntity = "";
   private menuOpen = false;
+  private phone = window.matchMedia("(max-width: 760px)");
+  private narrow = this.phone.matches;
+  private resize = () => {
+    this.narrow = this.phone.matches;
+  };
   private todos: Todo[] = [];
   private rangeSide: "low" | "high" = "low";
   private syncRoute = () => {
     const route = location.hash.replace("#signal/", "");
-    this.tab = tabs.some((t) => t.id === route) ? route : "home";
+    const next = tabs.some((t) => t.id === route) ? route : "home";
+    if (next !== this.tab) {
+      this.tab = next;
+      this.resetScroll();
+    }
   };
   private todoError = "";
   private busy = false;
@@ -92,6 +103,8 @@ export class SignalHome extends LitElement {
     window.addEventListener("popstate", this.syncRoute);
     window.addEventListener("hashchange", this.syncRoute);
     this.media.addEventListener("change", this.applyAppearance);
+    this.phone.addEventListener("change", this.resize);
+    this.resize();
     this.applyAppearance();
     this.clock = setInterval(() => {
       this.requestUpdate();
@@ -103,6 +116,7 @@ export class SignalHome extends LitElement {
     window.removeEventListener("popstate", this.syncRoute);
     window.removeEventListener("hashchange", this.syncRoute);
     this.media.removeEventListener("change", this.applyAppearance);
+    this.phone.removeEventListener("change", this.resize);
     clearInterval(this.clock);
     clearTimeout(this.timer);
     this.todoSequence++;
@@ -303,6 +317,12 @@ export class SignalHome extends LitElement {
   private navigate(id: string) {
     if (id !== this.tab) history.pushState(history.state, "", `#signal/${id}`);
     this.tab = id;
+    this.resetScroll();
+  }
+  private resetScroll() {
+    void this.updateComplete.then(() =>
+      this.renderRoot.querySelector("main")?.scrollTo({ top: 0 }),
+    );
   }
   private nav(bottom = false) {
     return html`<nav
@@ -684,6 +704,7 @@ export class SignalHome extends LitElement {
         </div>`;
     if (this.tab === "lists")
       return html`<div style="max-width:740px">${this.grocery(true)}</div>`;
+    if (this.narrow) return this.pocketOverview();
     return html`<div class="grid">
         ${this.climate()}
         <div class="stack">${this.weather()}${this.grocery()}</div>
@@ -696,6 +717,121 @@ export class SignalHome extends LitElement {
         </button>
       </div>
       ${this.safety()}`;
+  }
+  private pocketOverview() {
+    const climate = this.state(this.config.climate);
+    const c = climate?.attributes || {};
+    const climateReady = available(climate);
+    const weather = this.state(this.config.weather);
+    const w = weather?.attributes || {};
+    const weatherReady = available(weather);
+    const tempUnit = this.hass.config?.unit_system?.temperature || "°";
+    const humidity = number(
+      this.state(this.config.humidity)?.state ?? c.current_humidity,
+    );
+    const summary = this.safetySummary;
+    const target = !climateReady
+      ? this.config.climate
+        ? "Controls unavailable"
+        : "Choose a climate entity in the editor"
+      : climate.state === "off"
+        ? "Climate is off"
+        : climate.state === "heat_cool"
+          ? `Heat ${this.format(c.target_temp_low)}° · Cool ${this.format(c.target_temp_high)}°`
+          : `${modeLabels[climate.state] || words(climate.state)} · Target ${this.format(c.temperature)}°`;
+    const todo = this.state(this.config.todo);
+    const count = available(todo) ? number(todo.state) : undefined;
+    return html`<div class="pocket-overview">
+      <button
+        class="pocket-tile comfort-tile mint"
+        aria-label="Climate details"
+        ?disabled=${!this.config.climate}
+        @click=${() => this.moreInfo(this.config.climate)}
+      >
+        <span class="tile-top"
+          ><span class="tile-label">${icon("climate")} Inside</span
+          ><span class="live-chip"
+            >${climateReady ? words(c.hvac_action || climate.state) : "Unavailable"}</span
+          ></span
+        >
+        <span class="comfort-reading"
+          ><span class="pocket-temperature"
+            >${climateReady ? this.format(c.current_temperature) : "—"}<small
+              >${tempUnit}</small
+            ></span
+          ><span class="comfort-orbit" aria-hidden="true"
+            ><i></i><i></i><span>${icon("home")}</span></span
+          ></span
+        >
+        <span class="tile-bottom"
+          ><span
+            ><strong>${target}</strong
+            ><small
+              >${humidity !== undefined ? `${this.format(humidity)}% humidity` : "Humidity unavailable"}</small
+            ></span
+          ><span class="tile-arrow">${icon("arrow")}</span></span
+        >
+      </button>
+      <div class="pocket-pair">
+        <button
+          class="pocket-tile outside-tile lilac"
+          aria-label="Weather details"
+          ?disabled=${!this.config.weather}
+          @click=${() => this.moreInfo(this.config.weather)}
+        >
+          <span class="tile-top"
+            ><span class="tile-label">Outside</span
+            >${icon(weather?.state === "clear-night" ? "moon" : weather?.state === "sunny" ? "sun" : weather?.state?.includes("rain") ? "drop" : weather?.state?.includes("wind") ? "wind" : "cloud")}</span
+          >
+          <span class="pocket-reading"
+            >${weatherReady ? this.format(w.temperature) : "—"}<small
+              >${w.temperature_unit || tempUnit}</small
+            ></span
+          ><span class="tile-bottom"
+            ><span class="tile-caption"
+              >${weatherReady ? words(weather.state) : this.config.weather ? "Unavailable" : "Choose weather in editor"}</span
+            >${icon("arrow")}</span
+          >
+        </button>
+        <button
+          class="pocket-tile list-tile apricot"
+          aria-label="Open groceries"
+          @click=${() => this.navigate("lists")}
+        >
+          <span class="tile-top"
+            ><span class="tile-label">Groceries</span>${icon("list")}</span
+          ><span class="pocket-reading"
+            >${count === undefined ? "—" : count}<small
+              >${count === 1 ? "item" : "items"}</small
+            ></span
+          ><span class="tile-bottom"
+            ><span class="tile-caption"
+              >${this.todoError ? "Tap to retry" : count === undefined ? "Open your list" : count === 0 ? "All caught up" : this.todos[0]?.summary || "Ready when you are"}</span
+            >${icon("arrow")}</span
+          >
+        </button>
+      </div>
+      <button
+        class=${`home-signal ${summary.alarm ? "attention" : summary.unknown ? "uncertain" : ""}`}
+        @click=${() => this.navigate("safety")}
+        aria-label=${`Home status: ${summary.text}`}
+      >
+        <span class="signal-symbol"
+          >${icon(summary.alarm || summary.unknown ? "warn" : "shield")}</span
+        ><span
+          ><strong>${summary.text}</strong
+          ><small
+            >${summary.alarm ? "Take a closer look" : summary.unknown ? "Some spaces cannot be checked" : this.sensors.length ? "Your sensors, together" : "Choose sensors in the editor"}</small
+          ></span
+        >${icon("arrow")}
+      </button>
+      ${this.favorites()}
+      <div class="section-top">
+        <h2>Around the house</h2>
+        <small>${this.sensors.length} sensors</small>
+      </div>
+      ${this.safety()}
+    </div>`;
   }
   render() {
     if (!this.hass)
@@ -727,7 +863,7 @@ export class SignalHome extends LitElement {
     recovery.hash = "";
     const sensor = this.sensors.find((s) => s.entity === this.detailEntity);
     return html`<div
-      class=${`app ${this.dark ? "dark" : ""} ${this.config.immersive ? "immersive" : ""}`}
+      class=${`app ${this.dark ? "dark" : ""} ${this.config.immersive && !new URLSearchParams(location.search).has("disable_km") ? "immersive" : ""} ${this.tab === "home" ? "overview-page" : ""}`}
     >
       <aside>
         <div class="sidebar-inner">

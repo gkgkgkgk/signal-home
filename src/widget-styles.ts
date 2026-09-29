@@ -71,6 +71,10 @@ export const widgetStyles = css`
     padding: 22px;
     height: 100%;
     min-width: 0;
+    background-image: linear-gradient(145deg, #ffffff0b, transparent 60%);
+    box-shadow:
+      inset 0 1px 0 #ffffff18,
+      0 8px 20px -18px #0008;
   }
   .widget.lilac {
     --accent: #dce0fa;

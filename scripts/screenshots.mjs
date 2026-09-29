@@ -17,6 +17,7 @@ await page.getByRole("button", { name: "Switch to dark mode" }).click();
 await page.waitForTimeout(350);
 await page.screenshot({ path: "docs/desktop-dark.png", fullPage: true });
 await page.setViewportSize({ width: 390, height: 844 });
+await page.waitForTimeout(600);
 await page.screenshot({ path: "docs/mobile-dark.png", fullPage: true });
 await page.getByRole("button", { name: "Switch to light mode" }).click();
 await page.waitForTimeout(350);

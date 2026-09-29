@@ -18,6 +18,8 @@ Signal is a self-contained Lovelace card with Overview, Climate, Safety, and Lis
 ## Features
 
 - Light, dark, and system appearance; quick toggle saved per browser.
+- Phone-first overview: current room temperature, weather, groceries, and home status in whole-tile touch targets. A reserved bottom dock never covers scrolling content.
+- Opaque, softly sculpted surfaces, springy press feedback, and detail sheets that enter from the tapped control. Spacious full controls remain on desktop.
 - Animated climate dial, single target and dual heating/cooling limits, capability-aware mode selection.
 - Live weather, grocery list with add/check-off, and named safety sensors with optional battery readings.
 - Tactile switches, brightness/color/temperature sliders, fans, animated blinds, media transport/volume, scenes, selectors, number controls, and confirmed unlocking.
@@ -26,7 +28,7 @@ Signal is a self-contained Lovelace card with Overview, Climate, Safety, and Lis
 - Matching device sheets: climate controls, weather forecasts, safety history, sensor graphs, and device controls. Native HA is an explicit advanced fallback.
 - Signal menu with appearance, account/sign-out, admin settings, and a standard-HA recovery link.
 - Visual entity editor and YAML configuration.
-- Reduced-motion support, labeled controls, keyboard focus, and layouts tested down to 360 pixels.
+- Reduced-motion support, labeled controls, keyboard focus, and phone overview layouts tested down to 320 pixels.
 - One bundled JavaScript file; no separate theme, fonts, CDN, telemetry, or backend integration.
 
 ## Install with HACS
