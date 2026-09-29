@@ -51,6 +51,7 @@ export class SignalHome extends LitElement {
     detailEntity: { state: true },
     menuOpen: { state: true },
     narrow: { state: true },
+    contentScrolled: { state: true },
   };
   static styles = [styles, pocketStyles];
   declare hass: Hass;
@@ -59,6 +60,10 @@ export class SignalHome extends LitElement {
   private dark = false;
   private detailEntity = "";
   private menuOpen = false;
+  private contentScrolled = false;
+  private onContentScroll = (event: Event) => {
+    this.contentScrolled = (event.currentTarget as HTMLElement).scrollTop > 4;
+  };
   private chrome = new ImmersiveChrome();
   private chromePath = "";
   private get immersive() {
@@ -858,6 +863,44 @@ export class SignalHome extends LitElement {
       ${this.safety()}
     </div>`;
   }
+  private appHeader(time: Date) {
+    return html`<header
+      class=${`app-header ${this.contentScrolled ? "scrolled" : ""}`}
+    >
+      <div class="eyebrow">
+        ${
+          this.narrow
+            ? html`<span class="header-title"
+                >${this.tab === "home" ? this.config.title || "Home" : tabs.find((t) => t.id === this.tab)?.name}</span
+              >`
+            : html`${this.config.title || "Home"}<span
+                  style="color:var(--muted);font-weight:400"
+                >
+                  / ${tabs.find((t) => t.id === this.tab)?.name}</span
+                >`
+        }
+      </div>
+      <div class="header-right">
+        <span class="date"
+          >${time.toLocaleDateString(this.hass.locale?.language || undefined, { weekday: "short", month: "short", day: "numeric" })}</span
+        >
+        <button
+          class="icon-button"
+          aria-label=${this.dark ? "Switch to light mode" : "Switch to dark mode"}
+          @click=${this.toggleAppearance}
+        >
+          ${icon(this.dark ? "sun" : "moon")}
+        </button>
+        <button
+          class="icon-button"
+          aria-label="Open Signal menu"
+          @click=${() => (this.menuOpen = true)}
+        >
+          ${icon("settings")}
+        </button>
+      </div>
+    </header>`;
+  }
   render() {
     if (!this.hass)
       return html`<div class="notice" role="status">Connecting to home…</div>`;
@@ -904,33 +947,9 @@ export class SignalHome extends LitElement {
           </div>
         </div>
       </aside>
-      <main>
-        <header>
-          <div class="eyebrow">
-            ${this.config.title || "Home"}
-            <span style="color:var(--muted);font-weight:400"
-              >/ ${tabs.find((t) => t.id === this.tab)?.name}</span
-            >
-          </div>
-          <div class="header-right">
-            <span class="date"
-              >${time.toLocaleDateString(this.hass.locale?.language || undefined, { weekday: "short", month: "short", day: "numeric" })}</span
-            ><button
-              class="icon-button"
-              aria-label=${this.dark ? "Switch to light mode" : "Switch to dark mode"}
-              @click=${this.toggleAppearance}
-            >
-              ${icon(this.dark ? "sun" : "moon")}
-            </button>
-            <button
-              class="icon-button"
-              aria-label="Open Signal menu"
-              @click=${() => (this.menuOpen = true)}
-            >
-              ${icon("settings")}
-            </button>
-          </div>
-        </header>
+      ${this.narrow ? this.appHeader(time) : nothing}
+      <main @scroll=${this.onContentScroll}>
+        ${!this.narrow ? this.appHeader(time) : nothing}
         <div class="page-heading">
           <div>
             <h1>${title}</h1>

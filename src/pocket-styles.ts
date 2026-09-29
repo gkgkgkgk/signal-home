@@ -272,7 +272,8 @@ export const pocketStyles = css`
   @media (max-width: 760px) {
     .app {
       display: grid;
-      grid-template-rows: minmax(0, 1fr) auto;
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-rows: auto minmax(0, 1fr) auto;
       height: calc(100dvh - var(--signal-header-height, 56px));
       min-height: 0;
       overflow: hidden;
@@ -286,17 +287,45 @@ export const pocketStyles = css`
       overflow-y: auto;
       overscroll-behavior-y: contain;
       scrollbar-width: none;
-      padding: 18px 18px 24px;
+      padding: 19px 18px 24px;
+      scroll-padding-top: 12px;
     }
     .app main::-webkit-scrollbar {
       display: none;
     }
     .app.immersive main {
-      padding-top: max(18px, env(safe-area-inset-top));
+      padding-top: 19px;
     }
     header {
-      margin-bottom: 19px;
+      --signal-top-padding: 10px;
+      min-width: 0;
+      position: relative;
+      z-index: 10;
+      margin: 0;
+      padding: var(--signal-top-padding) 18px 10px;
       gap: 10px;
+      background: var(--paper);
+      transition: box-shadow 180ms ease;
+    }
+    .app.immersive > header {
+      --signal-top-padding: max(10px, env(safe-area-inset-top));
+    }
+    header.scrolled {
+      box-shadow: 0 10px 16px -12px #00000045;
+    }
+    header .eyebrow {
+      min-width: 0;
+      flex: 1;
+    }
+    .header-title {
+      display: block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-size: 16px;
+      font-weight: 650;
+      text-transform: none;
+      letter-spacing: -0.3px;
     }
     .eyebrow {
       font-size: 10px;
@@ -304,6 +333,7 @@ export const pocketStyles = css`
     }
     .header-right {
       gap: 7px;
+      flex-shrink: 0;
     }
     .header-right .icon-button {
       background: var(--surface);
@@ -399,6 +429,7 @@ export const pocketStyles = css`
   @media (prefers-reduced-motion: reduce) {
     .pocket-tile,
     .home-signal,
+    header,
     .nav-indicator {
       transition: none !important;
     }

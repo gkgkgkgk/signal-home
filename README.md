@@ -19,6 +19,7 @@ Signal is a self-contained Lovelace card with Overview, Climate, Safety, and Lis
 
 - Light, dark, and system appearance; quick toggle saved per browser.
 - Phone-first overview: current room temperature, weather, groceries, and home status in whole-tile touch targets. A reserved bottom dock never covers scrolling content.
+- A pinned mobile header keeps the page title and menu accessible while the greeting and cards scroll underneath. A quiet shadow appears only when scrolled; the opaque background matches the system bars.
 - Opaque, softly sculpted surfaces, springy press feedback, and detail sheets that enter from the tapped control. Spacious full controls remain on desktop.
 - Animated climate dial, single target and dual heating/cooling limits, capability-aware mode selection.
 - Live weather, grocery list with add/check-off, and named safety sensors with optional battery readings.
