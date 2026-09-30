@@ -18,13 +18,13 @@ Signal is a self-contained Lovelace card with Overview, Climate, Safety, and Lis
 ## Features
 
 - A shared motion language: crisp press feedback, short directional page transitions, settling navigation, and small acknowledgment/check-off details. Re-tapping the current tab keeps your scroll position. Reduced-motion preferences turn decorative movement off.
-- Quiet loading: list placeholders only on first load; background refreshes preserve tasks. Graphs reserve their plot space, keep their existing time scale until fresh data arrives, and retain clearly labeled previous history if a refresh fails. Appearance changes do not reload graphs.
+- Quiet loading: list placeholders only on first load; background refreshes preserve tasks. Graphs reserve their plot space, keep their existing time scale until fresh data arrives, and retain clearly labeled previous history if a refresh fails. Climate-sheet history waits until the entrance finishes; reopening reuses up to 60 seconds of cached history, held only in memory and scoped to the HA connection/user. Appearance changes do not reload graphs.
 - Device controls acknowledge accepted commands without pretending the reported device state changed. Quick-close dialogs smoothly interrupt their opening animation.
 
 - Settings-only appearance: Auto (light 7am–7pm, dark overnight in HA's home time zone), System, Dark, or Light; saved per browser/device. Auto is the default.
 - Phone-first overview: current room temperature, weather, groceries, and home status in whole-tile touch targets. A reserved bottom dock never covers scrolling content.
 - A pinned mobile header shows a greeting (or custom address/nickname), date and home label. Content fades beneath its scrolling edge; the opaque background matches the system bars.
-- Opaque, softly sculpted surfaces, springy press feedback, and detail sheets that enter from the tapped control. Spacious full controls remain on desktop.
+- Opaque, softly sculpted surfaces and springy press feedback. Phone detail sheets slide from the bottom without shrinking, with a synchronized backdrop fade; desktop and compact confirmations use a small fade/lift. Back or Escape can interrupt the entrance without snapping. Spacious full controls remain on desktop.
 - Animated climate dial, single target and dual heating/cooling limits, capability-aware mode selection.
 - Live weather, shared grocery list with add/check-off/Undo, smooth task transitions, recently completed tasks, recoverable Older completed after 24 hours, confirmed permanent deletion, and named safety sensors with optional battery readings.
 - Tactile switches, brightness/color/temperature sliders, fans, animated blinds, media transport/volume, scenes, selectors, number controls, and confirmed unlocking.

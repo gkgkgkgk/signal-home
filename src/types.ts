@@ -4,11 +4,12 @@ export interface Entity {
   attributes: Record<string, any>;
 }
 export interface Hass {
+  connection?: object;
   auth?: {
     external?: { fireMessage(message: { type: "theme-update" }): void };
   };
   states: Record<string, Entity>;
-  user?: { name: string; is_admin?: boolean };
+  user?: { id?: string; name: string; is_admin?: boolean };
   locale?: { language: string };
   config?: { unit_system?: { temperature?: string }; time_zone?: string };
   callService(

@@ -95,6 +95,7 @@ states["sensor.battery"] = {
 const update = () =>
   cards.forEach((card) => (card.hass = { ...hass, states: { ...states } }));
 const hass: Hass = {
+  connection: {},
   states,
   locale: { language: "en" },
   async callService(domain, service, data) {

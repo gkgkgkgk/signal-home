@@ -59,6 +59,7 @@ export class SignalHome extends LitElement {
     draft: { state: true },
     rangeSide: { state: true },
     detailEntity: { state: true },
+    detailReady: { state: true },
     menuOpen: { state: true },
     narrow: { state: true },
     contentScrolled: { state: true },
@@ -155,6 +156,7 @@ export class SignalHome extends LitElement {
     }
   }
   private detailEntity = "";
+  private detailReady = false;
   private menuOpen = false;
   private contentScrolled = false;
   private onContentScroll = (event: Event) => {
@@ -389,7 +391,10 @@ export class SignalHome extends LitElement {
     }
   }
   private moreInfo(entity?: string) {
-    if (entity) this.detailEntity = entity;
+    if (entity) {
+      this.detailReady = false;
+      this.detailEntity = entity;
+    }
   }
   private async loadTodos() {
     const entity = this.todoEntity;
@@ -1155,7 +1160,7 @@ export class SignalHome extends LitElement {
         })}
       </div>`;
   }
-  private graphs() {
+  private graphs(suspended = false) {
     if (!this.config.graphs?.length) return nothing;
     return html`<div class="section-top">
         <h2>The bigger picture</h2>
@@ -1165,6 +1170,7 @@ export class SignalHome extends LitElement {
         ${this.config.graphs.map((entry, index) => {
           const graph = typeof entry === "string" ? { entity: entry } : entry;
           return html`<signal-graph
+            .suspended=${suspended}
             .hass=${this.hass}
             .configuration=${{ ...graph, type: "custom:signal-graph", accent: index % 2 ? "mint" : "lilac", appearance: this.dark ? "dark" : "light" }}
           ></signal-graph>`;
@@ -1538,12 +1544,13 @@ export class SignalHome extends LitElement {
         .name=${this.detailEntity === this.config.climate ? "Climate" : this.detailEntity === this.config.weather ? "Weather" : sensor?.name || ""}
         .battery=${sensor?.battery || ""}
         .custom=${!!this.detailEntity && [this.config.climate, this.config.weather].includes(this.detailEntity)}
-        @signal-close=${() => (this.detailEntity = "")}
+        @signal-opened=${() => (this.detailReady = true)}
+        @signal-close=${() => { this.detailEntity = ""; this.detailReady = false; }}
       >
         ${
           this.detailEntity === this.config.climate
             ? html`<div class="sheet-custom">
-                ${this.climate(true)}${this.message ? html`<p role="status">${this.message}</p>` : nothing}${this.graphs()}
+                ${this.climate(true)}${this.message ? html`<p role="status">${this.message}</p>` : nothing}${this.graphs(!this.detailReady)}
               </div>`
             : this.detailEntity === this.config.weather
               ? html`<div class="sheet-custom">

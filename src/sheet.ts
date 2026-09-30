@@ -149,8 +149,37 @@ export class SignalSheet extends LitElement {
   private closing = false;
   private closeRequested = false;
   private startY = 0;
-  private entryTransform = "translateY(24px) scale(.96)";
+  private entryTransform = "translateY(12px)";
+  private mobileSheet = false;
   private entryAnimation?: Animation;
+  private backdropAnimation?: Animation;
+  private exitAnimation?: Animation;
+  private motionSequence = 0;
+  private cancelMotion() {
+    this.motionSequence++;
+    this.entryAnimation?.cancel();
+    this.backdropAnimation?.cancel();
+    this.exitAnimation?.cancel();
+  }
+  private fadeBackdrop(
+    dialog: HTMLDialogElement,
+    from: string,
+    to: string,
+    duration: number,
+    easing: string,
+  ) {
+    this.backdropAnimation?.cancel();
+    // Keep the native top layer and focus trap; only animate its scrim.
+    this.backdropAnimation = dialog.animate(
+      [{ opacity: from }, { opacity: to }],
+      {
+        pseudoElement: "::backdrop",
+        duration,
+        easing,
+        fill: "both",
+      },
+    );
+  }
   private trapTab(event: KeyboardEvent) {
     if (event.key !== "Tab") return;
     const focusable: HTMLElement[] = [];
@@ -196,7 +225,7 @@ export class SignalSheet extends LitElement {
   disconnectedCallback() {
     super.disconnectedCallback();
     window.removeEventListener("popstate", this.pop);
-    this.entryAnimation?.cancel();
+    this.cancelMotion();
     this.renderRoot.querySelector("dialog")?.close();
     if (history.state?.signalSheet === this.sheetId) {
       const state = { ...history.state };
@@ -208,49 +237,49 @@ export class SignalSheet extends LitElement {
     if (changed.has("open")) {
       const dialog = this.renderRoot.querySelector("dialog")!;
       if (this.open && !dialog.open) {
+        this.cancelMotion();
+        const sequence = this.motionSequence;
+        this.closing = false;
         this.closeRequested = false;
-        let trigger = document.activeElement;
-        while (trigger?.shadowRoot?.activeElement)
-          trigger = trigger.shadowRoot.activeElement;
-        const source = trigger?.getBoundingClientRect();
+        this.mobileSheet =
+          !this.compact && matchMedia("(max-width: 600px)").matches;
+        this.entryTransform = this.mobileSheet
+          ? "translateY(100%)"
+          : "translateY(12px)";
         dialog.showModal();
-        const destination = dialog.getBoundingClientRect();
-        if (source && source.width && source.height) {
-          const x = Math.max(
-            -48,
-            Math.min(
-              48,
-              (source.x +
-                source.width / 2 -
-                destination.x -
-                destination.width / 2) *
-                0.18,
-            ),
-          );
-          const y = Math.max(
-            -64,
-            Math.min(
-              64,
-              (source.y +
-                source.height / 2 -
-                destination.y -
-                destination.height / 2) *
-                0.18,
-            ),
-          );
-          this.entryTransform = `translate(${x}px,${y}px) scale(.96)`;
-        }
         history.pushState({ ...history.state, signalSheet: this.sheetId }, "");
-        if (!matchMedia("(prefers-reduced-motion: reduce)").matches)
+        const opened = () => {
+          if (
+            sequence === this.motionSequence &&
+            this.open &&
+            !this.closeRequested &&
+            !this.closing
+          )
+            this.dispatchEvent(
+              new CustomEvent("signal-opened", {
+                bubbles: true,
+                composed: true,
+              }),
+            );
+        };
+        if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
+          const easing = "cubic-bezier(.2,.8,.2,1)";
+          this.fadeBackdrop(dialog, "0", "1", 280, easing);
           this.entryAnimation = dialog.animate(
             [
-              { opacity: 0, transform: this.entryTransform },
+              {
+                opacity: this.mobileSheet ? 1 : 0,
+                transform: this.entryTransform,
+              },
               { opacity: 1, transform: "none" },
             ],
-            { duration: 280, easing: "cubic-bezier(.16,1,.3,1)" },
+            { duration: 280, easing },
           );
+          void this.entryAnimation.finished.then(opened, () => {});
+        } else opened();
       } else if (!this.open && dialog.open) {
-        this.entryAnimation?.cancel();
+        this.cancelMotion();
+        this.closing = false;
         dialog.close();
       }
     }
@@ -267,15 +296,27 @@ export class SignalSheet extends LitElement {
     const dialog = this.renderRoot.querySelector("dialog")!;
     const current = getComputedStyle(dialog);
     const start = { opacity: current.opacity, transform: current.transform };
+    const backdropOpacity = getComputedStyle(dialog, "::backdrop").opacity;
+    const sequence = ++this.motionSequence;
     this.entryAnimation?.cancel();
-    if (dialog.open && !matchMedia("(prefers-reduced-motion: reduce)").matches)
-      await dialog
-        .animate([start, { opacity: 0, transform: this.entryTransform }], {
-          duration: 140,
-          easing: "ease-in",
-        })
-        .finished.catch(() => {});
+    if (
+      dialog.open &&
+      !matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) {
+      const easing = "cubic-bezier(.4,0,1,1)";
+      this.fadeBackdrop(dialog, backdropOpacity, "0", 200, easing);
+      this.exitAnimation = dialog.animate(
+        [
+          start,
+          { opacity: this.mobileSheet ? 1 : 0, transform: this.entryTransform },
+        ],
+        { duration: 200, easing, fill: "both" },
+      );
+      await this.exitAnimation.finished.catch(() => {});
+    }
+    if (sequence !== this.motionSequence || !this.isConnected) return;
     dialog.close();
+    this.cancelMotion();
     this.closing = false;
     this.dispatchEvent(
       new CustomEvent("signal-close", { bubbles: true, composed: true }),

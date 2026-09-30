@@ -58,6 +58,7 @@ const update = () => {
   card.hass = { ...hass, states: { ...states } };
 };
 const hass: Hass = {
+  connection: {},
   states,
   user: { name: "Alex", is_admin: true },
   locale: { language: "en" },

@@ -16,6 +16,14 @@ interface GraphConfig {
   accent?: string;
   appearance?: string;
 }
+interface HistorySnapshot {
+  points: HistoryPoint[];
+  start: number;
+  end: number;
+  hours: number;
+}
+// Short-lived, bounded memory only; never persist a home's history to storage.
+const historyCache = new WeakMap<object, Map<string, HistorySnapshot>>();
 export class SignalGraph extends LitElement {
   static properties = {
     hass: { attribute: false },
@@ -25,6 +33,7 @@ export class SignalGraph extends LitElement {
     error: { state: true },
     hours: { state: true },
     cursor: { state: true },
+    suspended: { type: Boolean },
   };
   static styles = [
     widgetStyles,
@@ -113,7 +122,6 @@ export class SignalGraph extends LitElement {
         stroke-linejoin: round;
         stroke-linecap: round;
         vector-effect: non-scaling-stroke;
-        animation: draw-in 600ms cubic-bezier(0.16, 1, 0.3, 1) both;
       }
       .widget.dark .line {
         stroke: var(--accent);
@@ -195,16 +203,6 @@ export class SignalGraph extends LitElement {
       .widget.auto .line {
         stroke: var(--signal-graph-stroke, var(--accent-ink));
       }
-      @keyframes draw-in {
-        from {
-          opacity: 0;
-          transform: translateY(5px);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
-      }
       @keyframes shimmer {
         to {
           background-position: -200% 0;
@@ -219,6 +217,7 @@ export class SignalGraph extends LitElement {
     motionStyles,
   ];
   declare hass: Hass;
+  suspended = false;
   private config: GraphConfig = { type: "custom:signal-graph", entity: "" };
   private points: HistoryPoint[] = [];
   private loading = false;
@@ -229,6 +228,9 @@ export class SignalGraph extends LitElement {
   private sequence = 0;
   private queried = "";
   private timer?: ReturnType<typeof setInterval>;
+  private cacheOwner?: object;
+  private cacheUser = "";
+  private restored = "";
   private end = Date.now();
   private start = this.end - 86400000;
   setConfig(c: GraphConfig) {
@@ -247,6 +249,7 @@ export class SignalGraph extends LitElement {
     this.hours = c.hours || 24;
     this.displayedHours = this.hours;
     this.queried = "";
+    this.restored = "";
     this.points = [];
     this.sequence++;
   }
@@ -307,15 +310,48 @@ export class SignalGraph extends LitElement {
     this.queried = "";
   }
   protected updated(changed: PropertyValues) {
+    if (this.hass) {
+      const owner = this.hass.connection || this.hass.callWS;
+      const user = this.hass.user?.id || this.hass.user?.name || "";
+      if (owner !== this.cacheOwner || user !== this.cacheUser) {
+        this.cacheOwner = owner;
+        this.cacheUser = user;
+        this.sequence++;
+        this.queried = this.restored = "";
+        this.points = [];
+        this.loading = false;
+        this.error = "";
+      }
+      const key = `${this.config.entity}:${this.hours}`;
+      if (this.restored !== key) {
+        this.restored = key;
+        const cached = historyCache.get(owner)?.get(`${user}:${key}`);
+        if (cached && Date.now() - cached.end < 60000) {
+          this.points = cached.points;
+          this.start = cached.start;
+          this.end = cached.end;
+          this.displayedHours = cached.hours;
+          this.queried = key;
+        }
+      }
+    }
     if (
       this.hass &&
-      (changed.has("hass") || changed.has("config")) &&
+      (changed.has("hass") ||
+        changed.has("config") ||
+        changed.has("suspended")) &&
       this.queried !== `${this.config.entity}:${this.hours}`
     )
       void this.fetchHistory();
   }
   private async fetchHistory() {
-    if (!this.hass || !this.config.entity || !this.isConnected) return;
+    if (
+      !this.hass ||
+      !this.config.entity ||
+      !this.isConnected ||
+      this.suspended
+    )
+      return;
     const sequence = ++this.sequence;
     this.queried = `${this.config.entity}:${this.hours}`;
     this.loading = true;
@@ -341,6 +377,13 @@ export class SignalGraph extends LitElement {
         this.start = start;
         this.end = end;
         this.displayedHours = hours;
+        const owner = this.hass.connection || this.hass.callWS;
+        let cache = historyCache.get(owner);
+        if (!cache) historyCache.set(owner, (cache = new Map()));
+        const key = `${this.cacheUser}:${this.queried}`;
+        cache.delete(key);
+        cache.set(key, { points: this.points, start, end, hours });
+        if (cache.size > 16) cache.delete(cache.keys().next().value!);
       }
     } catch {
       if (sequence === this.sequence) {
@@ -457,11 +500,12 @@ export class SignalGraph extends LitElement {
           of history</span
         >
       </div>
-      <div class="plot" aria-busy=${this.loading}>
+      <div class="plot" aria-busy=${this.loading || this.suspended}>
         ${
-          this.loading && !this.points.length
+          (this.loading || this.suspended) && !this.points.length
             ? html`<div
                 class="skeleton"
+                style=${this.suspended ? "animation: none" : ""}
                 role="status"
                 aria-label="Loading history"
               ></div>`

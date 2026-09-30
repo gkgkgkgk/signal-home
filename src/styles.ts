@@ -508,6 +508,9 @@ export const styles = css`
     display: inline-block;
     animation: value-in 300ms cubic-bezier(0.16, 1, 0.3, 1);
   }
+  .sheet-custom .value-in {
+    animation: none;
+  }
   @keyframes value-in {
     from {
       opacity: 0.3;
