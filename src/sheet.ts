@@ -1,5 +1,6 @@
 import { LitElement, html, css, type PropertyValues } from "lit";
 import { icon } from "./icons";
+import { motionStyles } from "./motion";
 
 /** Native top-layer dialog: focus containment, inert background, and an owned Back entry. */
 export class SignalSheet extends LitElement {
@@ -9,132 +10,136 @@ export class SignalSheet extends LitElement {
     dark: { type: Boolean },
     compact: { type: Boolean },
   };
-  static styles = css`
-    :host {
-      font-family: var(--signal-font, system-ui, sans-serif);
-    }
-    * {
-      box-sizing: border-box;
-    }
-    dialog {
-      --paper: #f4f3ee;
-      --ink: #222b28;
-      --muted: #606963;
-      --line: #dedfd6;
-      background: var(--paper);
-      color: var(--ink);
-      border: 1px solid var(--line);
-      border-radius: 30px;
-      padding: 0;
-      width: min(580px, calc(100vw - 40px));
-      max-height: 88dvh;
-      overflow: hidden;
-      box-shadow: 0 24px 90px #0003;
-    }
-    dialog.dark {
-      --paper: #1a2320;
-      --ink: #f0f2e9;
-      --muted: #b0bcb2;
-      --line: #425248;
-      color-scheme: dark;
-    }
-    dialog::backdrop {
-      background: #101e18a3;
-    }
-    dialog.compact {
-      position: fixed;
-      inset: 0;
-      margin: auto;
-      width: min(420px, calc(100vw - 32px));
-      border: 1px solid var(--line);
-      border-radius: 28px;
-    }
-    dialog.compact .handle {
-      display: none;
-    }
-    dialog.compact h2 {
-      font-size: 22px;
-    }
-    header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      padding: 22px 24px 16px;
-      touch-action: none;
-    }
-    h2 {
-      font-size: 24px;
-      letter-spacing: -0.8px;
-      margin: 0;
-      font-weight: 650;
-    }
-    button {
-      display: grid;
-      place-items: center;
-      border: 1px solid var(--line);
-      border-radius: 50%;
-      width: 44px;
-      height: 44px;
-      flex-shrink: 0;
-      background: transparent;
-      color: var(--ink);
-      cursor: pointer;
-      touch-action: manipulation;
-    }
-    button:active {
-      transform: scale(0.94);
-    }
-    button:focus-visible {
-      outline: 3px solid #6d8cce;
-      outline-offset: 3px;
-    }
-    svg {
-      width: 21px;
-      height: 21px;
-    }
-    .body {
-      padding: 0 24px 24px;
-      overflow-y: auto;
-      max-height: calc(88dvh - 90px);
-      overscroll-behavior: contain;
-    }
-    .handle {
-      display: none;
-    }
-    @media (max-width: 600px) {
-      dialog {
-        position: fixed;
-        inset: auto 0 0;
-        margin: 0;
-        width: 100%;
-        max-width: 100%;
-        max-height: 92dvh;
-        border-radius: 28px 28px 0 0;
-        border-bottom: 0;
+  static styles = [
+    css`
+      :host {
+        font-family: var(--signal-font, system-ui, sans-serif);
       }
-      .handle {
-        display: block;
-        position: absolute;
-        width: 34px;
-        height: 4px;
-        top: 10px;
-        left: calc(50% - 17px);
-        background: var(--line);
-        border-radius: 4px;
+      * {
+        box-sizing: border-box;
+      }
+      dialog {
+        --paper: #f4f3ee;
+        --ink: #222b28;
+        --muted: #606963;
+        --line: #dedfd6;
+        background: var(--paper);
+        color: var(--ink);
+        border: 1px solid var(--line);
+        border-radius: 30px;
+        padding: 0;
+        width: min(580px, calc(100vw - 40px));
+        max-height: 88dvh;
+        overflow: hidden;
+        box-shadow: 0 24px 90px #0003;
+      }
+      dialog.dark {
+        --paper: #1a2320;
+        --ink: #f0f2e9;
+        --muted: #b0bcb2;
+        --line: #425248;
+        color-scheme: dark;
+      }
+      dialog::backdrop {
+        background: #101e18a3;
+      }
+      dialog.compact {
+        position: fixed;
+        inset: 0;
+        margin: auto;
+        width: min(420px, calc(100vw - 32px));
+        border: 1px solid var(--line);
+        border-radius: 28px;
+      }
+      dialog.compact .handle {
+        display: none;
+      }
+      dialog.compact h2 {
+        font-size: 22px;
       }
       header {
-        padding: 26px 20px 16px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 22px 24px 16px;
+        touch-action: none;
       }
       h2 {
-        font-size: 23px;
+        font-size: 24px;
+        letter-spacing: -0.8px;
+        margin: 0;
+        font-weight: 650;
+      }
+      button {
+        display: grid;
+        place-items: center;
+        border: 1px solid var(--line);
+        border-radius: 50%;
+        width: 44px;
+        height: 44px;
+        flex-shrink: 0;
+        background: transparent;
+        color: var(--ink);
+        cursor: pointer;
+        touch-action: manipulation;
+        transition: transform 240ms var(--signal-ease);
+      }
+      button:active {
+        transform: scale(0.94);
+      }
+      button:focus-visible {
+        outline: 3px solid #6d8cce;
+        outline-offset: 3px;
+      }
+      svg {
+        width: 21px;
+        height: 21px;
       }
       .body {
-        padding: 0 16px max(24px, env(safe-area-inset-bottom));
-        max-height: calc(92dvh - 96px);
+        padding: 0 24px 24px;
+        overflow-y: auto;
+        max-height: calc(88dvh - 90px);
+        overscroll-behavior: contain;
       }
-    }
-  `;
+      .handle {
+        display: none;
+      }
+      @media (max-width: 600px) {
+        dialog {
+          position: fixed;
+          inset: auto 0 0;
+          margin: 0;
+          width: 100%;
+          max-width: 100%;
+          max-height: 92dvh;
+          border-radius: 28px 28px 0 0;
+          border-bottom: 0;
+        }
+        .handle {
+          display: block;
+          position: absolute;
+          width: 34px;
+          height: 4px;
+          top: 10px;
+          left: calc(50% - 17px);
+          background: var(--line);
+          border-radius: 4px;
+        }
+        header {
+          padding: 26px 20px 16px;
+        }
+        h2 {
+          font-size: 23px;
+        }
+        .body {
+          padding: 0 16px max(24px, env(safe-area-inset-bottom));
+          max-height: calc(92dvh - 96px);
+        }
+      }
+    `,
+    motionStyles,
+  ];
   open = false;
   heading = "Details";
   dark = false;
@@ -145,6 +150,7 @@ export class SignalSheet extends LitElement {
   private closeRequested = false;
   private startY = 0;
   private entryTransform = "translateY(24px) scale(.96)";
+  private entryAnimation?: Animation;
   private trapTab(event: KeyboardEvent) {
     if (event.key !== "Tab") return;
     const focusable: HTMLElement[] = [];
@@ -190,6 +196,7 @@ export class SignalSheet extends LitElement {
   disconnectedCallback() {
     super.disconnectedCallback();
     window.removeEventListener("popstate", this.pop);
+    this.entryAnimation?.cancel();
     this.renderRoot.querySelector("dialog")?.close();
     if (history.state?.signalSheet === this.sheetId) {
       const state = { ...history.state };
@@ -235,14 +242,17 @@ export class SignalSheet extends LitElement {
         }
         history.pushState({ ...history.state, signalSheet: this.sheetId }, "");
         if (!matchMedia("(prefers-reduced-motion: reduce)").matches)
-          dialog.animate(
+          this.entryAnimation = dialog.animate(
             [
               { opacity: 0, transform: this.entryTransform },
               { opacity: 1, transform: "none" },
             ],
             { duration: 280, easing: "cubic-bezier(.16,1,.3,1)" },
           );
-      } else if (!this.open && dialog.open) dialog.close();
+      } else if (!this.open && dialog.open) {
+        this.entryAnimation?.cancel();
+        dialog.close();
+      }
     }
   }
   requestClose() {
@@ -255,15 +265,15 @@ export class SignalSheet extends LitElement {
     if (this.closing) return;
     this.closing = true;
     const dialog = this.renderRoot.querySelector("dialog")!;
+    const current = getComputedStyle(dialog);
+    const start = { opacity: current.opacity, transform: current.transform };
+    this.entryAnimation?.cancel();
     if (dialog.open && !matchMedia("(prefers-reduced-motion: reduce)").matches)
       await dialog
-        .animate(
-          [
-            { opacity: 1, transform: "none" },
-            { opacity: 0, transform: this.entryTransform },
-          ],
-          { duration: 140, easing: "ease-in" },
-        )
+        .animate([start, { opacity: 0, transform: this.entryTransform }], {
+          duration: 140,
+          easing: "ease-in",
+        })
         .finished.catch(() => {});
     dialog.close();
     this.closing = false;

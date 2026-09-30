@@ -5,6 +5,7 @@ import { repeat } from "lit/directives/repeat.js";
 import type { SignalSheet } from "./sheet";
 import { styles } from "./styles";
 import { pocketStyles } from "./pocket-styles";
+import { motionStyles, polishStyles } from "./motion";
 import { ImmersiveChrome } from "./immersive-chrome";
 import {
   appearanceModes,
@@ -67,11 +68,17 @@ export class SignalHome extends LitElement {
     deleteTarget: { state: true },
     deleteError: { state: true },
     selectedTodo: { state: true },
+    todoLoading: { state: true },
+    pendingTodo: { state: true },
+    messageTone: { state: true },
   };
-  static styles = [styles, pocketStyles];
+  static styles = [styles, pocketStyles, polishStyles, motionStyles];
   declare hass: Hass;
   private config: Config = { type: "custom:signal-home" };
   private tab = "home";
+  private pageTravel = 0;
+  private pendingTodo = "";
+  private messageTone: "neutral" | "success" | "error" = "neutral";
   private dark = false;
   private appearance: Appearance = "auto";
   private completedTodos: Todo[] = [];
@@ -134,6 +141,7 @@ export class SignalHome extends LitElement {
     this.message = "";
     this.draft = "";
     this.todoError = "";
+    this.todoLoaded = false;
     try {
       const saved = JSON.parse(
         localStorage.getItem(this.completionKey) || "{}",
@@ -180,6 +188,11 @@ export class SignalHome extends LitElement {
     const route = location.hash.replace("#signal/", "");
     const next = tabs.some((t) => t.id === route) ? route : "home";
     if (next !== this.tab) {
+      this.pageTravel =
+        tabs.findIndex((t) => t.id === next) >
+        tabs.findIndex((t) => t.id === this.tab)
+          ? 12
+          : -12;
       this.tab = next;
       this.resetScroll();
     }
@@ -193,6 +206,7 @@ export class SignalHome extends LitElement {
   private todoSequence = 0;
   private todoSignature = "";
   private todoLoading = false;
+  private todoLoaded = false;
   private media = window.matchMedia("(prefers-color-scheme: dark)");
   private get appearanceKey() {
     return `signal-home-appearance-v2:${this.config.title || "Home"}`;
@@ -341,8 +355,12 @@ export class SignalHome extends LitElement {
           maximumFractionDigits: digits,
         }).format(n);
   }
-  private notify(text: string) {
+  private notify(
+    text: string,
+    tone: "neutral" | "success" | "error" = "neutral",
+  ) {
     this.message = text;
+    this.messageTone = tone;
     this.undoItem = undefined;
     clearTimeout(this.timer);
     this.timer = setTimeout(() => {
@@ -360,10 +378,11 @@ export class SignalHome extends LitElement {
     this.busy = true;
     try {
       await this.hass.callService(domain, service, data);
-      if (success) this.notify(success);
+      if (success) this.notify(success, "success");
     } catch {
       this.notify(
         "That didn’t go through. Check the connection and try again.",
+        "error",
       );
     } finally {
       this.busy = false;
@@ -411,6 +430,7 @@ export class SignalHome extends LitElement {
         }
         this.saveCompletionTimes();
         this.todoError = "";
+        this.todoLoaded = true;
       }
     } catch {
       if (sequence === this.todoSequence)
@@ -590,6 +610,7 @@ export class SignalHome extends LitElement {
       active.closest<HTMLElement>("[data-todo-uid]")?.dataset.todoUid ===
         item.uid;
     this.busy = true;
+    this.pendingTodo = item.uid;
     this.todoMutating = true;
     this.todoSequence++;
     try {
@@ -616,7 +637,7 @@ export class SignalHome extends LitElement {
                   (this.todoOrder.get(a.uid) ?? Infinity) -
                   (this.todoOrder.get(b.uid) ?? Infinity),
               );
-            this.notify("Back on your list.");
+            this.notify("Back on your list.", "success");
           } else {
             this.completionTimes[item.uid] = Date.now();
             this.todos = this.todos.filter((t) => t.uid !== item.uid);
@@ -628,7 +649,7 @@ export class SignalHome extends LitElement {
               },
               ...this.completedTodos.filter((t) => t.uid !== item.uid),
             ];
-            this.notify("Checked off.");
+            this.notify("Checked off.", "success");
             this.undoItem = item;
           }
           this.saveCompletionTimes();
@@ -637,9 +658,10 @@ export class SignalHome extends LitElement {
         focused,
       );
     } catch {
-      this.notify("Couldn’t update the list. Try again.");
+      this.notify("Couldn’t update the list. Try again.", "error");
     } finally {
       this.busy = false;
+      this.pendingTodo = "";
       this.todoMutating = false;
       if (this.todoRefreshPending && this.isConnected) void this.loadTodos();
     }
@@ -659,8 +681,10 @@ export class SignalHome extends LitElement {
       if (entity !== this.todoEntity) return;
       this.draft = "";
       await this.loadTodos();
+      if (entity !== this.todoEntity || !this.isConnected) return;
+      this.notify("Added to your list.", "success");
     } catch {
-      this.notify("Couldn’t add that item. Try again.");
+      this.notify("Couldn’t add that item. Try again.", "error");
     } finally {
       this.busy = false;
     }
@@ -676,6 +700,12 @@ export class SignalHome extends LitElement {
     this.applyAppearance();
   }
   private navigate(id: string) {
+    if (id === this.tab) return;
+    this.pageTravel =
+      tabs.findIndex((t) => t.id === id) >
+      tabs.findIndex((t) => t.id === this.tab)
+        ? 12
+        : -12;
     if (id !== this.tab) history.pushState(history.state, "", `#signal/${id}`);
     this.tab = id;
     this.resetScroll();
@@ -932,6 +962,7 @@ export class SignalHome extends LitElement {
     return html`<div
       class=${`todo-row ${completed ? "completed-row" : ""}`}
       data-todo-uid=${item.uid}
+      aria-busy=${this.pendingTodo === item.uid}
       data-todo-motion=${`row:${item.uid}`}
     >
       <button
@@ -976,7 +1007,10 @@ export class SignalHome extends LitElement {
     </div>`;
   }
   private grocery(detail = false) {
-    return html`<section class="panel apricot groceries">
+    return html`<section
+      class="panel apricot groceries"
+      aria-busy=${this.todoLoading}
+    >
       <div class="panel-top">
         <span class="panel-label">${icon("list")} ${this.todoName}</span
         >${detail ? html`<button class="icon-button" aria-label="Refresh list" @click=${() => this.loadTodos()}>${icon("list")}</button>` : html`<button class="icon-button" aria-label="Open to-do lists" @click=${() => this.navigate("lists")}>${icon("arrow")}</button>`}
@@ -987,7 +1021,7 @@ export class SignalHome extends LitElement {
               No to-do lists are available. Add a list in Home Assistant and it
               will appear here.
             </p>`
-          : this.todoError
+          : this.todoError && !this.todoLoaded
             ? html`<button class="text-button" @click=${() => this.loadTodos()}>
                 ${this.todoError}
               </button>`
@@ -999,14 +1033,25 @@ export class SignalHome extends LitElement {
                         (item) => item.uid,
                         (item) => this.todoRow(item),
                       )
-                    : html`<div class="empty">
-                        ${this.todoLoading ? "Loading your list…" : "All caught up. Room for something good."}
-                      </div>`
+                    : this.todoLoading && !this.todoLoaded
+                      ? html`<div
+                          class="list-loading"
+                          role="status"
+                          aria-label="Loading list"
+                        >
+                          <div class="loading-row" aria-hidden="true"></div>
+                          <div class="loading-row" aria-hidden="true"></div>
+                          <div class="loading-row" aria-hidden="true"></div>
+                        </div>`
+                      : html`<div class="empty">
+                          All caught up. Room for something good.
+                        </div>`
                 }
               </div>`
       }
       ${detail && this.todoEntity ? html`<form class="todo-form" data-todo-motion="form" @submit=${this.addTodo}><input aria-label="New task" placeholder="Add something good…" maxlength="255" ?disabled=${!this.todoSupports(1)} .value=${this.draft} @input=${(e: Event) => (this.draft = (e.target as HTMLInputElement).value)} /><button aria-label="Add task" ?disabled=${this.busy || !this.draft.trim() || !this.todoSupports(1)}>${icon("plus")}</button></form>` : html`<button class="text-button" @click=${() => this.navigate("lists")}>${this.todos.length ? `${this.todos.length} things on your list` : "Open your list"} ${icon("arrow")}</button>`}
-      ${detail && !this.todoError ? this.completedList() : nothing}
+      ${this.todoError && this.todoLoaded ? html`<button class="text-button" @click=${() => this.loadTodos()}>Couldn’t refresh. Showing the last loaded list. Retry</button>` : nothing}
+      ${detail && (!this.todoError || this.todoLoaded) ? this.completedList() : nothing}
     </section>`;
   }
   private completedList() {
@@ -1366,14 +1411,14 @@ export class SignalHome extends LitElement {
             <span class="dot"></span>${summary.text}
           </div>
         </div>
-        ${keyed(this.tab, html`<div class="page">${this.content()}</div>`)}
+        ${keyed(this.tab, html`<div class="page" style=${`--page-travel:${this.pageTravel}px`}>${this.content()}</div>`)}
         <footer class="footer">
           <span
             >Signal Home <span style="opacity:.5">/</span> made for living</span
           >
         </footer>
       </main>
-      ${this.nav(true)}${this.message ? html`<div class="toast" role="status"><span>${this.message}</span>${this.undoItem ? html`<button ?disabled=${this.busy} @click=${() => this.undoItem && this.complete(this.undoItem, true)}>Undo</button>` : nothing}</div>` : nothing}
+      ${this.nav(true)}${this.message ? html`<div class=${`toast ${this.messageTone}`} role="status">${this.messageTone !== "neutral" ? html`<span class="toast-mark" aria-hidden="true">${icon(this.messageTone === "success" ? "check" : "warn")}</span>` : nothing}<span class="toast-copy">${this.message}</span>${this.undoItem ? html`<button ?disabled=${this.busy} @click=${() => this.undoItem && this.complete(this.undoItem, true)}>Undo</button>` : nothing}</div>` : nothing}
       <signal-sheet
         .open=${this.menuOpen}
         heading="Your place. Your way."

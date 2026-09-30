@@ -3,6 +3,7 @@ import { live } from "lit/directives/live.js";
 import { available, number, words, type Hass } from "./types";
 import { icon } from "./icons";
 import { widgetStyles } from "./widget-styles";
+import { motionStyles } from "./motion";
 import "./details";
 
 export interface ControlConfig {
@@ -22,6 +23,7 @@ export class SignalControl extends LitElement {
     confirmUnlock: { state: true },
     preview: { state: true },
     detailsOpen: { state: true },
+    acknowledged: { state: true },
   };
   static styles = [
     widgetStyles,
@@ -110,6 +112,28 @@ export class SignalControl extends LitElement {
         gap: 7px;
         font-size: 13px;
         color: var(--subtle);
+        min-height: 20px;
+      }
+      .command-feedback {
+        margin-left: auto;
+        font-size: 11px;
+        white-space: nowrap;
+      }
+      .command-feedback svg {
+        width: 13px;
+        height: 13px;
+        vertical-align: -2px;
+      }
+      .acknowledged .entity-icon {
+        animation: signal-ack 320ms cubic-bezier(0.2, 0.8, 0.2, 1);
+      }
+      @keyframes signal-ack {
+        50% {
+          scale: 1.08;
+        }
+      }
+      .switch:disabled {
+        opacity: 0.8;
       }
       .state-dot {
         width: 6px;
@@ -286,10 +310,18 @@ export class SignalControl extends LitElement {
         }
       }
     `,
+    motionStyles,
   ];
   declare hass: Hass;
   private config: ControlConfig = { type: "custom:signal-control", entity: "" };
   private pending = false;
+  private acknowledged = false;
+  private feedbackTimer?: ReturnType<typeof setTimeout>;
+  disconnectedCallback() {
+    super.disconnectedCallback();
+    clearTimeout(this.feedbackTimer);
+    this.acknowledged = false;
+  }
   private detailsOpen = false;
   private error = "";
   private confirmUnlock = false;
@@ -298,6 +330,8 @@ export class SignalControl extends LitElement {
     if (!c.entity || typeof c.entity !== "string")
       throw new Error("Choose an entity.");
     this.config = { ...c };
+    clearTimeout(this.feedbackTimer);
+    this.acknowledged = false;
     this.preview = {};
   }
   set configuration(c: ControlConfig) {
@@ -347,16 +381,27 @@ export class SignalControl extends LitElement {
   private async send(service: string, data: Record<string, unknown> = {}) {
     if (this.pending || !this.isReady()) return;
     this.pending = true;
+    this.acknowledged = false;
+    clearTimeout(this.feedbackTimer);
     this.error = "";
+    const entity = this.config.entity;
     const [domain, action] = service.split(".");
     try {
       await this.hass.callService(domain, action, {
-        entity_id: this.config.entity,
+        entity_id: entity,
         ...data,
       });
-      this.confirmUnlock = false;
+      if (entity === this.config.entity && this.isConnected) {
+        this.confirmUnlock = false;
+        this.acknowledged = true;
+        this.feedbackTimer = setTimeout(
+          () => (this.acknowledged = false),
+          1600,
+        );
+      }
     } catch {
-      this.error = "Couldn’t reach this device. Try again.";
+      if (entity === this.config.entity && this.isConnected)
+        this.error = "Couldn’t reach this device. Try again.";
     } finally {
       this.pending = false;
       this.preview = {};
@@ -440,7 +485,7 @@ export class SignalControl extends LitElement {
         .map((n: number) => Math.round(n).toString(16).padStart(2, "0"))
         .join("");
     return html`<article
-        class=${`widget ${this.config.appearance || "auto"} ${this.config.accent || "mint"} ${on ? "on" : ""}`}
+        class=${`widget ${this.config.appearance || "auto"} ${this.config.accent || "mint"} ${on ? "on" : ""} ${this.acknowledged ? "acknowledged" : ""}`}
         aria-busy=${this.pending}
       >
         <div class="control-top">
@@ -460,7 +505,11 @@ export class SignalControl extends LitElement {
         <h2>${this.config.name || a.friendly_name || this.config.entity}</h2>
         <div class="state-line">
           <span class="state-dot"></span
-          >${this.pending ? "Updating…" : ready ? words(e.state) : "Unavailable"}
+          >${ready ? words(e.state) : "Unavailable"}<span
+            class="command-feedback"
+            role="status"
+            >${this.pending ? "Sending…" : this.acknowledged ? html`${icon("check")} Sent` : nothing}</span
+          >
         </div>
         ${dimmable ? this.slider("Brightness", "brightness", on ? ((number(a.brightness) ?? 0) / 255) * 100 : 0, 0, 100, 1, "%", (v) => this.send(v === 0 ? "light.turn_off" : "light.turn_on", v ? { brightness_pct: Math.round(v) } : {}), !ready) : nothing}
         ${domain === "light" && colors.includes("color_temp") && number(a.min_color_temp_kelvin) !== undefined && number(a.max_color_temp_kelvin) !== undefined ? this.slider("Color temperature", "kelvin", number(a.color_temp_kelvin), Number(a.min_color_temp_kelvin), Number(a.max_color_temp_kelvin), 50, " K", (v) => this.send("light.turn_on", { color_temp_kelvin: v }), !ready) : nothing}

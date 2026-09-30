@@ -6,6 +6,7 @@ import {
   type HistoryPoint,
 } from "./history";
 import { widgetStyles } from "./widget-styles";
+import { motionStyles } from "./motion";
 import { icon } from "./icons";
 interface GraphConfig {
   type: string;
@@ -58,6 +59,24 @@ export class SignalGraph extends LitElement {
         align-items: end;
         gap: 15px;
         margin: 24px 0 16px;
+      }
+      .plot {
+        min-height: 190px;
+      }
+      .history-status {
+        min-height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        font-size: 11px;
+        color: var(--subtle);
+      }
+      .history-status .retry {
+        margin: 0;
+        padding: 4px 10px;
+        min-height: 32px;
+        font-size: 11px;
       }
       .value {
         font-size: 42px;
@@ -197,6 +216,7 @@ export class SignalGraph extends LitElement {
         }
       }
     `,
+    motionStyles,
   ];
   declare hass: Hass;
   private config: GraphConfig = { type: "custom:signal-graph", entity: "" };
@@ -204,6 +224,7 @@ export class SignalGraph extends LitElement {
   private loading = false;
   private error = "";
   private hours = 24;
+  private displayedHours = 24;
   private cursor: number | undefined;
   private sequence = 0;
   private queried = "";
@@ -218,8 +239,13 @@ export class SignalGraph extends LitElement {
       (!Number.isFinite(c.hours) || c.hours < 1 || c.hours > 168)
     )
       throw new Error("History hours must be between 1 and 168.");
+    const sourceChanged =
+      c.entity !== this.config.entity ||
+      (c.hours || 24) !== (this.config.hours || 24);
     this.config = { ...c };
+    if (!sourceChanged) return;
     this.hours = c.hours || 24;
+    this.displayedHours = this.hours;
     this.queried = "";
     this.points = [];
     this.sequence++;
@@ -295,32 +321,37 @@ export class SignalGraph extends LitElement {
     this.loading = true;
     this.error = "";
     this.cursor = undefined;
-    this.end = Date.now();
-    this.start = this.end - this.hours * 3600000;
+    const end = Date.now();
+    const hours = this.hours;
+    const start = end - hours * 3600000;
     try {
       const result = await this.hass.callWS<
         Record<string, Record<string, unknown>[]>
       >({
         type: "history/history_during_period",
-        start_time: new Date(this.start).toISOString(),
-        end_time: new Date(this.end).toISOString(),
+        start_time: new Date(start).toISOString(),
+        end_time: new Date(end).toISOString(),
         entity_ids: [this.config.entity],
         minimal_response: true,
         no_attributes: true,
         significant_changes_only: false,
       });
-      if (sequence === this.sequence)
+      if (sequence === this.sequence) {
         this.points = normalizeHistory(result[this.config.entity] || []);
+        this.start = start;
+        this.end = end;
+        this.displayedHours = hours;
+      }
     } catch {
       if (sequence === this.sequence) {
         this.error = "History couldn’t be loaded.";
-        this.points = [];
       }
     } finally {
       if (sequence === this.sequence) this.loading = false;
     }
   }
   private period(hours: number) {
+    if (hours === this.hours) return;
     this.hours = hours;
     void this.fetchHistory();
   }
@@ -422,28 +453,21 @@ export class SignalGraph extends LitElement {
           </div>
         </div>
         <span class="subtle"
-          >${this.loading ? "Updating…" : `${this.hours === 168 ? "7 days" : this.hours + " hours"} of history`}</span
+          >${this.displayedHours === 168 ? "7 days" : this.displayedHours + " hours"}
+          of history</span
         >
       </div>
-      ${
-        this.loading && !this.points.length
-          ? html`<div
-              class="skeleton"
-              role="status"
-              aria-label="Loading history"
-            ></div>`
-          : this.error
-            ? html`<div class="empty" role="status">
-                ${this.error}<button
-                  class="retry"
-                  @click=${() => this.fetchHistory()}
-                >
-                  Try again
-                </button>
-              </div>`
+      <div class="plot" aria-busy=${this.loading}>
+        ${
+          this.loading && !this.points.length
+            ? html`<div
+                class="skeleton"
+                role="status"
+                aria-label="Loading history"
+              ></div>`
             : !numeric.length
               ? html`<div class="empty">
-                  No numeric history in this period.
+                  ${this.error ? "History is unavailable." : "No numeric history in this period."}
                 </div>`
               : html`<div
                     class="chart"
@@ -480,10 +504,19 @@ export class SignalGraph extends LitElement {
                   </div>
                   <div class="bounds">
                     <span
-                      >${new Date(this.start).toLocaleString(undefined, { weekday: this.hours > 24 ? "short" : undefined, hour: "numeric", minute: "2-digit" })}</span
-                    ><span>Now</span>
+                      >${new Date(this.start).toLocaleString(undefined, { weekday: this.displayedHours > 24 ? "short" : undefined, hour: "numeric", minute: "2-digit" })}</span
+                    ><span
+                      >${new Date(this.end).toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" })}</span
+                    >
                   </div>`
-      }
+        }
+      </div>
+      <div class="history-status" role="status">
+        <span
+          >${this.error ? `${this.error}${this.points.length ? " Showing previous data." : ""}` : this.loading ? "Updating history…" : ""}</span
+        >
+        ${this.error ? html`<button class="retry" @click=${() => this.fetchHistory()}>Try again</button>` : nothing}
+      </div>
       <div class="stats">
         <span
           >Low<strong
