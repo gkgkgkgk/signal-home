@@ -89,6 +89,14 @@ await page.evaluate(() =>
   ]),
 );
 await page.getByRole("button", { name: "Restore Oat milk" }).waitFor();
+await page.evaluate(() => {
+  window.demo.setList("todo.projects", "House projects", [
+    { uid: "project", summary: "Paint the hallway", status: "needs_action" },
+  ]);
+  window.demo.setList("todo.weekend", "Weekend", [
+    { uid: "weekend", summary: "Book a table", status: "needs_action" },
+  ]);
+});
 await page.waitForTimeout(400);
 await page.screenshot({ path: "docs/completed-mobile-dark.png" });
 await page

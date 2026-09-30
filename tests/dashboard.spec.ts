@@ -82,12 +82,12 @@ test("grocery add and completion use entity UID and stay synchronized", async ({
 }) => {
   await page.goto("/");
   await page
-    .getByRole("button", { name: "Open groceries", exact: true })
+    .getByRole("button", { name: "Open to-do lists", exact: true })
     .click();
   await page
-    .getByRole("textbox", { name: "New grocery item" })
+    .getByRole("textbox", { name: "New task" })
     .fill("Coffee beans");
-  await page.getByRole("button", { name: "Add grocery item" }).click();
+  await page.getByRole("button", { name: "Add task" }).click();
   await expect(
     page.getByRole("button", { name: "Complete Coffee beans" }),
   ).toBeVisible();

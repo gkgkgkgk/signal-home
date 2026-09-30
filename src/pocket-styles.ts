@@ -1,5 +1,63 @@
 import { css } from "lit";
 export const pocketStyles = css`
+  .list-tile .tile-label {
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    display: block;
+    flex: 1;
+  }
+  .groceries .panel-label {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+  .groceries .panel-top > button {
+    flex-shrink: 0;
+  }
+  .list-switcher {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 0 0 18px;
+  }
+  .list-switcher button {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 48px;
+    border: 1px solid var(--line);
+    background: var(--surface);
+    color: var(--ink);
+    padding: 12px 14px;
+    border-radius: 18px;
+    max-width: 100%;
+    font-size: 13px;
+  }
+  .list-switcher button[aria-pressed="true"] {
+    background: var(--ink);
+    color: var(--paper);
+    border-color: var(--ink);
+  }
+  .list-switcher button > span {
+    overflow-wrap: anywhere;
+    text-align: left;
+    font-weight: 650;
+  }
+  .list-switcher svg {
+    width: 18px;
+    height: 18px;
+  }
+  .list-switcher small {
+    border-radius: 8px;
+    padding: 2px 7px;
+    background: #899a8924;
+    white-space: nowrap;
+  }
+  .delete-confirmation .delete-list-name {
+    margin-top: 0;
+    font-size: 12px;
+  }
   .groceries {
     overflow-anchor: none;
   }

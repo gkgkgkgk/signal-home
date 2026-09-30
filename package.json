@@ -1,6 +1,6 @@
 {
   "name": "signal-home",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "description": "A colorful, fluid Home Assistant dashboard. Solid surfaces. Clear signals.",
   "type": "module",
   "license": "MIT",

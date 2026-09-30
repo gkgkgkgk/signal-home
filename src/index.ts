@@ -19,6 +19,7 @@ import {
   sensorConfig,
   words,
   type Config,
+  type Entity,
   type Hass,
   type Todo,
 } from "./types";
@@ -65,6 +66,7 @@ export class SignalHome extends LitElement {
     undoItem: { state: true },
     deleteTarget: { state: true },
     deleteError: { state: true },
+    selectedTodo: { state: true },
   };
   static styles = [styles, pocketStyles];
   declare hass: Hass;
@@ -80,6 +82,70 @@ export class SignalHome extends LitElement {
   private todoMutating = false;
   private todoRefreshPending = false;
   private todoOrder = new Map<string, number>();
+  private selectedTodo = "";
+  private loadedTodo = "";
+  private todoListStates?: Hass["states"];
+  private discoveredTodos: Entity[] = [];
+  private get todoLists() {
+    if (this.todoListStates === this.hass?.states) return this.discoveredTodos;
+    this.todoListStates = this.hass?.states;
+    this.discoveredTodos = Object.entries(this.hass?.states || {})
+      .filter(([id]) => id.startsWith("todo."))
+      .map(([id, entity]) => ({ ...entity, entity_id: id }))
+      .sort((a, b) =>
+        this.listName(a.entity_id).localeCompare(this.listName(b.entity_id)),
+      );
+    return this.discoveredTodos;
+  }
+  private listName(entity: string) {
+    return (
+      this.hass?.states[entity]?.attributes.friendly_name ||
+      words(entity.replace(/^todo\./, ""))
+    );
+  }
+  private get todoEntity(): string | undefined {
+    const lists = this.todoLists;
+    return (
+      lists.find((entity) => entity.entity_id === this.selectedTodo)
+        ?.entity_id ||
+      lists.find((entity) => entity.entity_id === this.config.todo)
+        ?.entity_id ||
+      lists[0]?.entity_id
+    );
+  }
+  private get todoName() {
+    return this.todoEntity ? this.listName(this.todoEntity) : "To-do lists";
+  }
+  private chooseTodo(entity: string) {
+    if (this.busy || entity === this.todoEntity) return;
+    this.selectedTodo = entity;
+    this.resetTodoState();
+  }
+  private resetTodoState() {
+    this.closeDelete();
+    this.deleteTarget = undefined;
+    this.loadedTodo = this.todoEntity || "";
+    this.todoSignature = "";
+    this.todoSequence++;
+    this.todos = [];
+    this.completedTodos = [];
+    this.todoOrder.clear();
+    this.undoItem = undefined;
+    this.message = "";
+    this.draft = "";
+    this.todoError = "";
+    try {
+      const saved = JSON.parse(
+        localStorage.getItem(this.completionKey) || "{}",
+      );
+      this.completionTimes =
+        saved && typeof saved === "object" && !Array.isArray(saved)
+          ? saved
+          : {};
+    } catch {
+      this.completionTimes = {};
+    }
+  }
   private detailEntity = "";
   private menuOpen = false;
   private contentScrolled = false;
@@ -165,7 +231,7 @@ export class SignalHome extends LitElement {
     this.clock = setInterval(() => {
       this.applyAppearance();
       this.requestUpdate();
-      if (this.config.todo) void this.loadTodos();
+      if (this.todoEntity) void this.loadTodos();
     }, 60000);
   }
   disconnectedCallback() {
@@ -222,26 +288,8 @@ export class SignalHome extends LitElement {
         "Graphs need an entity ID and optional hours between 1 and 168.",
       );
     this.config = { ...config };
-    this.todoSignature = "";
-    this.todoSequence++;
-    this.todos = [];
-    this.completedTodos = [];
-    this.todoOrder.clear();
-    this.undoItem = undefined;
-    this.closeDelete();
-    try {
-      this.completionTimes = JSON.parse(
-        localStorage.getItem(this.completionKey) || "{}",
-      );
-    } catch {
-      this.completionTimes = {};
-    }
-    if (
-      !this.completionTimes ||
-      typeof this.completionTimes !== "object" ||
-      Array.isArray(this.completionTimes)
-    )
-      this.completionTimes = {};
+    this.selectedTodo = "";
+    this.resetTodoState();
     this.applyAppearance();
   }
   static getConfigElement() {
@@ -269,11 +317,13 @@ export class SignalHome extends LitElement {
     if (changed.has("hass")) this.applyAppearance();
     this.syncChrome();
     if (
-      (changed.has("hass") || changed.has("config")) &&
-      this.config.todo &&
+      (changed.has("hass") ||
+        changed.has("config") ||
+        changed.has("selectedTodo")) &&
       this.hass
     ) {
-      const signature = `${this.config.todo}:${this.hass.states[this.config.todo]?.state}`;
+      if ((this.todoEntity || "") !== this.loadedTodo) this.resetTodoState();
+      const signature = `${this.todoEntity}:${this.hass.states[this.todoEntity || ""]?.state}`;
       if (signature !== this.todoSignature) {
         this.todoSignature = signature;
         void this.loadTodos();
@@ -323,7 +373,7 @@ export class SignalHome extends LitElement {
     if (entity) this.detailEntity = entity;
   }
   private async loadTodos() {
-    const entity = this.config.todo;
+    const entity = this.todoEntity;
     if (!entity || !this.hass) return;
     if (this.todoMutating || this.todoLoading) {
       this.todoRefreshPending = true;
@@ -342,7 +392,7 @@ export class SignalHome extends LitElement {
         service_data: { entity_id: entity },
         return_response: true,
       });
-      if (sequence === this.todoSequence) {
+      if (sequence === this.todoSequence && entity === this.todoEntity) {
         const items = result.response?.[entity]?.items;
         if (!Array.isArray(items)) throw new Error("Missing list response");
         this.todoOrder = new Map(items.map((item, index) => [item.uid, index]));
@@ -372,7 +422,7 @@ export class SignalHome extends LitElement {
     }
   }
   private get completionKey() {
-    return `signal-completed:${this.config.todo || ""}`;
+    return `signal-completed:${this.todoEntity || ""}`;
   }
   private saveCompletionTimes() {
     try {
@@ -416,7 +466,7 @@ export class SignalHome extends LitElement {
         )
         .finished.catch(() => {});
     }
-    if (entity !== this.config.todo || !this.isConnected) return;
+    if (entity !== this.todoEntity || !this.isConnected) return;
     const before = new Map(
       rows.map((row) => [
         row.dataset.todoMotion!,
@@ -470,9 +520,7 @@ export class SignalHome extends LitElement {
           button.focus({ preventScroll: true });
         else if (this.tab === "lists")
           this.renderRoot
-            .querySelector<HTMLButtonElement>(
-              '[aria-label="Refresh groceries"]',
-            )
+            .querySelector<HTMLButtonElement>('[aria-label="Refresh list"]')
             ?.focus({ preventScroll: true });
       });
     }
@@ -484,16 +532,16 @@ export class SignalHome extends LitElement {
         ?.requestClose();
   }
   private askDelete(item: Todo) {
-    if (this.busy || !this.config.todo || !this.canDeleteTodo) return;
+    if (this.busy || !this.todoEntity || !this.canDeleteTodo) return;
     this.deleteError = "";
-    this.deleteTarget = { item, entity: this.config.todo };
+    this.deleteTarget = { item, entity: this.todoEntity };
   }
   private async deleteTodo() {
     const target = this.deleteTarget;
     if (
       !target ||
       this.busy ||
-      target.entity !== this.config.todo ||
+      target.entity !== this.todoEntity ||
       !this.canDeleteTodo
     )
       return;
@@ -505,7 +553,7 @@ export class SignalHome extends LitElement {
         entity_id: target.entity,
         item: target.item.uid,
       });
-      if (target.entity !== this.config.todo || !this.isConnected) return;
+      if (target.entity !== this.todoEntity || !this.isConnected) return;
       await this.moveTodo(
         target.item.uid,
         () => {
@@ -534,8 +582,8 @@ export class SignalHome extends LitElement {
     }
   }
   private async complete(item: Todo, restore = false) {
-    if (this.busy) return;
-    const entity = this.config.todo;
+    if (this.busy || !this.todoSupports(4)) return;
+    const entity = this.todoEntity;
     const active = this.shadowRoot?.activeElement;
     const focused =
       !!active?.matches(":focus-visible") &&
@@ -550,7 +598,7 @@ export class SignalHome extends LitElement {
         item: item.uid,
         status: restore ? "needs_action" : "completed",
       });
-      if (entity !== this.config.todo) return;
+      if (entity !== this.todoEntity) return;
       await this.moveTodo(
         item.uid,
         () => {
@@ -599,13 +647,16 @@ export class SignalHome extends LitElement {
   private async addTodo(event: Event) {
     event.preventDefault();
     const item = this.draft.trim();
-    if (!item || this.busy) return;
+    if (!item || this.busy || !this.todoSupports(1)) return;
+    const entity = this.todoEntity;
+    if (!entity) return;
     this.busy = true;
     try {
       await this.hass.callService("todo", "add_item", {
-        entity_id: this.config.todo,
+        entity_id: entity,
         item,
       });
+      if (entity !== this.todoEntity) return;
       this.draft = "";
       await this.loadTodos();
     } catch {
@@ -868,9 +919,13 @@ export class SignalHome extends LitElement {
     </section>`;
   }
   private get canDeleteTodo() {
-    const state = this.hass.states[this.config.todo || ""];
+    return this.todoSupports(2);
+  }
+  private todoSupports(feature: number) {
+    const state = this.hass.states[this.todoEntity || ""];
     return (
-      available(state) && !!(Number(state?.attributes.supported_features) & 2)
+      available(state) &&
+      !!(Number(state?.attributes.supported_features) & feature)
     );
   }
   private todoRow(item: Todo, completed = false) {
@@ -881,7 +936,7 @@ export class SignalHome extends LitElement {
     >
       <button
         class="check-button"
-        ?disabled=${this.busy}
+        ?disabled=${this.busy || !this.todoSupports(4)}
         aria-label=${`${completed ? "Restore" : "Complete"} ${item.summary}`}
         @click=${() => this.complete(item, completed)}
       >
@@ -899,16 +954,38 @@ export class SignalHome extends LitElement {
       </button>
     </div>`;
   }
+  private todoListPicker() {
+    if (this.todoLists.length < 2) return nothing;
+    return html`<div
+      class="list-switcher"
+      role="group"
+      aria-label="Your to-do lists"
+    >
+      ${this.todoLists.map(
+        (entity) =>
+          html`<button
+            aria-label=${`Open list ${this.listName(entity.entity_id)}`}
+            aria-pressed=${entity.entity_id === this.todoEntity}
+            ?disabled=${this.busy}
+            @click=${() => this.chooseTodo(entity.entity_id)}
+          >
+            ${icon("list")}<span>${this.listName(entity.entity_id)}</span>
+            <small>${available(entity) ? entity.state : "Offline"}</small>
+          </button>`,
+      )}
+    </div>`;
+  }
   private grocery(detail = false) {
     return html`<section class="panel apricot groceries">
       <div class="panel-top">
-        <span class="panel-label">${icon("list")} Groceries</span
-        >${detail ? html`<button class="icon-button" aria-label="Refresh groceries" @click=${() => this.loadTodos()}>${icon("list")}</button>` : html`<button class="icon-button" aria-label="Open groceries" @click=${() => this.navigate("lists")}>${icon("arrow")}</button>`}
+        <span class="panel-label">${icon("list")} ${this.todoName}</span
+        >${detail ? html`<button class="icon-button" aria-label="Refresh list" @click=${() => this.loadTodos()}>${icon("list")}</button>` : html`<button class="icon-button" aria-label="Open to-do lists" @click=${() => this.navigate("lists")}>${icon("arrow")}</button>`}
       </div>
       ${
-        !this.config.todo
+        !this.todoEntity
           ? html`<p class="empty">
-              Select your to-do list in the card editor.
+              No to-do lists are available. Add a list in Home Assistant and it
+              will appear here.
             </p>`
           : this.todoError
             ? html`<button class="text-button" @click=${() => this.loadTodos()}>
@@ -928,7 +1005,7 @@ export class SignalHome extends LitElement {
                 }
               </div>`
       }
-      ${detail && this.config.todo ? html`<form class="todo-form" data-todo-motion="form" @submit=${this.addTodo}><input aria-label="New grocery item" placeholder="Add something good…" maxlength="255" .value=${this.draft} @input=${(e: Event) => (this.draft = (e.target as HTMLInputElement).value)} /><button aria-label="Add grocery item" ?disabled=${this.busy || !this.draft.trim()}>${icon("plus")}</button></form>` : html`<button class="text-button" @click=${() => this.navigate("lists")}>${this.todos.length ? `${this.todos.length} things on your list` : "Open your list"} ${icon("arrow")}</button>`}
+      ${detail && this.todoEntity ? html`<form class="todo-form" data-todo-motion="form" @submit=${this.addTodo}><input aria-label="New task" placeholder="Add something good…" maxlength="255" ?disabled=${!this.todoSupports(1)} .value=${this.draft} @input=${(e: Event) => (this.draft = (e.target as HTMLInputElement).value)} /><button aria-label="Add task" ?disabled=${this.busy || !this.draft.trim() || !this.todoSupports(1)}>${icon("plus")}</button></form>` : html`<button class="text-button" @click=${() => this.navigate("lists")}>${this.todos.length ? `${this.todos.length} things on your list` : "Open your list"} ${icon("arrow")}</button>`}
       ${detail && !this.todoError ? this.completedList() : nothing}
     </section>`;
   }
@@ -954,7 +1031,7 @@ export class SignalHome extends LitElement {
         Tap a check to put it back. After 24 hours, items move to Older
         completed.
       </p>
-      ${this.config.completed_retention_days ? html`<p data-todo-motion="retention">HA automatically deletes timestamped completed items after ${this.config.completed_retention_days} days. Restore anything you still need before then.</p>` : nothing}
+      ${this.config.completed_retention_days && this.todoEntity === this.config.todo ? html`<p data-todo-motion="retention">HA automatically deletes timestamped completed items after ${this.config.completed_retention_days} days. Restore anything you still need before then.</p>` : nothing}
       ${rows(recent)}
       ${
         older.length
@@ -1075,7 +1152,9 @@ export class SignalHome extends LitElement {
           ${this.safetySummary.alarm ? "A sensor is reporting an active state. Open it for details." : this.safetySummary.unknown ? "An unavailable sensor cannot confirm the condition of its space." : "Tap any sensor for its history and details."}
         </div>`;
     if (this.tab === "lists")
-      return html`<div style="max-width:740px">${this.grocery(true)}</div>`;
+      return html`<div style="max-width:740px">
+        ${this.todoListPicker()}${this.grocery(true)}
+      </div>`;
     if (this.narrow) return this.pocketOverview();
     return html`<div class="grid">
         ${this.climate()}
@@ -1111,7 +1190,7 @@ export class SignalHome extends LitElement {
         : climate.state === "heat_cool"
           ? `Heat ${this.format(c.target_temp_low)}° · Cool ${this.format(c.target_temp_high)}°`
           : `${modeLabels[climate.state] || words(climate.state)} · Target ${this.format(c.temperature)}°`;
-    const todo = this.state(this.config.todo);
+    const todo = this.state(this.todoEntity);
     const count = available(todo) ? number(todo.state) : undefined;
     return html`<div class="pocket-overview">
       <button
@@ -1167,11 +1246,12 @@ export class SignalHome extends LitElement {
         </button>
         <button
           class="pocket-tile list-tile apricot"
-          aria-label="Open groceries"
+          aria-label="Open to-do lists"
           @click=${() => this.navigate("lists")}
         >
           <span class="tile-top"
-            ><span class="tile-label">Groceries</span>${icon("list")}</span
+            ><span class="tile-label">${this.todoName}</span
+            >${icon("list")}</span
           ><span class="pocket-reading"
             >${count === undefined ? "—" : count}<small
               >${count === 1 ? "item" : "items"}</small
@@ -1377,15 +1457,16 @@ export class SignalHome extends LitElement {
           this.deleteError = "";
           if (deleted && this.tab === "lists")
             this.renderRoot
-              .querySelector<HTMLButtonElement>(
-                '[aria-label="Refresh groceries"]',
-              )
+              .querySelector<HTMLButtonElement>('[aria-label="Refresh list"]')
               ?.focus({ preventScroll: true });
         }}
       >
         <div class="delete-confirmation">
           <div class="delete-symbol" aria-hidden="true">${icon("trash")}</div>
           <p class="delete-item">${this.deleteTarget?.item.summary}</p>
+          <p class="delete-list-name">
+            ${this.deleteTarget ? this.listName(this.deleteTarget.entity) : ""}
+          </p>
           <p>
             This removes the item from the shared list for everyone. It can’t be
             undone.

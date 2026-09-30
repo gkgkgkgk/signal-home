@@ -84,10 +84,10 @@ test("status stays honest and the whole grocery tile navigates to the list", asy
   await expect(page.locator(".home-signal")).toContainText("need attention");
   await page.locator(".list-tile").click();
   await expect(
-    page.getByRole("textbox", { name: "New grocery item" }),
+    page.getByRole("textbox", { name: "New task" }),
   ).toBeVisible();
-  await page.getByRole("textbox", { name: "New grocery item" }).fill("Coffee");
-  await page.getByRole("button", { name: "Add grocery item" }).click();
+  await page.getByRole("textbox", { name: "New task" }).fill("Coffee");
+  await page.getByRole("button", { name: "Add task" }).click();
   await expect(
     page.getByRole("button", { name: "Complete Coffee" }),
   ).toBeVisible();

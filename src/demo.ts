@@ -28,7 +28,10 @@ let states: Record<string, Entity> = {
     wind_speed_unit: "mph",
   }),
   "sensor.humidity": state("sensor.humidity", "48", {}),
-  "todo.demo": state("todo.demo", "3", { supported_features: 127 }),
+  "todo.demo": state("todo.demo", "3", {
+    supported_features: 127,
+    friendly_name: "Groceries",
+  }),
   "binary_sensor.kitchen": state("binary_sensor.kitchen", "off", {
     device_class: "moisture",
     friendly_name: "Kitchen sink",
@@ -50,6 +53,7 @@ let items: Todo[] = [
   { uid: "3", summary: "Something for Friday night", status: "needs_action" },
 ];
 const calls: unknown[] = [];
+const todoItems: Record<string, Todo[]> = { "todo.demo": items };
 const update = () => {
   card.hass = { ...hass, states: { ...states } };
 };
@@ -73,6 +77,7 @@ const hass: Hass = {
       states[id] = { ...states[id], attributes };
     }
     if (domain === "todo") {
+      let items = todoItems[id] || [];
       if (service === "remove_item")
         items = items.filter((item) => item.uid !== data.item);
       if (service === "update_item")
@@ -95,6 +100,7 @@ const hass: Hass = {
             status: "needs_action",
           },
         ];
+      todoItems[id] = items;
       states[id] = {
         ...states[id],
         state: String(items.filter((i) => i.status === "needs_action").length),
@@ -129,7 +135,8 @@ const hass: Hass = {
           { s: "off", lu: Date.now() / 1000 - 86400 },
         ],
       } as T;
-    return { response: { "todo.demo": { items } } } as T;
+    const entity = (message.service_data as { entity_id: string }).entity_id;
+    return { response: { [entity]: { items: todoItems[entity] || [] } } } as T;
   },
 };
 card.setConfig({
@@ -164,10 +171,24 @@ card.setConfig({
   fail: false,
   setItems(next: Todo[]) {
     items = next;
+    todoItems["todo.demo"] = next;
     states["todo.demo"] = {
       ...states["todo.demo"],
       state: String(items.filter((i) => i.status === "needs_action").length),
     };
+    update();
+    void card.loadTodos();
+  },
+  setList(id: string, name: string, next: Todo[], features = 127) {
+    todoItems[id] = next;
+    states[id] = state(
+      id,
+      String(next.filter((item) => item.status === "needs_action").length),
+      {
+        friendly_name: name,
+        supported_features: features,
+      },
+    );
     update();
     void card.loadTodos();
   },

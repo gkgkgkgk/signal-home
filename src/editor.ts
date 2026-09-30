@@ -83,7 +83,7 @@ export class SignalEditor extends LitElement {
         .hass=${this.hass}
         .data=${this.config}
         .schema=${schema}
-        .computeLabel=${(s: { name: string }) => ({ todo: "Grocery list", greeting: "Custom greeting (optional)", favorites: "Shortcut entities", humidity: "Humidity sensor (optional)" })[s.name] || s.name[0].toUpperCase() + s.name.slice(1)}
+        .computeLabel=${(s: { name: string }) => ({ todo: "Default to-do list (all lists are available)", greeting: "Custom greeting (optional)", favorites: "Shortcut entities", humidity: "Humidity sensor (optional)" })[s.name] || s.name[0].toUpperCase() + s.name.slice(1)}
         @value-changed=${(event: CustomEvent) => this.change({ ...this.config, ...event.detail.value })}
       ></ha-form>
       <details>

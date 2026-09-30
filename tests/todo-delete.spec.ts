@@ -78,7 +78,7 @@ test("confirmation deletes only the chosen UID even with duplicate labels", asyn
     page.getByRole("button", { name: "Undo", exact: true }),
   ).toHaveCount(0);
   await expect(
-    page.getByRole("button", { name: "Refresh groceries" }),
+    page.getByRole("button", { name: "Refresh list" }),
   ).toBeFocused();
   expect(await page.evaluate(() => history.state?.signalSheet)).toBeUndefined();
   expect(
@@ -95,7 +95,7 @@ test("confirmation deletes only the chosen UID even with duplicate labels", asyn
     },
   ]);
   // A refresh reads the actual demo backend, not merely the optimistic UI.
-  await page.getByRole("button", { name: "Refresh groceries" }).click();
+  await page.getByRole("button", { name: "Refresh list" }).click();
   await expect(page.locator('[data-todo-uid="keep-me"]')).toBeVisible();
   await expect(page.locator('[data-todo-uid="delete-me"]')).toHaveCount(0);
 });
@@ -185,7 +185,7 @@ test("check and restore animate stable rows without jumping or opening the keybo
     page.getByRole("button", { name: "Restore Fresh lemons" }),
   ).toBeEnabled();
   await expect(
-    page.getByRole("textbox", { name: "New grocery item" }),
+    page.getByRole("textbox", { name: "New task" }),
   ).not.toBeFocused();
   expect(
     await page.evaluate(

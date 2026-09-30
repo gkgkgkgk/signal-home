@@ -86,7 +86,7 @@ Replace entity IDs with your own. Every entity field is optional; unconfigured c
 | `completed_retention_days` | Optional cleanup notice; use `7` only after installing the seven-day HA automation below |
 | `climate`    | Climate entity                                                                             |
 | `weather`    | Weather entity                                                                             |
-| `todo`       | To-do entity supporting get/add/update items                                               |
+| `todo`       | Optional default to-do entity; all available HA to-do lists are discovered automatically    |
 | `humidity`   | Optional humidity sensor; otherwise uses climate humidity                                  |
 | `sensors`    | Binary sensor IDs, or objects with `entity`, `name`, and `battery`                         |
 | `favorites`  | Entity IDs rendered as capability-aware control cards                                      |
@@ -95,6 +95,10 @@ Replace entity IDs with your own. Every entity field is optional; unconfigured c
 Choose appearance in Signal's settings menu. Auto uses HA's configured time zone (device time if unavailable); System follows the device's light/dark preference. Changes apply on the next minute or app resume. Old sun/moon-button preferences are retired so this release starts from the configured/default mode. Preferences do not change other HA dashboards. Standalone cards retain their own appearance configuration.
 
 ## Shared lists and retention
+
+Signal discovers all `todo.*` entities available to your HA session. The Lists view provides a named switcher with unfinished counts; `todo` selects the initial/default list, not an allowlist. The Overview tile follows the currently selected list. Without a configured default, Signal selects the first list alphabetically. Unavailable/read-only lists remain visible, with unsupported actions disabled. Selecting a different list clears its draft and Undo so neither can act on the wrong list; slow responses and completion metadata are isolated by entity.
+
+The cleanup notice applies only to the configured default `todo` entity. Discovering another list **does not enable automatic deletion** for it or change its retention policy.
 
 Each active or completed task has a touch-friendly trash button. A small confirmation shows the exact item and warns that deletion affects everyone. **Keep item**, Escape, or Back dismisses it without a change. **Delete permanently** removes only the selected item's UID through HA's `todo.remove_item` service; there is no undo for deletion. Failed requests keep the confirmation open for retry. The trash button is disabled for unavailable lists or providers without deletion support.
 
