@@ -52,6 +52,9 @@ export interface Config {
   light_rooms?: LightRoom[];
   quick_actions?: QuickAction[];
   home_mode?: string;
+  alarm_entity?: string;
+  alarm_sensors?: string[];
+  alarm_siren?: string;
   all_lights_off?: string;
   doorbell?: { entity: string; camera: string; instance?: string; activity_entity?: string };
   graphs?: (string | { entity: string; name?: string; hours?: number })[];

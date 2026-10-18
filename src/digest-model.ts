@@ -151,16 +151,25 @@ export function digestRows(
       "No sensors connected",
       "shield",
     );
-  const mode = states[config.home_mode || ""];
+  const alarm = states[config.alarm_entity || ""];
+  const mode = config.alarm_entity ? alarm : states[config.home_mode || ""];
+  const alarmLabels: Record<string, string> = {
+    disarmed: "Home · alarm disarmed",
+    armed_night: "Sleeping · alarm armed",
+    armed_away: "Away · alarm armed",
+    arming: `${alarm?.attributes.arm_mode === "armed_night" ? "Sleeping" : "Away"} · arming`,
+    pending: `${alarm?.attributes.arm_mode === "armed_night" ? "Sleeping" : "Away"} · door opened; siren countdown`,
+    triggered: "Alarm sounding",
+  };
   rows.push({
     id: "mode",
-    label: "Household mode",
+    label: config.alarm_entity ? "Alarm mode" : "Household mode",
     text: available(mode)
-      ? `${mode.state} · saved preference`
-      : "Mode unavailable · saved preference",
+      ? config.alarm_entity ? alarmLabels[mode.state] || mode.state : `${mode.state} · saved preference`
+      : config.alarm_entity ? "Alarm unavailable" : "Mode unavailable · saved preference",
     route: "safety",
     icon: "home",
-    priority: available(mode) ? 10 : 45,
+    priority: available(mode) ? mode.state === "triggered" || mode.state === "pending" ? 95 : 10 : 45,
     stamp: stamp([mode]),
   });
   const ids = [
@@ -176,7 +185,9 @@ export function digestRows(
     homeHour(now, hass.config?.time_zone) >= 22 ||
     homeHour(now, hass.config?.time_zone) < 6;
   const relevant =
-    on > 0 && (["Sleeping", "Away"].includes(mode?.state || "") || late);
+    on > 0 && ((config.alarm_entity
+      ? ["armed_night", "armed_away", "arming", "pending"].includes(mode?.state || "")
+      : ["Sleeping", "Away"].includes(mode?.state || "")) || late);
   rows.push({
     id: "lights",
     label: "Lighting",

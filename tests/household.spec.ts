@@ -167,6 +167,82 @@ test("mode only changes the household helper", async ({ page }) => {
     },
   ]);
 });
+test("Alarmo mode shows confirmed state and arms through the alarm panel", async ({ page }) => {
+  await setup(page);
+  await page.evaluate(() => {
+    const c = document.querySelector("signal-home") as any;
+    c.hass = {
+      ...c.hass,
+      states: {
+        ...c.hass.states,
+        "alarm_control_panel.alarmo": {
+          entity_id: "alarm_control_panel.alarmo",
+          state: "disarmed",
+          attributes: { arm_mode: null },
+        },
+      },
+      callService: async (domain: string, service: string, data: any) => {
+        (window as any).demo.calls.push({ domain, service, data });
+      },
+    };
+    c.setConfig({ ...c.config, alarm_entity: "alarm_control_panel.alarmo" });
+  });
+  await expect(page.locator('[data-row="mode"]')).toContainText("Home · alarm disarmed");
+  await navigate(page, "Security");
+  await expect(page.getByRole("heading", { name: "Home · alarm off" })).toBeVisible();
+  await expect(page.getByRole("group", { name: "Alarm controls" })).toContainText("Alarm system · off");
+  await page.locator(".security-mode-option.mode-sleeping").click();
+  expect(await page.evaluate(() => (window as any).demo.calls.at(-1))).toEqual({
+    domain: "alarm_control_panel",
+    service: "alarm_arm_night",
+    data: { entity_id: "alarm_control_panel.alarmo" },
+  });
+  await page.evaluate(() => {
+    const c = document.querySelector("signal-home") as any;
+    c.hass = { ...c.hass, states: { ...c.hass.states,
+      "alarm_control_panel.alarmo": {
+        entity_id: "alarm_control_panel.alarmo", state: "pending",
+        attributes: { arm_mode: "armed_night", delay: 30 },
+        last_updated: new Date(Date.now() - 5000).toISOString(),
+      },
+    } };
+  });
+  await expect(page.getByRole("heading", { name: "Sleeping · door opened" })).toBeVisible();
+  await expect(page.getByRole("timer")).toContainText(/Before siren25s/);
+  await expect(page.locator(".security-mode-option.mode-sleeping")).toHaveAttribute("aria-pressed", "true");
+  await expect(page.locator(".security-mode-option.mode-away")).toBeDisabled();
+  await page.getByRole("button", { name: "Turn alarm off" }).click();
+  expect(await page.evaluate(() => (window as any).demo.calls.at(-1))).toEqual({
+    domain: "alarm_control_panel",
+    service: "alarm_disarm",
+    data: { entity_id: "alarm_control_panel.alarmo" },
+  });
+  await page.evaluate(() => {
+    const c = document.querySelector("signal-home") as any;
+    c.hass = { ...c.hass, states: { ...c.hass.states,
+      "alarm_control_panel.alarmo": {
+        entity_id: "alarm_control_panel.alarmo", state: "arming",
+        attributes: { arm_mode: "armed_away", delay: 60 },
+        last_updated: new Date(Date.now() - 10000).toISOString(),
+      },
+    } };
+  });
+  await expect(page.getByRole("heading", { name: "Away · arming" })).toBeVisible();
+  await expect(page.getByRole("timer")).toContainText(/Arming50s/);
+  await expect(page.locator(".security-mode-option.mode-away .mode-progress")).toBeVisible();
+  await expect(page.locator(".security-mode-option.mode-sleeping")).toBeDisabled();
+  await page.evaluate(() => {
+    const c = document.querySelector("signal-home") as any;
+    c.hass = { ...c.hass, states: { ...c.hass.states,
+      "alarm_control_panel.alarmo": {
+        entity_id: "alarm_control_panel.alarmo", state: "triggered",
+        attributes: { arm_mode: "armed_away" },
+      },
+    } };
+  });
+  await expect(page.getByRole("heading", { name: "Away · alarm sounding" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Disarm and silence" })).toBeEnabled();
+});
 test("room scenes can run before first activation and notes use backend state", async ({
   page,
 }) => {

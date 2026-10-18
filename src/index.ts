@@ -219,6 +219,7 @@ export class SignalHome extends LitElement {
   private draft = "";
   private timer?: ReturnType<typeof setTimeout>;
   private clock?: ReturnType<typeof setInterval>;
+  private alarmClock?: ReturnType<typeof setInterval>;
   private todoSequence = 0;
   private todoSignature = "";
   private todoLoading = false;
@@ -264,6 +265,10 @@ export class SignalHome extends LitElement {
       this.requestUpdate();
       if (this.todoEntity) void this.loadTodos();
     }, 60000);
+    this.alarmClock = setInterval(() => {
+      const state = this.state(this.config.alarm_entity)?.state;
+      if (state === "arming" || state === "pending") this.requestUpdate();
+    }, 1000);
   }
   disconnectedCallback() {
     super.disconnectedCallback();
@@ -277,6 +282,7 @@ export class SignalHome extends LitElement {
     document.removeEventListener("visibilitychange", this.applyAppearance);
     this.phone.removeEventListener("change", this.resize);
     clearInterval(this.clock);
+    clearInterval(this.alarmClock);
     clearTimeout(this.timer);
     this.todoSequence++;
   }
@@ -323,6 +329,8 @@ export class SignalHome extends LitElement {
       throw new Error("Cameras must be Home Assistant camera entity IDs.");
     if (config.home_mode && !/^input_select\.[a-z0-9_]+$/.test(config.home_mode))
       throw new Error("Home mode must be an input_select helper.");
+    if (config.alarm_entity && !/^alarm_control_panel\.[a-z0-9_]+$/.test(config.alarm_entity))
+      throw new Error("Alarm entity must be a Home Assistant alarm control panel.");
     const validAction = (action: any) => action && typeof action.name === "string" && /^(script|scene)\.[a-z0-9_]+$/.test(action.entity);
     if (config.quick_actions && (!Array.isArray(config.quick_actions) || !config.quick_actions.every(validAction)))
       throw new Error("Quick actions need a name and script or scene entity.");
@@ -1155,6 +1163,56 @@ export class SignalHome extends LitElement {
     </div>`;
   }
   private securityMode() {
+    if (this.config.alarm_entity) {
+      const alarm = this.state(this.config.alarm_entity);
+      const state = alarm?.state;
+      const armMode = alarm?.attributes.arm_mode;
+      const siren = this.state(this.config.alarm_siren);
+      const modeName = armMode === "armed_night" ? "Sleeping" : "Away";
+      const active = ["arming", "pending", "triggered"].includes(state || "") ? armMode : state;
+      const delay = Number(alarm?.attributes.delay);
+      // last_changed marks the state transition; last_updated also moves when Alarmo
+      // updates attributes (e.g. open_sensors when the door closes), which would restart the countdown.
+      const since = Date.parse(alarm?.last_changed || alarm?.last_updated || "");
+      const countdown = (state === "arming" || state === "pending") && Number.isFinite(delay) && delay > 0;
+      const remaining = countdown ? Math.max(0, Math.ceil(delay - (Number.isFinite(since) ? (Date.now() - since) / 1000 : 0))) : 0;
+      const progress = countdown ? Math.min(100, Math.max(0, ((delay - remaining) / delay) * 100)) : 0;
+      const monitored = (this.config.alarm_sensors || []).map(id => this.state(id));
+      const unavailable = monitored.filter(sensor => !available(sensor));
+      const open = monitored.filter(sensor => sensor?.state === "on");
+      const names = (sensors: (Entity | undefined)[]) => sensors.map(sensor => sensor?.attributes.friendly_name || sensor?.entity_id || "A door").join(", ");
+      const blocked = unavailable.length ? `${names(unavailable)} unavailable` : open.length ? `${names(open)} open` : "";
+      const failed = state === "disarmed" && alarm?.attributes.open_sensors && Object.keys(alarm.attributes.open_sensors).length > 0;
+      const title = !available(alarm) ? "Alarm unavailable"
+        : state === "disarmed" ? "Home · alarm off"
+        : state === "arming" ? `${modeName} · arming`
+        : state === "pending" ? `${modeName} · door opened`
+        : state === "triggered" ? `${modeName} · alarm sounding`
+        : state === "armed_night" ? "Sleeping · armed"
+        : state === "armed_away" ? "Away · armed" : "Alarm state unavailable";
+      const detail = state === "arming" ? `Alarm arms in ${remaining} seconds. Close the doors before then.`
+        : state === "pending" ? `The siren sounds in ${remaining} seconds unless you disarm.`
+        : state === "triggered" ? "The alarm has triggered. Disarm to stop the siren."
+        : state === "disarmed" ? failed && blocked ? `Could not arm: ${blocked}.` : blocked ? `Before arming: ${blocked}.` : "The alarm is off."
+        : state === "armed_night" || state === "armed_away" ? "The alarm is armed. Opening a monitored door starts a 30-second countdown." : "Check Home Assistant for the current alarm state.";
+      const items = [
+        { name: "Home", icon: "home", title: "Home", detail: "Alarm off", service: "alarm_disarm", state: "disarmed" },
+        { name: "Sleeping", icon: "moon", title: "Sleeping", detail: "Arm for night", service: "alarm_arm_night", state: "armed_night" },
+        { name: "Away", icon: "arrow", title: "Away", detail: "60-second exit", service: "alarm_arm_away", state: "armed_away" },
+      ];
+      const alarmOn = !!state && state !== "disarmed" && available(alarm);
+      const alarmText = state === "triggered" ? "Triggered" : state === "pending" ? "Entry countdown" : state === "arming" ? "Arming" : alarmOn ? "Armed" : "Disarmed";
+      return html`<section class="security-mode" aria-label="Alarm mode" data-alarm-state=${state || "unavailable"}>
+        <div class="security-mode-head"><div><span class="eyebrow">Current mode</span><h2>${title}</h2></div><span class=${`alarm-state-badge ${alarmOn ? "on" : "off"}`}>${alarmText}</span></div>
+        <p class="alarm-mode-detail" role="status">${detail}</p>
+        ${countdown ? html`<div class="alarm-countdown" role="timer" aria-label=${`${remaining} seconds remaining`}><span>${state === "arming" ? "Arming" : "Before siren"}</span><strong>${remaining}s</strong><div class="alarm-progress"><span style=${`width:${progress}%`}></span></div></div>` : nothing}
+        <div class="security-mode-options">${items.map(item => html`<button class=${`security-mode-option mode-${item.name.toLowerCase()} ${active === item.state ? "selected" : ""}`} aria-pressed=${active === item.state} ?disabled=${!available(alarm) || this.busy || this.hass.connection?.connected === false || (item.state !== "disarmed" && (["arming", "pending", "triggered"].includes(state || "") || item.state === state || unavailable.length > 0 || (item.state === "armed_night" && open.length > 0)))} @click=${() => this.service("alarm_control_panel", item.service, { entity_id: this.config.alarm_entity }, `${item.title} requested; waiting for alarm confirmation`)}>
+          <span class="mode-icon">${icon(item.icon)}</span><strong>${item.title}</strong><small>${item.detail}</small><span class="mode-check" aria-hidden="true">${active === item.state ? icon("check") : nothing}</span>
+          ${countdown && active === item.state ? html`<span class="mode-progress" style=${`width:${progress}%`}></span>` : nothing}
+        </button>`)}</div>
+        <div class="alarm-control" role="group" aria-label="Alarm controls"><div><strong>Alarm system · ${alarmOn ? "on" : "off"}</strong><span>${alarmText}${this.config.alarm_siren ? ` · Siren ${siren?.state === "on" ? "on" : "off"}` : ""}</span></div><button ?disabled=${!alarmOn || this.busy || this.hass.connection?.connected === false} @click=${() => this.service("alarm_control_panel", "alarm_disarm", { entity_id: this.config.alarm_entity }, "Disarm requested; waiting for confirmation")}>${state === "triggered" ? "Disarm and silence" : "Turn alarm off"}</button></div>
+      </section>`;
+    }
     const mode=this.state(this.config.home_mode);
     const items=[
       {name:"Home",icon:"home",title:"At home",detail:"Saved household preference"},
