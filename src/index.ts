@@ -325,8 +325,9 @@ export class SignalHome extends LitElement {
       throw new Error(
         "Graphs need an entity ID and optional hours between 1 and 168.",
       );
-    if (config.cameras !== undefined && (!Array.isArray(config.cameras) || config.cameras.some((entity) => typeof entity !== "string" || !/^camera\.[a-z0-9_]+$/.test(entity))))
-      throw new Error("Cameras must be Home Assistant camera entity IDs.");
+    for (const key of ["cameras", "alarm_cameras"] as const)
+      if (config[key] !== undefined && (!Array.isArray(config[key]) || config[key].some((entity) => typeof entity !== "string" || !/^camera\.[a-z0-9_]+$/.test(entity))))
+        throw new Error("Cameras must be Home Assistant camera entity IDs.");
     if (config.home_mode && !/^input_select\.[a-z0-9_]+$/.test(config.home_mode))
       throw new Error("Home mode must be an input_select helper.");
     if (config.alarm_entity && !/^alarm_control_panel\.[a-z0-9_]+$/.test(config.alarm_entity))
@@ -1326,7 +1327,7 @@ export class SignalHome extends LitElement {
     if (this.tab === "rooms")
       return html`<signal-lights .hass=${this.hass} .rooms=${this.config.light_rooms || []} .dark=${this.dark}></signal-lights>`;
     if (this.tab === "cameras")
-      return html`<signal-cameras .hass=${this.hass} .cameras=${this.config.cameras || []} @signal-camera-navigation=${()=>this.resetScroll()}></signal-cameras>`;
+      return html`<signal-cameras .hass=${this.hass} .cameras=${this.config.cameras || []} .alarmCameras=${this.config.alarm_cameras || []} .alarmEntity=${this.config.alarm_entity || ""} @signal-camera-navigation=${()=>this.resetScroll()}></signal-cameras>`;
     if (this.tab === "climate")
       return html`<div class="grid detail-grid">
           ${this.climate()}

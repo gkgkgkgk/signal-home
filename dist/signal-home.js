@@ -2798,7 +2798,8 @@ class Ze extends z {
       })),
       { name: "humidity", selector: { entity: { domain: "sensor" } } },
       { name: "favorites", selector: { entity: { multiple: !0 } } },
-      { name: "cameras", selector: { entity: { domain: "camera", multiple: !0 } } }
+      { name: "cameras", selector: { entity: { domain: "camera", multiple: !0 } } },
+      { name: "alarm_cameras", selector: { entity: { domain: "camera", multiple: !0 } } }
     ];
     return r`<p>
         <strong>Welcome to Signal.</strong> Select your entities below. For the
@@ -2811,7 +2812,7 @@ class Ze extends z {
         .hass=${this.hass}
         .data=${this.config}
         .schema=${t}
-        .computeLabel=${(e) => ({ todo: "Default to-do list (all lists are available)", greeting: "Custom greeting (optional)", favorites: "Shortcut entities", cameras: "Frigate cameras (live, events, and playback)", humidity: "Humidity sensor (optional)" })[e.name] || e.name[0].toUpperCase() + e.name.slice(1)}
+        .computeLabel=${(e) => ({ todo: "Default to-do list (all lists are available)", greeting: "Custom greeting (optional)", favorites: "Shortcut entities", cameras: "Frigate cameras (live, events, and playback)", alarm_cameras: "Cameras that run only while the alarm is armed", humidity: "Humidity sensor (optional)" })[e.name] || e.name[0].toUpperCase() + e.name.slice(1)}
         @value-changed=${(e) => this.change({ ...this.config, ...e.detail.value })}
       ></ha-form>
       <details>
@@ -3035,10 +3036,10 @@ class Ke extends z {
   }
 }
 customElements.get("signal-camera-grid") || customElements.define("signal-camera-grid", Ke);
-const Je = 2e3;
-class Ge extends z {
+const Je = 2e3, Ge = ["armed_night", "armed_away", "armed_home", "armed_vacation", "armed_custom_bypass", "pending", "triggered"];
+class Xe extends z {
   constructor() {
-    super(...arguments), this.cameras = [], this.eventId = "", this.eventCamera = "", this.eventInstance = "frigate", this.eventKind = "event", this.selected = "", this.error = "", this.ready = !1, this.voiceActive = !1, this.talking = !1, this.liveSignature = "", this.generation = 0, this.toggleVoice = () => {
+    super(...arguments), this.cameras = [], this.alarmCameras = [], this.alarmEntity = "", this.eventId = "", this.eventCamera = "", this.eventInstance = "frigate", this.eventKind = "event", this.selected = "", this.error = "", this.ready = !1, this.voiceActive = !1, this.talking = !1, this.liveSignature = "", this.generation = 0, this.toggleVoice = () => {
       if (this.voiceActive) {
         this.stopVoice();
         return;
@@ -3082,6 +3083,8 @@ class Ge extends z {
     this.properties = {
       hass: { attribute: !1 },
       cameras: { attribute: !1 },
+      alarmCameras: { attribute: !1 },
+      alarmEntity: { attribute: !1 },
       eventId: { state: !0 },
       eventCamera: { state: !0 },
       eventInstance: { state: !0 },
@@ -3135,6 +3138,10 @@ class Ge extends z {
     select { font:inherit; font-size:16px; border:1px solid var(--line); border-radius:12px; padding:10px 14px; background:var(--surface); color:var(--ink); max-width:100%; }
     .notice { padding:24px; background:var(--surface); border:1px solid var(--line); border-radius:20px; line-height:1.6; }
     .notice p { margin-bottom:10px; }
+    .resting { display:grid; place-items:center; align-content:center; gap:10px; aspect-ratio:16/9; padding:24px; text-align:center; background:color-mix(in srgb,var(--line) 30%,var(--surface)); color:var(--ink); }
+    .resting svg { width:30px; height:30px; color:var(--muted); }
+    .resting h3 { margin:0; font-size:17px; letter-spacing:-.3px; }
+    .resting p { max-width:34ch; color:var(--muted); font-size:13px; line-height:1.5; }
     @media(max-width:1000px) { .layout { grid-template-columns:1fr; gap:22px; } }
     @media(max-width:480px) { .camera-heading { padding:18px; } signal-camera-grid { padding:16px; } .camera-panel,.history-panel { border-radius:22px; } .talk-help { padding:12px 18px 16px; } h2 { font-size:18px; } .camera-icon { width:40px; height:40px; border-radius:13px; } }
   `;
@@ -3176,8 +3183,12 @@ class Ge extends z {
       menu: { style: "outside", position: "bottom", auto_hide: [], buttons: i }
     }), t;
   }
+  /** An alarm-only camera is off (turned away, privacy mode, not recording) unless the alarm is armed. */
+  resting(t) {
+    return this.alarmCameras.includes(t) && !Ge.includes(this.hass?.states[this.alarmEntity]?.state || "");
+  }
   willUpdate(t) {
-    if (this.cameras.includes(this.selected) || (this.selected = this.cameras[0] || ""), (this.connection !== this.hass?.connection || this.user !== this.hass?.user?.id) && (this.releaseViewers(), this.connection = this.hass?.connection, this.user = this.hass?.user?.id), this.eventId) {
+    if (this.cameras.includes(this.selected) || (this.selected = this.cameras[0] || ""), (this.connection !== this.hass?.connection || this.user !== this.hass?.user?.id) && (this.releaseViewers(), this.connection = this.hass?.connection, this.user = this.hass?.user?.id), this.eventId || this.resting(this.selected)) {
       this.releaseViewers();
       return;
     }
@@ -3195,15 +3206,15 @@ class Ge extends z {
     if (!this.cameras.length) return r`<div class="notice"><p>No cameras added yet.</p>Select your Frigate cameras in Signal’s editor to see them here.</div>`;
     if (this.eventId) return r`<div class="event-layout"><nav class="event-toolbar" aria-label="Event navigation"><span class="recorded-mode">Recorded event</span><button class="live-action" aria-label="Back to live & events" @click=${this.leaveEvent}>← Back to live & events</button></nav>${this.cameras.includes(`camera.${this.eventCamera}`) ? r`<signal-camera-event .hass=${this.hass} .eventId=${this.eventId} .kind=${this.eventKind} .camera=${this.eventCamera} .instance=${this.eventInstance}></signal-camera-event>` : r`<div class="notice" role="alert">This camera isn’t available on this dashboard.</div>`}</div>`;
     if (this.error) return r`<div class="notice" role="alert"><p>${this.error}</p><button @click=${this.retry}>Retry camera viewer</button></div>`;
-    const t = this.hass?.states[this.selected]?.state, e = !t || ["unavailable", "unknown"].includes(t);
+    const t = this.hass?.states[this.selected]?.state, e = this.resting(this.selected), i = !e && (!t || ["unavailable", "unknown"].includes(t));
     return r`
-      ${this.cameras.length > 1 ? r`<label class="selector">Camera<select aria-label="Camera" .value=${this.selected} @change=${(i) => {
-      this.selected = i.target.value;
-    }}>${this.cameras.map((i) => r`<option value=${i}>${this.name(i)}</option>`)}</select></label>` : ""}
+      ${this.cameras.length > 1 ? r`<label class="selector">Camera<select aria-label="Camera" .value=${this.selected} @change=${(s) => {
+      this.selected = s.target.value;
+    }}>${this.cameras.map((s) => r`<option value=${s}>${this.name(s)}</option>`)}</select></label>` : ""}
       <div class="layout">
         <section class="camera-panel" aria-label="Live camera">
-          <div class="camera-heading"><div class="identity"><span class="camera-icon">${b("camera")}</span><div><h2>${this.name(this.selected)}</h2></div></div><span class="live-label ${e ? "offline" : ""}"><span class="dot"></span>${e ? "Unavailable" : "LIVE · Now"}</span></div>
-          <div class="viewer live-viewer">${this.liveCard || r`<div class="notice" role="status">Connecting to camera…</div>`}</div>
+          <div class="camera-heading"><div class="identity"><span class="camera-icon">${b("camera")}</span><div><h2>${this.name(this.selected)}</h2></div></div><span class="live-label ${i || e ? "offline" : ""}"><span class="dot"></span>${e ? "Off" : i ? "Unavailable" : "LIVE · Now"}</span></div>
+          ${e ? r`<div class="resting" role="status">${b("shield")}<h3>Off while you’re home</h3><p>This camera only turns on and records while the alarm is set to Sleeping or Away.</p></div>` : r`<div class="viewer live-viewer">${this.liveCard || r`<div class="notice" role="status">Connecting to camera…</div>`}</div>`}
           ${this.selected === "camera.front_door" ? window.isSecureContext ? r`
             <div class="voice-controls" role="group" aria-label="Doorbell voice controls">
               <button class="session ${this.voiceActive ? "active" : ""}" aria-pressed=${this.voiceActive} @click=${this.toggleVoice}>${b("phone")} ${this.voiceActive ? "End voice" : "Start voice"}</button>
@@ -3217,7 +3228,7 @@ class Ge extends z {
       </div>`;
   }
 }
-customElements.get("signal-cameras") || customElements.define("signal-cameras", Ge);
+customElements.get("signal-cameras") || customElements.define("signal-cameras", Xe);
 const Pt = T`
   :host {
     display: block;
@@ -3391,7 +3402,7 @@ const Pt = T`
     }
   }
 `;
-class Xe extends z {
+class Qe extends z {
   constructor() {
     super(...arguments), this.open = !1, this.heading = "Details", this.dark = !1, this.compact = !1, this.sheetId = `signal-sheet-${Date.now()}-${Math.random().toString(36).slice(2)}`, this.closing = !1, this.closeRequested = !1, this.startY = 0, this.entryTransform = "translateY(12px)", this.mobileSheet = !1, this.motionSequence = 0, this.pop = () => {
       this.open && history.state?.signalSheet !== this.sheetId && this.finish();
@@ -3656,8 +3667,8 @@ class Xe extends z {
     </dialog>`;
   }
 }
-customElements.define("signal-sheet", Xe);
-class Qe extends z {
+customElements.define("signal-sheet", Qe);
+class ti extends z {
   constructor() {
     super(...arguments), this.entity = "", this.dark = !1, this.name = "", this.custom = !1, this.battery = "", this.advanced = !1, this.records = [], this.loading = !1, this.loadError = "", this.sequence = 0;
   }
@@ -3924,8 +3935,8 @@ class Qe extends z {
     >`;
   }
 }
-customElements.define("signal-details", Qe);
-class ti extends z {
+customElements.define("signal-details", ti);
+class ei extends z {
   constructor() {
     super(...arguments), this.config = { type: "custom:signal-control", entity: "" }, this.pending = !1, this.acknowledged = !1, this.detailsOpen = !1, this.error = "", this.confirmUnlock = !1, this.preview = {};
   }
@@ -4442,7 +4453,7 @@ class ti extends z {
       ${this.config.detail ? p : r`<signal-details .hass=${this.hass} .entity=${this.detailsOpen ? this.config.entity : ""} .name=${this.config.name || ""} .dark=${this.config.appearance === "dark" || this.config.appearance !== "light" && matchMedia("(prefers-color-scheme: dark)").matches} @signal-close=${() => this.detailsOpen = !1}></signal-details>`}`;
   }
 }
-customElements.define("signal-control", ti);
+customElements.define("signal-control", ei);
 function ue(n, t = Date.now()) {
   if (!$(n)) return;
   const e = Date.parse(String(n.attributes.next_change_at || ""));
@@ -4450,7 +4461,7 @@ function ue(n, t = Date.now()) {
   const i = n.state.trim();
   return i && i !== "none" ? i : void 0;
 }
-class ei extends z {
+class ii extends z {
   constructor() {
     super(...arguments), this.rooms = [], this.dark = !1, this.selected = "", this.pending = !1, this.error = "";
   }
@@ -4725,15 +4736,15 @@ class ei extends z {
     ${this.error ? r`<p class="error" role="alert">${this.error}</p>` : p}`;
   }
 }
-customElements.define("signal-lights", ei);
+customElements.define("signal-lights", ii);
 const nt = (n) => {
   const t = n.map((e) => e?.last_reported || e?.last_updated).filter((e) => !!e && Number.isFinite(Date.parse(e)));
   return t.length === n.length && t.length ? t.sort((e, i) => Date.parse(e) - Date.parse(i))[0] : void 0;
-}, ii = (n, t) => n?.attributes.friendly_name || t;
-function si(n, t, e, i = /* @__PURE__ */ new Date()) {
+}, si = (n, t) => n?.attributes.friendly_name || t;
+function ai(n, t, e, i = /* @__PURE__ */ new Date()) {
   const s = n.states, a = (t.sensors || []).map(zt).map((x) => ({
     id: x.entity,
-    name: x.name || ii(s[x.entity], x.entity),
+    name: x.name || si(s[x.entity], x.entity),
     e: s[x.entity],
     unverified: !!x.unverified
   })), o = a.filter(
@@ -4868,7 +4879,7 @@ function si(n, t, e, i = /* @__PURE__ */ new Date()) {
   }
   return d.sort((x, E) => E.priority - x.priority);
 }
-function ai(n, t = !0) {
+function ni(n, t = !0) {
   if (!t) return "Connection lost. Showing last received states.";
   const e = n.find((u) => u.tone === "alert");
   if (e) return e.text + ".";
@@ -4888,7 +4899,7 @@ const J = (n) => new Intl.DateTimeFormat("en-CA", {
 }).format(n), ae = J, Mt = (n, t) => {
   const e = /* @__PURE__ */ new Date(`${J(n)}T12:00:00Z`);
   return e.setUTCDate(e.getUTCDate() + t), J(e);
-}, ni = (n, t = "15217") => {
+}, oi = (n, t = "15217") => {
   const e = J(n), i = Mt(n, 30);
   return `https://www.hebcal.com/hebcal?${new URLSearchParams({
     v: "1",
@@ -4908,7 +4919,7 @@ const J = (n) => new Intl.DateTimeFormat("en-CA", {
     i: "off"
   })}`;
 };
-function oi(n, t) {
+function ri(n, t) {
   if (!$(n)) return [];
   if (Array.isArray(n.attributes.events)) {
     const s = J(t);
@@ -4933,7 +4944,7 @@ function oi(n, t) {
     return Number.isNaN(Date.parse(`${h}T12:00:00Z`)) || h < i ? [] : [{ id: `pghst-${o}-${h}`, date: h, title: a, kind: o, source: "pghst", url: "https://pgh.st/" }];
   });
 }
-function ri(n, t) {
+function li(n, t) {
   if (!n || typeof n != "object" || !Array.isArray(n.items)) return [];
   const e = J(t);
   return n.items.flatMap((i) => {
@@ -4955,10 +4966,10 @@ function ri(n, t) {
     }];
   });
 }
-function li(n) {
+function ci(n) {
   return [...n].sort((t, e) => t.date.localeCompare(e.date) || (t.time || "").localeCompare(e.time || "") || t.title.localeCompare(e.title));
 }
-const ne = /* @__PURE__ */ new Map(), ci = {
+const ne = /* @__PURE__ */ new Map(), di = {
   trash: "trash",
   recycling: "recycling",
   yard: "yard",
@@ -4966,8 +4977,8 @@ const ne = /* @__PURE__ */ new Map(), ci = {
   havdalah: "havdalah",
   shabbat: "shabbat",
   holiday: "holiday"
-}, di = (n) => n === "trash" || n === "recycling" || n === "yard" ? "trash" : n === "candles" ? "sun" : n === "havdalah" ? "moon" : "sparkle";
-class hi extends z {
+}, hi = (n) => n === "trash" || n === "recycling" || n === "yard" ? "trash" : n === "candles" ? "sun" : n === "havdalah" ? "moon" : "sparkle";
+class pi extends z {
   constructor() {
     super(...arguments), this.config = { type: "custom:signal-home" }, this.events = [], this.status = "loading", this.now = /* @__PURE__ */ new Date(), this.expanded = !1, this.requestKey = "", this.requestedAt = 0, this.onVisibility = () => {
       document.visibilityState === "visible" && (this.now = /* @__PURE__ */ new Date(), this.refresh());
@@ -5039,11 +5050,11 @@ class hi extends z {
     }
     this.requestKey = e, this.requestedAt = Date.now(), this.status = "loading";
     const s = new AbortController(), a = setTimeout(() => s.abort(), 1e4);
-    fetch(ni(this.now, t), { signal: s.signal }).then((o) => {
+    fetch(oi(this.now, t), { signal: s.signal }).then((o) => {
       if (!o.ok) throw new Error("Hebcal unavailable");
       return o.json();
     }).then((o) => {
-      this.requestKey === e && (this.events = ri(o, this.now), ne.set(e, { fetched: Date.now(), events: this.events }), this.status = "ready");
+      this.requestKey === e && (this.events = li(o, this.now), ne.set(e, { fetched: Date.now(), events: this.events }), this.status = "ready");
     }).catch(() => {
       this.requestKey === e && (this.status = "error");
     }).finally(() => clearTimeout(a));
@@ -5065,14 +5076,14 @@ class hi extends z {
     }).format(new Date(t)) : "";
   }
   render() {
-    const t = this.config.upcoming?.waste_entity ? this.hass?.states[this.config.upcoming.waste_entity] : void 0, e = li([...oi(t, this.now), ...this.events]), i = Mt(this.now, this.expanded ? 30 : 7), s = e.filter((d) => d.date <= i), a = t?.attributes.checked_at || t?.last_reported || t?.last_updated, o = a && Date.now() - Date.parse(a) > 36 * 36e5, c = this.config.upcoming?.waste_entity ? $(t) ? o ? "Collection schedule may be out of date" : "" : "Collection schedule unavailable" : "Collection schedule not connected", l = this.status === "error" ? "Jewish calendar unavailable" : "";
+    const t = this.config.upcoming?.waste_entity ? this.hass?.states[this.config.upcoming.waste_entity] : void 0, e = ci([...ri(t, this.now), ...this.events]), i = Mt(this.now, this.expanded ? 30 : 7), s = e.filter((d) => d.date <= i), a = t?.attributes.checked_at || t?.last_reported || t?.last_updated, o = a && Date.now() - Date.parse(a) > 36 * 36e5, c = this.config.upcoming?.waste_entity ? $(t) ? o ? "Collection schedule may be out of date" : "" : "Collection schedule unavailable" : "Collection schedule not connected", l = this.status === "error" ? "Jewish calendar unavailable" : "";
     return r`<section aria-labelledby="upcoming-title">
       <div class="heading"><h2 id="upcoming-title">Coming up</h2><small>Pittsburgh · next ${this.expanded ? "30" : "7"} days</small></div>
       <div class="shell">
         <div id="upcoming-events">${s.length ? s.map((d, u) => r`
           ${u === 0 || s[u - 1].date !== d.date ? r`<div class="day">${this.dateLabel(d.date)}</div>` : p}
-          <a class=${`event ${ci[d.kind]}`} href=${d.url} target="_blank" rel="noopener noreferrer" aria-label=${`${d.title}, ${this.dateLabel(d.date)}${d.time ? ` at ${this.timeLabel(d.time)}` : ""}; source ${d.source === "pghst" ? "PGH.ST" : "Hebcal"}`}>
-            <span class="glyph">${b(di(d.kind))}</span>
+          <a class=${`event ${di[d.kind]}`} href=${d.url} target="_blank" rel="noopener noreferrer" aria-label=${`${d.title}, ${this.dateLabel(d.date)}${d.time ? ` at ${this.timeLabel(d.time)}` : ""}; source ${d.source === "pghst" ? "PGH.ST" : "Hebcal"}`}>
+            <span class="glyph">${b(hi(d.kind))}</span>
             <span class="copy"><span class="title">${d.title}</span><span class="detail">${d.detail ? `${d.detail} · ` : ""}${d.source === "pghst" ? "City collection" : "Jewish calendar"}</span></span>
             ${d.time ? r`<span class="time">${this.timeLabel(d.time)}</span>` : p}
           </a>`) : r`<p class="empty">${this.status === "loading" ? "Finding what’s next…" : "Nothing on the calendar in this window."}</p>`}</div>
@@ -5089,8 +5100,8 @@ class hi extends z {
     </section>`;
   }
 }
-customElements.define("signal-upcoming", hi);
-class pi extends z {
+customElements.define("signal-upcoming", pi);
+class ui extends z {
   constructor() {
     super(...arguments), this.config = { type: "custom:signal-home" }, this.front = {}, this.pending = "", this.error = "", this.now = /* @__PURE__ */ new Date(), this.signature = "", this.generation = 0, this.resume = () => {
       document.visibilityState === "visible" && (this.now = /* @__PURE__ */ new Date(), this.loadFront());
@@ -5598,10 +5609,10 @@ class pi extends z {
   }
   render() {
     if (!this.hass) return p;
-    const t = this.hass.connection?.connected !== !1, e = si(this.hass, this.config, this.front, this.now);
+    const t = this.hass.connection?.connected !== !1, e = ai(this.hass, this.config, this.front, this.now);
     return r`<header class="digest-heading">
         <div class="eyebrow">Your home</div>
-        <h1>${ai(e, t)}</h1>
+        <h1>${ni(e, t)}</h1>
         ${t ? p : r`<p>Reconnect to see current conditions.</p>`}
       </header>
       <div class="digest-list">
@@ -5615,8 +5626,8 @@ class pi extends z {
       ${this.pending ? r`<p class="feedback" role="status">Sending…</p>` : p}${this.error ? r`<p class="feedback error" role="alert">${this.error}</p>` : p}`;
   }
 }
-customElements.define("signal-digest", pi);
-const ui = T`
+customElements.define("signal-digest", ui);
+const mi = T`
   .more-links {display:grid;gap:12px;padding:0 6px 16px;}
   .more-links button {display:flex;align-items:center;gap:14px;min-height:60px;padding:16px;border:1px solid var(--line);border-radius:16px;color:var(--ink);background:var(--surface);font:inherit;cursor:pointer;}
   .more-links button span {flex:1;text-align:left;}
@@ -5689,13 +5700,13 @@ const ui = T`
   }
   @media(prefers-reduced-motion:reduce) { .climate,.security-mode-option { transition:none; } }
 `;
-function mi(n) {
+function gi(n) {
   return n.map((t) => {
     const e = t.lu ?? t.last_updated ?? t.lc ?? t.last_changed;
     return { time: typeof e == "number" ? e * 1e3 : Date.parse(String(e)), value: w(t.s ?? t.state) ?? null };
   }).filter((t) => Number.isFinite(t.time)).sort((t, e) => t.time - e.time);
 }
-function gi(n, t = 600) {
+function fi(n, t = 600) {
   if (n.length <= t) return n;
   const e = Math.ceil(n.length / (t / 4)), i = [];
   for (let s = 0; s < n.length; s += e) {
@@ -5706,7 +5717,7 @@ function gi(n, t = 600) {
   }
   return i;
 }
-function fi(n, t, e) {
+function bi(n, t, e) {
   const i = new Intl.DateTimeFormat("en-US", { hour: "numeric", hourCycle: "h23", timeZone: e }), s = (l) => {
     const d = Number(i.format(new Date(l)));
     return d >= 6 && d < 18;
@@ -5727,7 +5738,7 @@ function fi(n, t, e) {
   return a.push({ start: o, end: t, day: c }), a;
 }
 const Tt = /* @__PURE__ */ new WeakMap();
-class bi extends z {
+class vi extends z {
   constructor() {
     super(...arguments), this.suspended = !1, this.config = { type: "custom:signal-graph", entity: "" }, this.points = [], this.loading = !1, this.error = "", this.hours = 24, this.displayedHours = 24, this.sequence = 0, this.queried = "", this.cacheUser = "", this.restored = "", this.end = Date.now(), this.start = this.end - 864e5;
   }
@@ -6022,7 +6033,7 @@ class bi extends z {
         significant_changes_only: !1
       });
       if (t === this.sequence) {
-        this.points = mi(a[this.config.entity] || []), this.start = s, this.end = e, this.displayedHours = i;
+        this.points = gi(a[this.config.entity] || []), this.start = s, this.end = e, this.displayedHours = i;
         const o = this.hass.connection || this.hass.callWS;
         let c = Tt.get(o);
         c || Tt.set(o, c = /* @__PURE__ */ new Map());
@@ -6069,10 +6080,10 @@ class bi extends z {
       Math.min(600, (y.time - this.start) / (this.end - this.start) * 600)
     ), h = (y) => 150 - (y.value - l) / (d - l) * 150, m = [];
     let g = [];
-    for (const y of gi(this.points))
+    for (const y of fi(this.points))
       y.value === null ? (g.length && m.push(g), g = []) : g.push(y);
     g.length && m.push(g);
-    const v = this.cursor !== void 0 ? this.points[this.cursor] : void 0, f = fi(this.start, this.end, this.hass?.config?.time_zone), A = v ? v.value : $(t) ? t.state : void 0;
+    const v = this.cursor !== void 0 ? this.points[this.cursor] : void 0, f = bi(this.start, this.end, this.hass?.config?.time_zone), A = v ? v.value : $(t) ? t.state : void 0;
     return r`<article
       class=${`widget ${this.config.appearance || "auto"} ${this.config.accent || "lilac"}`}
     >
@@ -6166,8 +6177,8 @@ class bi extends z {
     </article>`;
   }
 }
-customElements.define("signal-graph", bi);
-class vi extends z {
+customElements.define("signal-graph", vi);
+class xi extends z {
   constructor() {
     super(...arguments), this.detailsOpen = !1, this.config = { type: "custom:signal-metric", entity: "" };
   }
@@ -6317,15 +6328,15 @@ class vi extends z {
       ></signal-details>`;
   }
 }
-customElements.define("signal-metric", vi);
-const xi = [
+customElements.define("signal-metric", xi);
+const yi = [
   { id: "home", name: "Home", icon: "home" },
   { id: "rooms", name: "Lighting", icon: "bulb" },
   { id: "cameras", name: "Cameras", icon: "camera" },
   { id: "lists", name: "Lists", icon: "list" },
   { id: "safety", name: "Security", icon: "shield" },
   { id: "climate", name: "Climate", icon: "climate" }
-], yi = {
+], wi = {
   off: "Off",
   heat: "Heat",
   cool: "Cool",
@@ -6334,7 +6345,7 @@ const xi = [
   dry: "Dry",
   fan_only: "Fan"
 };
-class wi extends z {
+class $i extends z {
   constructor() {
     super(...arguments), this.config = { type: "custom:signal-home" }, this.tab = "home", this.pageTravel = 0, this.pendingTodo = "", this.messageTone = "neutral", this.dark = !1, this.appearance = "auto", this.completedTodos = [], this.completionTimes = {}, this.deleteError = "", this.todoMutating = !1, this.todoRefreshPending = !1, this.todoOrder = /* @__PURE__ */ new Map(), this.selectedTodo = "", this.loadedTodo = "", this.discoveredTodos = [], this.detailEntity = "", this.detailReady = !1, this.menuOpen = !1, this.moreOpen = !1, this.moreDestination = "", this.contentScrolled = !1, this.onContentScroll = (t) => {
       this.contentScrolled = t.currentTarget.scrollTop > 4;
@@ -6390,10 +6401,10 @@ class wi extends z {
     };
   }
   static {
-    this.styles = [je, Fe, Be, xt, ui];
+    this.styles = [je, Fe, Be, xt, mi];
   }
   get tabs() {
-    return xi;
+    return yi;
   }
   get todoLists() {
     return this.todoListStates === this.hass?.states ? this.discoveredTodos : (this.todoListStates = this.hass?.states, this.discoveredTodos = Object.entries(this.hass?.states || {}).filter(([t]) => t.startsWith("todo.")).map(([t, e]) => ({ ...e, entity_id: t })).sort(
@@ -6461,8 +6472,9 @@ class wi extends z {
       throw new Error(
         "Graphs need an entity ID and optional hours between 1 and 168."
       );
-    if (t.cameras !== void 0 && (!Array.isArray(t.cameras) || t.cameras.some((i) => typeof i != "string" || !/^camera\.[a-z0-9_]+$/.test(i))))
-      throw new Error("Cameras must be Home Assistant camera entity IDs.");
+    for (const i of ["cameras", "alarm_cameras"])
+      if (t[i] !== void 0 && (!Array.isArray(t[i]) || t[i].some((s) => typeof s != "string" || !/^camera\.[a-z0-9_]+$/.test(s))))
+        throw new Error("Cameras must be Home Assistant camera entity IDs.");
     if (t.home_mode && !/^input_select\.[a-z0-9_]+$/.test(t.home_mode))
       throw new Error("Home mode must be an input_select helper.");
     if (t.alarm_entity && !/^alarm_control_panel\.[a-z0-9_]+$/.test(t.alarm_entity))
@@ -6902,7 +6914,7 @@ class wi extends z {
                 ?disabled=${!i || this.busy}
                 @change=${(C) => this.service("climate", "set_hvac_mode", { entity_id: this.config.climate, hvac_mode: C.target.value })}
               >
-                ${S.map((C) => r`<option value=${C} .selected=${Q(C === e?.state)}>${yi[C] || N(C)}</option>`)}
+                ${S.map((C) => r`<option value=${C} .selected=${Q(C === e?.state)}>${wi[C] || N(C)}</option>`)}
               </select>` : p}
       </div>
     </section>`;
@@ -7156,7 +7168,7 @@ class wi extends z {
       </div>` : p;
   }
   content() {
-    return this.tab === "rooms" ? r`<signal-lights .hass=${this.hass} .rooms=${this.config.light_rooms || []} .dark=${this.dark}></signal-lights>` : this.tab === "cameras" ? r`<signal-cameras .hass=${this.hass} .cameras=${this.config.cameras || []} @signal-camera-navigation=${() => this.resetScroll()}></signal-cameras>` : this.tab === "climate" ? r`<div class="grid detail-grid">
+    return this.tab === "rooms" ? r`<signal-lights .hass=${this.hass} .rooms=${this.config.light_rooms || []} .dark=${this.dark}></signal-lights>` : this.tab === "cameras" ? r`<signal-cameras .hass=${this.hass} .cameras=${this.config.cameras || []} .alarmCameras=${this.config.alarm_cameras || []} .alarmEntity=${this.config.alarm_entity || ""} @signal-camera-navigation=${() => this.resetScroll()}></signal-cameras>` : this.tab === "climate" ? r`<div class="grid detail-grid">
           ${this.climate()}
           <div class="stack">
             ${this.weather()}
@@ -7380,7 +7392,7 @@ class wi extends z {
     </div>`;
   }
 }
-customElements.get("signal-home") || customElements.define("signal-home", wi);
+customElements.get("signal-home") || customElements.define("signal-home", $i);
 const ft = window;
 ft.customCards = ft.customCards || [];
 ft.customCards.push({
@@ -7414,5 +7426,5 @@ ft.customCards.push(
   }
 );
 export {
-  wi as SignalHome
+  $i as SignalHome
 };

@@ -49,6 +49,8 @@ export interface Config {
   sensors?: (string | SensorConfig)[];
   favorites?: string[];
   cameras?: string[];
+  /** Cameras that run only while alarm_entity is armed; Signal shows them as off otherwise. */
+  alarm_cameras?: string[];
   light_rooms?: LightRoom[];
   quick_actions?: QuickAction[];
   home_mode?: string;

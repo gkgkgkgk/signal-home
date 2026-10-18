@@ -198,3 +198,43 @@ test('malformed notification event ID is rejected without a media request',async
   await expect(page.getByRole('region',{name:'Live camera'})).toBeVisible();
   await expect(page.locator('signal-camera-grid .tile')).toHaveCount(1);
 });
+
+test('alarm-only camera stays off and unconnected until the alarm is armed', async ({ page }) => {
+  await page.goto('/');
+  await page.evaluate(() => {
+    class CameraStub extends HTMLElement {
+      hass: any;
+      config: any;
+      setConfig(config: any) { this.config = config; }
+      connectedCallback() { this.textContent = this.config.view.default; }
+    }
+    customElements.define('advanced-camera-card', CameraStub);
+    (window as any).demo.setState('alarm_control_panel.alarmo', 'disarmed');
+    const card = document.querySelector('signal-home') as any;
+    card.setConfig({ ...card.config, cameras: ['camera.front_door', 'camera.living_room'], alarm_cameras: ['camera.living_room'], alarm_entity: 'alarm_control_panel.alarmo' });
+  });
+  await page.getByRole('button', { name: 'Cameras', exact: true }).click();
+  const live = page.getByRole('region', { name: 'Live camera' });
+  // The doorbell is not alarm-only, so it stays live while disarmed.
+  await expect(live.locator('advanced-camera-card')).toHaveCount(1);
+  await page.getByRole('combobox', { name: 'Camera', exact: true }).selectOption('camera.living_room');
+  await expect(live.getByRole('status')).toContainText('Off while you’re home');
+  await expect(live.locator('.live-label')).toHaveText('Off');
+  await expect(page.locator('advanced-camera-card')).toHaveCount(0);
+  // Footage recorded while armed stays browsable.
+  expect(await page.locator('signal-camera-grid').evaluate((e: any) => e.camera)).toBe('living_room');
+  // Away's exit countdown still counts as home.
+  await page.evaluate(() => (window as any).demo.setState('alarm_control_panel.alarmo', 'arming'));
+  await expect(page.locator('advanced-camera-card')).toHaveCount(0);
+  await page.evaluate(() => (window as any).demo.setState('alarm_control_panel.alarmo', 'armed_night'));
+  await expect(live.locator('advanced-camera-card')).toHaveCount(1);
+  const config = await live.locator('advanced-camera-card').evaluate((e: any) => e.config);
+  expect(config.cameras[0].camera_entity).toBe('camera.living_room');
+  expect(config.cameras[0].go2rtc.stream).toBeUndefined();
+  expect(config.cameras[0].capabilities).toBeUndefined();
+  await expect(live.locator('.live-label')).not.toHaveText('Off');
+  await page.evaluate(() => (window as any).demo.setState('alarm_control_panel.alarmo', 'disarmed'));
+  await expect(page.locator('advanced-camera-card')).toHaveCount(0);
+  await expect(live.getByRole('status')).toContainText('Off while you’re home');
+  expect(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth)).toBe(false);
+});

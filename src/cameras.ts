@@ -8,16 +8,20 @@ type CameraCard = HTMLElement & { hass: Hass; setConfig(config: object): void };
 // The doorbell speaker feeds its own microphone, so talking is half-duplex: inbound audio
 // stays muted while the button is held and until the echo of the last words has returned.
 const ECHO_TAIL_MS = 2000;
+// Alarm states in which alarm-only cameras run (matches the HA automation that wakes them).
+const WATCH_STATES = ["armed_night", "armed_away", "armed_home", "armed_vacation", "armed_custom_bypass", "pending", "triggered"];
 
 export class SignalCameras extends LitElement {
   static properties = {
-    hass: { attribute: false }, cameras: { attribute: false },
+    hass: { attribute: false }, cameras: { attribute: false }, alarmCameras: { attribute: false }, alarmEntity: { attribute: false },
     eventId: { state: true }, eventCamera: { state: true }, eventInstance: { state: true }, eventKind: { state: true },
     selected: { state: true }, error: { state: true }, ready: { state: true },
     voiceActive: { state: true }, talking: { state: true },
   };
   declare hass: Hass;
   cameras: string[] = [];
+  alarmCameras: string[] = [];
+  alarmEntity = "";
   private eventId = "";
   private eventCamera = "";
   private eventInstance = "frigate";
@@ -76,6 +80,10 @@ export class SignalCameras extends LitElement {
     select { font:inherit; font-size:16px; border:1px solid var(--line); border-radius:12px; padding:10px 14px; background:var(--surface); color:var(--ink); max-width:100%; }
     .notice { padding:24px; background:var(--surface); border:1px solid var(--line); border-radius:20px; line-height:1.6; }
     .notice p { margin-bottom:10px; }
+    .resting { display:grid; place-items:center; align-content:center; gap:10px; aspect-ratio:16/9; padding:24px; text-align:center; background:color-mix(in srgb,var(--line) 30%,var(--surface)); color:var(--ink); }
+    .resting svg { width:30px; height:30px; color:var(--muted); }
+    .resting h3 { margin:0; font-size:17px; letter-spacing:-.3px; }
+    .resting p { max-width:34ch; color:var(--muted); font-size:13px; line-height:1.5; }
     @media(max-width:1000px) { .layout { grid-template-columns:1fr; gap:22px; } }
     @media(max-width:480px) { .camera-heading { padding:18px; } signal-camera-grid { padding:16px; } .camera-panel,.history-panel { border-radius:22px; } .talk-help { padding:12px 18px 16px; } h2 { font-size:18px; } .camera-icon { width:40px; height:40px; border-radius:13px; } }
   `;
@@ -168,12 +176,16 @@ export class SignalCameras extends LitElement {
     });
     return card;
   }
+  /** An alarm-only camera is off (turned away, privacy mode, not recording) unless the alarm is armed. */
+  private resting(entity:string){
+    return this.alarmCameras.includes(entity) && !WATCH_STATES.includes(this.hass?.states[this.alarmEntity]?.state||"");
+  }
   protected willUpdate(_changes: PropertyValues) {
     if(!this.cameras.includes(this.selected)) this.selected=this.cameras[0]||"";
     if(this.connection!==this.hass?.connection || this.user!==this.hass?.user?.id){
       this.releaseViewers();this.connection=this.hass?.connection;this.user=this.hass?.user?.id;
     }
-    if(this.eventId) { this.releaseViewers(); return; }
+    if(this.eventId || this.resting(this.selected)) { this.releaseViewers(); return; }
     if(!this.ready || !this.selected || !this.hass) return;
     try {
       if(this.liveSignature!==this.selected || !this.liveCard){this.liveCard=this.createViewer();this.liveSignature=this.selected;}
@@ -187,13 +199,14 @@ export class SignalCameras extends LitElement {
     if(this.eventId) return html`<div class="event-layout"><nav class="event-toolbar" aria-label="Event navigation"><span class="recorded-mode">Recorded event</span><button class="live-action" aria-label="Back to live & events" @click=${this.leaveEvent}>← Back to live & events</button></nav>${this.cameras.includes(`camera.${this.eventCamera}`) ? html`<signal-camera-event .hass=${this.hass} .eventId=${this.eventId} .kind=${this.eventKind} .camera=${this.eventCamera} .instance=${this.eventInstance}></signal-camera-event>` : html`<div class="notice" role="alert">This camera isn’t available on this dashboard.</div>`}</div>`;
     if(this.error) return html`<div class="notice" role="alert"><p>${this.error}</p><button @click=${this.retry}>Retry camera viewer</button></div>`;
     const state=this.hass?.states[this.selected]?.state;
-    const unavailable=!state||["unavailable","unknown"].includes(state);
+    const resting=this.resting(this.selected);
+    const unavailable=!resting&&(!state||["unavailable","unknown"].includes(state));
     return html`
       ${this.cameras.length>1?html`<label class="selector">Camera<select aria-label="Camera" .value=${this.selected} @change=${(e:Event)=>{this.selected=(e.target as HTMLSelectElement).value;}}>${this.cameras.map(entity=>html`<option value=${entity}>${this.name(entity)}</option>`)}</select></label>`:""}
       <div class="layout">
         <section class="camera-panel" aria-label="Live camera">
-          <div class="camera-heading"><div class="identity"><span class="camera-icon">${icon("camera")}</span><div><h2>${this.name(this.selected)}</h2></div></div><span class="live-label ${unavailable?"offline":""}"><span class="dot"></span>${unavailable?"Unavailable":"LIVE · Now"}</span></div>
-          <div class="viewer live-viewer">${this.liveCard||html`<div class="notice" role="status">Connecting to camera…</div>`}</div>
+          <div class="camera-heading"><div class="identity"><span class="camera-icon">${icon("camera")}</span><div><h2>${this.name(this.selected)}</h2></div></div><span class="live-label ${unavailable||resting?"offline":""}"><span class="dot"></span>${resting?"Off":unavailable?"Unavailable":"LIVE · Now"}</span></div>
+          ${resting?html`<div class="resting" role="status">${icon("shield")}<h3>Off while you’re home</h3><p>This camera only turns on and records while the alarm is set to Sleeping or Away.</p></div>`:html`<div class="viewer live-viewer">${this.liveCard||html`<div class="notice" role="status">Connecting to camera…</div>`}</div>`}
           ${this.selected==="camera.front_door"?window.isSecureContext?html`
             <div class="voice-controls" role="group" aria-label="Doorbell voice controls">
               <button class="session ${this.voiceActive?"active":""}" aria-pressed=${this.voiceActive} @click=${this.toggleVoice}>${icon("phone")} ${this.voiceActive?"End voice":"Start voice"}</button>
