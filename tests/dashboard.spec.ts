@@ -144,8 +144,12 @@ test("dark preference persists and unavailable safety never claims clear", async
   );
   await navigate(page, "Security");
   await expect(
-    page.getByRole("button", { name: /Unavailable Kitchen sink/ }),
+    page.getByRole("button", { name: /Offline Kitchen sink/ }),
   ).toBeVisible();
+  // An offline sensor says when it went offline, not a stale "last reported" claim.
+  await expect(
+    page.getByRole("button", { name: /Offline Kitchen sink/ }).locator(".sensor-sub"),
+  ).toContainText(/^\s*Offline since /);
 });
 for (const width of [360, 390, 768, 1440])
   test(`responsive ${width}px has no overflow and reduced motion works`, async ({

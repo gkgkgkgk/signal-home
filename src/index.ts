@@ -881,7 +881,7 @@ export class SignalHome extends LitElement {
       text: alarm
         ? `${alarm} sensor${alarm > 1 ? "s" : ""} need attention`
         : unknown
-          ? `${unknown} sensor${unknown > 1 ? "s" : ""} unavailable`
+          ? `${unknown} sensor${unknown > 1 ? "s" : ""} offline`
           : unverified
             ? `${unverified} sensor${unverified > 1 ? "s" : ""} need verification`
           : all.length
@@ -1338,8 +1338,7 @@ export class SignalHome extends LitElement {
     const doors=this.sensors.filter(s=>s.entity.startsWith("lock.") || ["door","window","opening","garage_door"].includes(kindOf(s)));
     const water=this.sensors.filter(s=>kindOf(s)==="moisture");
     const other=this.sensors.filter(s=>!doors.includes(s)&&!water.includes(s));
-    const report=(e: Entity | undefined)=>{
-      const when=e?.last_reported || e?.last_updated;
+    const report=(e: Entity | undefined, when=e?.last_reported || e?.last_updated)=>{
       return when && Number.isFinite(Date.parse(when))
         ? new Date(when).toLocaleString(this.hass.locale?.language || undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit",timeZone:this.hass.config?.time_zone})
         : "time unknown";
@@ -1347,10 +1346,12 @@ export class SignalHome extends LitElement {
     const cards=(items: typeof this.sensors)=>html`<div class="sensors">${items.map((s) => {
         const e = this.state(s.entity);
         const ready = available(e);
+        // Captured before available() narrows e, so the offline branch keeps the raw state and time.
+        const rawState = e?.state, offlineSince = e?.last_changed, present = !!e;
         const alarm = s.entity.startsWith("lock.") ? ready && e.state!=="locked" : e?.state === "on";
         const kind = e?.attributes.device_class;
         const label = !ready
-          ? "Unavailable"
+          ? rawState === "unknown" ? "Unknown" : "Offline"
           : s.entity.startsWith("lock.") ? words(e?.state) : alarm
             ? kind === "moisture"
               ? "Water detected"
@@ -1381,7 +1382,7 @@ export class SignalHome extends LitElement {
               ${s.name || e?.attributes.friendly_name || s.entity}
             </div>
             <div class="sensor-sub">
-              ${s.unverified ? `Last reported ${ready ? s.entity.startsWith("lock.") ? e.state : e.state === "off" ? "closed" : e.state === "on" ? "open" : e.state : "unavailable"} · ${report(e)}` : s.battery ? (charge !== undefined ? `${charge}% battery${charge < 20 ? " · Low battery" : ""}` : "Battery unavailable") : "Tap for details"}
+              ${!ready ? (present ? `${rawState === "unknown" ? "State unknown" : "Offline"} since ${report(e, offlineSince)}` : "Not found in Home Assistant") : s.unverified ? `Last reported ${ready ? s.entity.startsWith("lock.") ? e.state : e.state === "off" ? "closed" : e.state === "on" ? "open" : e.state : "unavailable"} · ${report(e)}` : s.battery ? (charge !== undefined ? `${charge}% battery${charge < 20 ? " · Low battery" : ""}` : "Battery unavailable") : "Tap for details"}
             </div>
           </div>
         </button>`;
