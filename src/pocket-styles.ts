@@ -66,6 +66,42 @@ export const pocketStyles = css`
     min-width: 0;
     padding: 12px 0;
   }
+  .todo-edit {
+    border: 0;
+    border-radius: 10px;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    overflow-wrap: anywhere;
+    cursor: text;
+  }
+  .todo-edit:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+  }
+  .todo-edit-form {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+  }
+  .todo-edit-input {
+    width: 100%;
+    min-width: 0;
+    margin: 3px 0;
+    padding: 9px 12px;
+    border: 1px solid #51352055;
+    border-radius: 12px;
+    background: #fffefa88;
+    color: inherit;
+    font: inherit;
+    /* iOS zooms into inputs under 16px. */
+    font-size: max(16px, 1em);
+  }
+  .todo-edit-input:focus {
+    outline: 2px solid #513520;
+    outline-offset: 1px;
+  }
   .todo-trash {
     width: 44px;
     height: 44px;

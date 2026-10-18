@@ -86,9 +86,16 @@ const hass: Hass = {
           i.uid === data.item
             ? {
                 ...i,
-                status: data.status as string,
-                completed:
-                  data.status === "completed" ? new Date().toISOString() : null,
+                ...(data.rename !== undefined && {
+                  summary: data.rename as string,
+                }),
+                ...(data.status !== undefined && {
+                  status: data.status as string,
+                  completed:
+                    data.status === "completed"
+                      ? new Date().toISOString()
+                      : null,
+                }),
               }
             : i,
         );

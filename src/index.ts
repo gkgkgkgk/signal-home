@@ -78,6 +78,8 @@ export class SignalHome extends LitElement {
     selectedTodo: { state: true },
     todoLoading: { state: true },
     pendingTodo: { state: true },
+    editingTodo: { state: true },
+    editDraft: { state: true },
     messageTone: { state: true },
   };
   static styles = [styles, pocketStyles, polishStyles, motionStyles, householdStyles];
@@ -87,6 +89,9 @@ export class SignalHome extends LitElement {
   private get tabs() { return tabs; }
   private pageTravel = 0;
   private pendingTodo = "";
+  private editingTodo = "";
+  private editDraft = "";
+  private savingEdit = false;
   private messageTone: "neutral" | "success" | "error" = "neutral";
   private dark = false;
   private appearance: Appearance = "auto";
@@ -149,6 +154,8 @@ export class SignalHome extends LitElement {
     this.undoItem = undefined;
     this.message = "";
     this.draft = "";
+    this.editingTodo = "";
+    this.editDraft = "";
     this.todoError = "";
     this.todoLoaded = false;
     try {
@@ -712,6 +719,71 @@ export class SignalHome extends LitElement {
       if (this.todoRefreshPending && this.isConnected) void this.loadTodos();
     }
   }
+  private async startEdit(item: Todo) {
+    if (this.busy || !this.todoSupports(4)) return;
+    this.editingTodo = item.uid;
+    this.editDraft = item.summary;
+    await this.updateComplete;
+    const input =
+      this.renderRoot.querySelector<HTMLInputElement>(".todo-edit-input");
+    input?.focus({ preventScroll: true });
+    input?.select();
+  }
+  private cancelEdit() {
+    const uid = this.editingTodo;
+    this.editingTodo = "";
+    // Return focus to the item so keyboard users keep their place.
+    void this.updateComplete.then(() =>
+      this.renderRoot
+        .querySelector<HTMLElement>(
+          `[data-todo-uid="${CSS.escape(uid)}"] .todo-edit`,
+        )
+        ?.focus({ preventScroll: true }),
+    );
+  }
+  /** Saves on Enter or when the field loses focus; an empty or unchanged name just closes the editor. */
+  private async saveEdit(event?: Event) {
+    event?.preventDefault();
+    const uid = this.editingTodo;
+    const entity = this.todoEntity;
+    if (!uid || !entity || this.savingEdit) return;
+    const item = [...this.todos, ...this.completedTodos].find(
+      (t) => t.uid === uid,
+    );
+    const summary = this.editDraft.trim();
+    if (!item || !summary || summary === item.summary) {
+      this.editingTodo = "";
+      return;
+    }
+    if (this.busy || !this.todoSupports(4)) return;
+    this.savingEdit = true;
+    this.busy = true;
+    this.pendingTodo = uid;
+    this.todoMutating = true;
+    this.todoSequence++;
+    try {
+      await this.hass.callService("todo", "update_item", {
+        entity_id: entity,
+        item: uid,
+        rename: summary,
+      });
+      if (entity !== this.todoEntity) return;
+      const rename = (items: Todo[]) =>
+        items.map((t) => (t.uid === uid ? { ...t, summary } : t));
+      this.todos = rename(this.todos);
+      this.completedTodos = rename(this.completedTodos);
+      if (this.editingTodo === uid) this.editingTodo = "";
+      this.notify("Saved.", "success");
+    } catch {
+      this.notify("Couldn’t save that change. Try again.", "error");
+    } finally {
+      this.savingEdit = false;
+      this.busy = false;
+      this.pendingTodo = "";
+      this.todoMutating = false;
+      if (this.todoRefreshPending && this.isConnected) void this.loadTodos();
+    }
+  }
   private async addTodo(event: Event) {
     event.preventDefault();
     const item = this.draft.trim();
@@ -1030,7 +1102,8 @@ export class SignalHome extends LitElement {
       !!(Number(state?.attributes.supported_features) & feature)
     );
   }
-  private todoRow(item: Todo, completed = false) {
+  private todoRow(item: Todo, completed = false, editable = false) {
+    const editing = editable && this.editingTodo === item.uid;
     return html`<div
       class=${`todo-row ${completed ? "completed-row" : ""}`}
       data-todo-uid=${item.uid}
@@ -1039,13 +1112,41 @@ export class SignalHome extends LitElement {
     >
       <button
         class="check-button"
-        ?disabled=${this.busy || !this.todoSupports(4)}
+        ?disabled=${this.busy || editing || !this.todoSupports(4)}
         aria-label=${`${completed ? "Restore" : "Complete"} ${item.summary}`}
         @click=${() => this.complete(item, completed)}
       >
         <span class="check-box">${completed ? icon("check") : nothing}</span>
       </button>
-      <span class="todo-label">${item.summary}</span>
+      ${editing
+        ? html`<form class="todo-edit-form" @submit=${this.saveEdit}>
+            <input
+              class="todo-edit-input"
+              aria-label=${`Edit ${item.summary}`}
+              maxlength="255"
+              enterkeyhint="done"
+              .value=${this.editDraft}
+              @input=${(e: Event) =>
+                (this.editDraft = (e.target as HTMLInputElement).value)}
+              @keydown=${(e: KeyboardEvent) => {
+                if (e.key !== "Escape") return;
+                e.preventDefault();
+                e.stopPropagation();
+                this.cancelEdit();
+              }}
+              @blur=${() => this.saveEdit()}
+            />
+          </form>`
+        : editable && this.todoSupports(4)
+          ? html`<button
+              class="todo-label todo-edit"
+              aria-label=${`Edit ${item.summary}`}
+              ?disabled=${this.busy}
+              @click=${() => this.startEdit(item)}
+            >
+              ${item.summary}
+            </button>`
+          : html`<span class="todo-label">${item.summary}</span>`}
       <button
         class="todo-trash"
         ?disabled=${this.busy || !this.canDeleteTodo}
@@ -1103,7 +1204,7 @@ export class SignalHome extends LitElement {
                     ? repeat(
                         detail ? this.todos : this.todos.slice(0, 2),
                         (item) => item.uid,
-                        (item) => this.todoRow(item),
+                        (item) => this.todoRow(item, false, detail),
                       )
                     : this.todoLoading && !this.todoLoaded
                       ? html`<div
@@ -1138,7 +1239,7 @@ export class SignalHome extends LitElement {
       repeat(
         items,
         (item) => item.uid,
-        (item) => this.todoRow(item, true),
+        (item) => this.todoRow(item, true, true),
       );
     return html`<div class="completed-list">
       <h3 data-todo-motion="completed-heading">
