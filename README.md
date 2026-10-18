@@ -94,9 +94,18 @@ Replace entity IDs with your own. Every entity field is optional; unconfigured c
 | `humidity`   | Optional humidity sensor; otherwise uses climate humidity                                  |
 | `sensors`    | Binary sensor IDs, or objects with `entity`, `name`, and `battery`                         |
 | `favorites`  | Entity IDs rendered as capability-aware control cards                                      |
+| `cameras`    | Frigate `camera.*` entity IDs; adds a Cameras tab with live video and an event grid |
 | `graphs`     | Numeric sensor IDs or objects with `entity`, `name`, and `hours` (1–168); shown on Climate |
 
 Choose appearance in Signal's settings menu. Auto uses HA's configured time zone (device time if unavailable); System follows the device's light/dark preference. Changes apply on the next minute or app resume. Old sun/moon-button preferences are retired so this release starts from the configured/default mode. Preferences do not change other HA dashboards. Standalone cards retain their own appearance configuration.
+
+## Cameras
+
+Install the Frigate integration and Advanced Camera Card through HACS, register the camera card's JavaScript resource, then select Frigate camera entities in Signal's editor (or set `cameras: [camera.front_door]` in YAML). Signal adds a Cameras tab with live video and an event grid and a camera selector when more than one is configured. Live video uses the camera's configured provider; event clips use the Frigate integration. Communication uses the current HA session, and no camera passwords or Frigate URLs belong in Signal configuration. Recording availability and retention come from the NVR.
+
+Notification links can select an exact recording with `?signal_review=<review-id>&signal_camera=front_door&signal_instance=frigate#signal/cameras`. This view shows the event timestamp and playback controls, with **Back to live & events** navigation. Expired or invalid links show an unavailable message rather than substituting a different recording. Playback signs the authenticated HA Frigate VOD route with the review start minus 5 seconds and end plus 5 seconds. Legacy `signal_event` notification links resolve to the containing review; they never fall back to raw object playback.
+
+Events are a simple two-column phone grid (three columns on desktop) with a thumbnail and local date/time. Each tile corresponds to one Frigate review item, with the same visit time/duration. Tap to play that visit with a 5-second lead-in and 5-second tail; Back to live & events always restores the live view and grid. There are only two modes, Live and Recorded event. Ongoing visits are labeled and load a finite range through the opening time, with an explicit refresh button. There is no recording timeline, Playback tab, or next/previous carousel. Refresh and Load more provide access to recent/older events, and the visible grid refreshes once per minute. Continuous timeline browsing remains in the separate Admin dashboard. The viewer is embedded inside Signal and is removed when navigating away, allowing it to release streams. Ordinary HA state updates preserve the active viewer. Existing dashboards without `cameras` retain their four-tab layout. Advanced Camera Card is an optional dependency for camera-enabled dashboards only.
 
 ## Shared lists and retention
 
@@ -199,6 +208,124 @@ Source lives in `src/`. `src/demo.ts` is excluded from the production bundle. `d
 
 Signal uses the authenticated Home Assistant frontend connection. Home Assistant remains responsible for device authorization and actions. Safety cards are status displays; they do not implement alarm notifications. Device integration behavior and delayed state updates may vary.
 
-The suite covers everyday controls, climate, weather, groceries, safety, numeric history, and matching device sheets. Camera walls, room auto-discovery, alarm-panel controls, and translations remain future work. Signal styles its own interface, not Home Assistant's settings screens or native advanced dialogs.
+The suite covers everyday controls, climate, weather, groceries, safety, numeric history, camera navigation and viewer lifecycle, and matching device sheets. Room auto-discovery, alarm-panel controls, and translations remain future work. Signal styles its own interface; its embedded camera viewer uses Advanced Camera Card, while Home Assistant's settings screens and native advanced dialogs retain their own styles.
 
 [Design notes](DESIGN.md) · [MIT license](LICENSE)
+
+### Camera page and doorbell alerts
+
+The Cameras page opens with the front door, showing a live go2rtc view beside recent event clips. The front door's phone button starts a two-way call over HTTPS and automatically opens both listening and microphone audio; End closes the call. The normal video stream remains view-only, while the backchannel stream is connected only during a call. The browser may request microphone permission. On HTTP, Signal explains that talk requires HTTPS. The notification deep link is `/signal-home/home#signal/cameras`.
+
+On phones, navigation floats above the bottom safe area and stays fixed to the viewport while content scrolls underneath.
+
+### Lighting and household mode
+
+Signal has Home, Lighting, Cameras, Lists, Security, and Climate. Home is a digest;
+the saved household preference lives on Security. `#signal/safety` remains the
+Security route.
+
+```yaml
+home_mode: input_select.signal_home_mode
+all_lights_off: script.signal_all_lights_off
+light_rooms:
+  - id: living_room
+    name: Living Room
+    entities:
+      - light.fado
+      - light.gram_lamp
+      - switch.record_player_lamp
+    on_script: script.signal_living_room_on
+    off_script: script.signal_living_room_off
+    # Optional backend-authored status text, not a computed next-run prediction:
+    automation_note_entity: sensor.living_room_lighting_note
+    # Optional existing scripts/scenes shown only inside the room:
+    scenes:
+      - name: Reading
+        entity: scene.living_room_reading
+```
+
+Use your actual entity IDs. Scripts own room membership and behavior; keep their
+targets and the room's displayed entity list aligned. Include only lamp outlets,
+not arbitrary switches. A mixed room's active toggle turns the room off.
+Unavailable lights are reported separately. Individual lamps keep brightness and
+color temperature controls only when supported.
+
+The household helper must expose `Home`, `Sleeping`, and `Away`. This first-stage
+selector only saves a preference and explicitly says alarm behavior is not
+connected. It is independent of thermostat presets. Future Alarmo integration
+must show the alarm's confirmed state and arming errors, not infer protection
+from the requested household preference.
+
+Automation notes display backend text only when that entity also supplies a
+future `next_change_at` timestamp. No schedule is inferred from `last_triggered`,
+and Signal does not edit automation rules.
+Unconfigured notes and scenes are omitted. Current temperature stays prominent;
+HVAC activity, rather than selected mode, controls the heating/cooling/fan glow.
+
+### Home digest and Lighting
+
+Home is a read-only overview of cameras, monitored doors/locks, water sensors,
+other configured sensors, lights, climate, and lists. Household mode links to
+Security, where Home, Sleeping, and Away have distinct colors and remain saved
+preferences until an alarm is integrated. Small heat/cool target adjustments and a
+contextual lights-off action are the only other Home controls. The full
+thermostat, room switches, individual bulbs, and scenes live on their pages.
+
+On phones the dock shows Home, Lighting, Cameras, Lists, and More. More opens
+Security and Climate. Desktop retains the full six-destination sidebar. Existing
+`#signal/lights` links resolve to Lighting; existing `#signal/safety` links still
+resolve to Security.
+
+Additional configuration for a Frigate doorbell and the contextual action:
+
+```yaml
+all_lights_off: script.signal_all_lights_off
+doorbell:
+  entity: camera.front_door
+  camera: front_door
+  instance: frigate
+  activity_entity: automation.signal_front_doorbell_notifications
+```
+
+The digest queries the latest Frigate review within 24 hours and can display a
+signed review thumbnail. It also uses the configured doorbell automation's
+`last_triggered` for press recency. It never identifies visitors by name or
+presents a live camera frame as an old event. Recent activity grows for two
+hours and then settles. Query failure and camera unavailability are explicit.
+As with the rest of Signal, Home Assistant credentials remain in Home Assistant
+and the browser session; none are embedded in dashboard YAML.
+
+Door/window and water rows summarize only configured matching sensor types. An
+unconfigured category says so, and unknown sensors are reported individually.
+Row times are labeled Updated for entity state timestamps and Checked for event
+queries. Missing timestamps say Update time unavailable. Connection loss is
+shown separately and disables digest actions. A backend-written automation note
+still appears only when an appropriate entity is configured for the room.
+
+For a contact sensor whose real-world operation has not been verified, set
+`unverified: true` on its sensor entry. Security then shows the last reported
+state and time under a **Needs verification** label; Home and the header avoid
+claiming all doors are clear. This is a manual operational flag, not a Zigbee
+health detector. Remove it only after an open/close test reaches Home Assistant.
+
+Scheduled automation notes require a backend entity whose state contains the
+human-readable text and whose `next_change_at` attribute contains a valid
+future ISO timestamp. Missing or expired timestamps hide the note. Conditional
+rules without a known next change must not populate this field.
+
+### Coming up on Home
+
+Home now includes a chronological agenda instead of a calendar grid. It shows
+the next seven days by default; **Show next month** expands to 30 days. It merges
+upcoming PGH.ST collection dates from a Home Assistant command-line sensor with Jewish
+holidays, Shabbat, candle lighting, and Havdalah from Hebcal's Pittsburgh API.
+The calendar uses the `America/New_York` timezone. Set
+`upcoming: { waste_entity: sensor.pghst_month }` in the Signal card config.
+The PGH.ST address lives only in Home Assistant's local parser configuration;
+the Signal card receives only pickup dates. Signal labels a missing or stale
+collection sensor and a failed Hebcal request instead of guessing dates. Hebcal
+data is credited in the UI under CC BY 4.0. Additional sources can be normalized
+to `UpcomingEvent` and merged through `sortUpcoming`. The PGH.ST parser reads
+the block lookup and its public month schedules every six hours, covering the
+full expanded window rather than just the next pickup. The original REST sensor
+remains available as a fallback but is not used by the live Signal card.

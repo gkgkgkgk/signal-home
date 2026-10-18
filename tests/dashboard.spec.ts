@@ -1,9 +1,10 @@
+import {navigate} from "./navigation";
 import { test, expect } from "@playwright/test";
 import { setAppearance } from "../scripts/appearance.mjs";
 test("climate range actions preserve other limit and respect bounds", async ({
   page,
 }) => {
-  await page.goto("/");
+  await page.goto("/#signal/climate");
   await expect(page.getByRole("combobox", { name: "HVAC mode" })).toHaveValue(
     "heat_cool",
   );
@@ -55,7 +56,7 @@ test("climate range actions preserve other limit and respect bounds", async ({
 test("unavailable and off thermostat disables controls; service failure is visible", async ({
   page,
 }) => {
-  await page.goto("/");
+  await page.goto("/#signal/climate");
   await page.evaluate(() =>
     (window as any).demo.setState("climate.demo", "unavailable"),
   );
@@ -81,9 +82,7 @@ test("grocery add and completion use entity UID and stay synchronized", async ({
   page,
 }) => {
   await page.goto("/");
-  await page
-    .getByRole("button", { name: "Open to-do lists", exact: true })
-    .click();
+  await navigate(page, "Lists");
   await page
     .getByRole("textbox", { name: "New task" })
     .fill("Coffee beans");
@@ -108,18 +107,16 @@ test("navigation supports browser back and refresh; failed mode change resets di
   page,
 }) => {
   await page.goto("/");
-  await page
-    .getByRole("navigation", { name: "Dashboard navigation" })
-    .getByRole("button", { name: "Climate" })
-    .click();
+  await navigate(page, "Climate");
   await page.reload();
   await expect(
     page.getByRole("heading", { name: "Just your temperature." }),
   ).toBeVisible();
   await page.goBack();
   await expect(
-    page.getByRole("heading", { name: "Home feels good." }),
+    page.locator("signal-digest h1"),
   ).toBeVisible();
+  await navigate(page, "Climate");
   await page.evaluate(() => ((window as any).demo.fail = true));
   await page.getByRole("combobox", { name: "HVAC mode" }).selectOption("off");
   await expect(page.getByRole("status")).toContainText("didn’t go through");
@@ -136,15 +133,16 @@ test("dark preference persists and unavailable safety never claims clear", async
   await expect(page.locator("signal-home .app")).toHaveClass(/dark/);
   expect(
     await page
-      .getByRole("heading", { name: "Home feels good." })
+      .locator("signal-digest h1")
       .evaluate((el) => getComputedStyle(el).color),
   ).toBe("rgb(240, 242, 233)");
   await page.evaluate(() =>
     (window as any).demo.setState("binary_sensor.kitchen", "unavailable"),
   );
-  await expect(page.locator(".status-pill")).toContainText(
-    "1 sensor unavailable",
+  await expect(page.locator("signal-digest h1")).toContainText(
+    "Kitchen sink offline",
   );
+  await navigate(page, "Security");
   await expect(
     page.getByRole("button", { name: /Unavailable Kitchen sink/ }),
   ).toBeVisible();
@@ -157,7 +155,7 @@ for (const width of [360, 390, 768, 1440])
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto("/");
     await expect(
-      page.getByRole("heading", { name: "Home feels good." }),
+      page.locator("signal-digest h1"),
     ).toBeVisible();
     expect(
       await page.evaluate(
@@ -173,7 +171,7 @@ for (const width of [360, 390, 768, 1440])
       width <= 760
         ? page.getByRole("navigation", { name: "Mobile navigation" })
         : page.getByRole("navigation", { name: "Dashboard navigation" });
-    await nav.getByRole("button", { name: "Safety" }).click();
+    await navigate(page, "Security");
     await expect(
       page.getByRole("heading", { name: "Peace of mind." }),
     ).toBeVisible();

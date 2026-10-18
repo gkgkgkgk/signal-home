@@ -13,6 +13,7 @@ export interface ControlConfig {
   accent?: "mint" | "lilac" | "apricot" | "lime";
   appearance?: "auto" | "light" | "dark";
   detail?: boolean;
+  lamp?: boolean;
 }
 export class SignalControl extends LitElement {
   static properties = {
@@ -46,6 +47,8 @@ export class SignalControl extends LitElement {
           background 0.3s,
           transform 0.4s;
       }
+      .lamp.on { background:color-mix(in srgb,var(--card) 82%,#ffce7b); }
+      .lamp.on .entity-icon { background:#ffdc94; color:#604007; box-shadow:0 0 26px #ffc15e65; }
       .on .entity-icon {
         transform: rotate(-7deg);
       }
@@ -460,7 +463,7 @@ export class SignalControl extends LitElement {
     const media = domain === "media_player";
     const cover = domain === "cover";
     const symbol =
-      domain === "light"
+      (domain === "light" || this.config.lamp)
         ? "bulb"
         : cover
           ? "cover"
@@ -485,7 +488,7 @@ export class SignalControl extends LitElement {
         .map((n: number) => Math.round(n).toString(16).padStart(2, "0"))
         .join("");
     return html`<article
-        class=${`widget ${this.config.appearance || "auto"} ${this.config.accent || "mint"} ${on ? "on" : ""} ${this.acknowledged ? "acknowledged" : ""}`}
+        class=${`widget ${this.config.appearance || "auto"} ${this.config.accent || "mint"} ${on ? "on" : ""} ${domain === "light" || this.config.lamp ? "lamp" : ""} ${this.acknowledged ? "acknowledged" : ""}`}
         aria-busy=${this.pending}
       >
         <div class="control-top">

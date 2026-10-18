@@ -1,3 +1,4 @@
+import {navigate} from "./navigation";
 import { test, expect } from "@playwright/test";
 import { setAppearance } from "../scripts/appearance.mjs";
 test("recovery link forces a fresh document even when HA intercepts anchors", async ({
@@ -79,6 +80,7 @@ test("climate opens a Signal dialog, controls work, Escape restores focus", asyn
   page,
 }) => {
   await page.goto("/");
+  await navigate(page, "Climate");
   await page
     .getByRole("button", { name: "Climate details", exact: true })
     .click();
@@ -113,7 +115,7 @@ test("Back closes only the sheet; menu exposes account and recovery without chan
   await page.goto("/");
   await page
     .getByRole("navigation", { name: "Dashboard navigation" })
-    .getByRole("button", { name: "Safety", exact: true })
+    .getByRole("button", { name: "Security", exact: true })
     .click();
   await page.getByRole("button", { name: "Open Signal menu" }).click();
   const dialog = page.getByRole("dialog");
@@ -137,7 +139,7 @@ test("Back closes only the sheet; menu exposes account and recovery without chan
   await expect(page).toHaveURL(/#signal\/safety$/);
   await page.goBack();
   await expect(
-    page.getByRole("heading", { name: "Home feels good." }),
+    page.locator("signal-digest h1"),
   ).toBeVisible();
 });
 test("sensor details distinguish offline and alarm, load history, and gate native UI", async ({
@@ -151,6 +153,7 @@ test("sensor details distinguish offline and alarm, load history, and gate nativ
     );
     (window as any).demo.setState("binary_sensor.kitchen", "unavailable");
   });
+  await navigate(page, "Security");
   await page.locator(".sensor").first().click();
   const dialog = page.getByRole("dialog");
   await expect(page.locator("signal-details .summary")).toContainText(
@@ -177,6 +180,7 @@ test("weather sheet loads provider forecast and closes from the backdrop", async
   page,
 }) => {
   await page.goto("/");
+  await navigate(page, "Climate");
   await page.getByRole("button", { name: "Weather details" }).click();
   const dialog = page.getByRole("dialog");
   await expect(page.locator("signal-details .record")).toHaveCount(5);
@@ -214,6 +218,7 @@ for (const width of [360, 390, 768, 1440])
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto("/");
     await setAppearance(page, "dark");
+    await navigate(page, "Climate");
     await page
       .getByRole("button", { name: "Climate details", exact: true })
       .click();

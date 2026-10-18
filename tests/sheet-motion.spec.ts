@@ -33,6 +33,11 @@ async function setup(page: Page, width = 390) {
   });
 }
 
+// Isolate cold sheet history from the Climate page's independently loaded graphs.
+async function openClimate(page:Page) {
+ await page.evaluate(()=>{const card=document.querySelector('signal-home') as any;card.moreInfo(card.config.climate);});
+}
+
 async function finishMotion(page: Page) {
   await page.evaluate(() => {
     for (const animation of (window as any).sheetAnimations)
@@ -44,9 +49,7 @@ test("mobile sheet slides without shrinking, fades its scrim, and defers cold hi
   page,
 }) => {
   await setup(page);
-  await page
-    .getByRole("button", { name: "Climate details", exact: true })
-    .click();
+  await openClimate(page);
   const dialog = page.getByRole("dialog");
   await expect(dialog).toBeVisible();
   const motion = await dialog.evaluate((el) => {
@@ -87,9 +90,7 @@ test("mobile sheet slides without shrinking, fades its scrim, and defers cold hi
     .toBe(4);
   await finishMotion(page);
   await expect(dialog).toHaveCount(0);
-  await page
-    .getByRole("button", { name: "Climate details", exact: true })
-    .click();
+  await openClimate(page);
   // Warm history is available even before the new entrance completes.
   await expect(page.locator("signal-details .chart")).toBeVisible();
   await finishMotion(page);
@@ -102,9 +103,7 @@ test("Back interrupts entrance from its current position and never starts hidden
   page,
 }) => {
   await setup(page);
-  await page
-    .getByRole("button", { name: "Climate details", exact: true })
-    .click();
+  await openClimate(page);
   const dialog = page.getByRole("dialog");
   const before = await dialog.evaluate((el) => ({
     transform: getComputedStyle(el).transform,
@@ -142,9 +141,7 @@ test("desktop dialogs keep a small fade rather than full-height mobile travel", 
   page,
 }) => {
   await setup(page, 1440);
-  await page
-    .getByRole("button", { name: "Climate details", exact: true })
-    .click();
+  await openClimate(page);
   expect(
     await page.evaluate(() => {
       const animation = (window as any).sheetAnimations.find(
@@ -160,9 +157,7 @@ test("reduced motion opens immediately and still loads history", async ({
 }) => {
   await setup(page);
   await page.emulateMedia({ reducedMotion: "reduce" });
-  await page
-    .getByRole("button", { name: "Climate details", exact: true })
-    .click();
+  await openClimate(page);
   await expect(page.locator("signal-details .chart")).toBeVisible();
   expect(
     await page.evaluate(() => (window as any).sheetAnimations.length),
@@ -177,7 +172,7 @@ test("history cache expires and cannot cross Home Assistant sessions", async ({
   await setup(page);
   await page.emulateMedia({ reducedMotion: "reduce" });
   const open = () =>
-    page.getByRole("button", { name: "Climate details", exact: true }).click();
+    openClimate(page);
   const close = async () => {
     await page.keyboard.press("Escape");
     await expect(page.getByRole("dialog")).toHaveCount(0);

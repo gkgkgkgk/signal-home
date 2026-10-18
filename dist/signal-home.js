@@ -1,15 +1,15 @@
-const V = globalThis, ot = V.ShadowRoot && (V.ShadyCSS === void 0 || V.ShadyCSS.nativeShadow) && "adoptedStyleSheets" in Document.prototype && "replace" in CSSStyleSheet.prototype, nt = /* @__PURE__ */ Symbol(), mt = /* @__PURE__ */ new WeakMap();
-let Ht = class {
+const dt = globalThis, zt = dt.ShadowRoot && (dt.ShadyCSS === void 0 || dt.ShadyCSS.nativeShadow) && "adoptedStyleSheets" in Document.prototype && "replace" in CSSStyleSheet.prototype, Mt = /* @__PURE__ */ Symbol(), Ut = /* @__PURE__ */ new WeakMap();
+let ae = class {
   constructor(t, e, i) {
-    if (this._$cssResult$ = !0, i !== nt) throw Error("CSSResult is not constructable. Use `unsafeCSS` or `css` instead.");
+    if (this._$cssResult$ = !0, i !== Mt) throw Error("CSSResult is not constructable. Use `unsafeCSS` or `css` instead.");
     this.cssText = t, this.t = e;
   }
   get styleSheet() {
     let t = this.o;
     const e = this.t;
-    if (ot && t === void 0) {
+    if (zt && t === void 0) {
       const i = e !== void 0 && e.length === 1;
-      i && (t = mt.get(e)), t === void 0 && ((this.o = t = new CSSStyleSheet()).replaceSync(this.cssText), i && mt.set(e, t));
+      i && (t = Ut.get(e)), t === void 0 && ((this.o = t = new CSSStyleSheet()).replaceSync(this.cssText), i && Ut.set(e, t));
     }
     return t;
   }
@@ -17,90 +17,90 @@ let Ht = class {
     return this.cssText;
   }
 };
-const Bt = (o) => new Ht(typeof o == "string" ? o : o + "", void 0, nt), S = (o, ...t) => {
-  const e = o.length === 1 ? o[0] : t.reduce((i, s, n) => i + ((a) => {
-    if (a._$cssResult$ === !0) return a.cssText;
-    if (typeof a == "number") return a;
-    throw Error("Value passed to 'css' function must be a 'css' function result: " + a + ". Use 'unsafeCSS' to pass non-literal values, but take care to ensure page security.");
-  })(s) + o[n + 1], o[0]);
-  return new Ht(e, o, nt);
-}, Ft = (o, t) => {
-  if (ot) o.adoptedStyleSheets = t.map((e) => e instanceof CSSStyleSheet ? e : e.styleSheet);
+const me = (n) => new ae(typeof n == "string" ? n : n + "", void 0, Mt), _ = (n, ...t) => {
+  const e = n.length === 1 ? n[0] : t.reduce((i, s, a) => i + ((o) => {
+    if (o._$cssResult$ === !0) return o.cssText;
+    if (typeof o == "number") return o;
+    throw Error("Value passed to 'css' function must be a 'css' function result: " + o + ". Use 'unsafeCSS' to pass non-literal values, but take care to ensure page security.");
+  })(s) + n[a + 1], n[0]);
+  return new ae(e, n, Mt);
+}, ge = (n, t) => {
+  if (zt) n.adoptedStyleSheets = t.map((e) => e instanceof CSSStyleSheet ? e : e.styleSheet);
   else for (const e of t) {
-    const i = document.createElement("style"), s = V.litNonce;
-    s !== void 0 && i.setAttribute("nonce", s), i.textContent = e.cssText, o.appendChild(i);
+    const i = document.createElement("style"), s = dt.litNonce;
+    s !== void 0 && i.setAttribute("nonce", s), i.textContent = e.cssText, n.appendChild(i);
   }
-}, gt = ot ? (o) => o : (o) => o instanceof CSSStyleSheet ? ((t) => {
+}, Pt = zt ? (n) => n : (n) => n instanceof CSSStyleSheet ? ((t) => {
   let e = "";
   for (const i of t.cssRules) e += i.cssText;
-  return Bt(e);
-})(o) : o;
-const { is: Yt, defineProperty: Wt, getOwnPropertyDescriptor: Zt, getOwnPropertyNames: Vt, getOwnPropertySymbols: Kt, getPrototypeOf: Gt } = Object, X = globalThis, ft = X.trustedTypes, Xt = ft ? ft.emptyScript : "", Jt = X.reactiveElementPolyfillSupport, F = (o, t) => o, at = { toAttribute(o, t) {
+  return me(e);
+})(n) : n;
+const { is: fe, defineProperty: be, getOwnPropertyDescriptor: ve, getOwnPropertyNames: xe, getOwnPropertySymbols: ye, getPrototypeOf: we } = Object, gt = globalThis, qt = gt.trustedTypes, $e = qt ? qt.emptyScript : "", ke = gt.reactiveElementPolyfillSupport, st = (n, t) => n, Ct = { toAttribute(n, t) {
   switch (t) {
     case Boolean:
-      o = o ? Xt : null;
+      n = n ? $e : null;
       break;
     case Object:
     case Array:
-      o = o == null ? o : JSON.stringify(o);
+      n = n == null ? n : JSON.stringify(n);
   }
-  return o;
-}, fromAttribute(o, t) {
-  let e = o;
+  return n;
+}, fromAttribute(n, t) {
+  let e = n;
   switch (t) {
     case Boolean:
-      e = o !== null;
+      e = n !== null;
       break;
     case Number:
-      e = o === null ? null : Number(o);
+      e = n === null ? null : Number(n);
       break;
     case Object:
     case Array:
       try {
-        e = JSON.parse(o);
+        e = JSON.parse(n);
       } catch {
         e = null;
       }
   }
   return e;
-} }, Lt = (o, t) => !Yt(o, t), bt = { attribute: !0, type: String, converter: at, reflect: !1, useDefault: !1, hasChanged: Lt };
-Symbol.metadata ??= /* @__PURE__ */ Symbol("metadata"), X.litPropertyMetadata ??= /* @__PURE__ */ new WeakMap();
-let L = class extends HTMLElement {
+} }, ne = (n, t) => !fe(n, t), jt = { attribute: !0, type: String, converter: Ct, reflect: !1, useDefault: !1, hasChanged: ne };
+Symbol.metadata ??= /* @__PURE__ */ Symbol("metadata"), gt.litPropertyMetadata ??= /* @__PURE__ */ new WeakMap();
+let Y = class extends HTMLElement {
   static addInitializer(t) {
     this._$Ei(), (this.l ??= []).push(t);
   }
   static get observedAttributes() {
     return this.finalize(), this._$Eh && [...this._$Eh.keys()];
   }
-  static createProperty(t, e = bt) {
+  static createProperty(t, e = jt) {
     if (e.state && (e.attribute = !1), this._$Ei(), this.prototype.hasOwnProperty(t) && ((e = Object.create(e)).wrapped = !0), this.elementProperties.set(t, e), !e.noAccessor) {
       const i = /* @__PURE__ */ Symbol(), s = this.getPropertyDescriptor(t, i, e);
-      s !== void 0 && Wt(this.prototype, t, s);
+      s !== void 0 && be(this.prototype, t, s);
     }
   }
   static getPropertyDescriptor(t, e, i) {
-    const { get: s, set: n } = Zt(this.prototype, t) ?? { get() {
+    const { get: s, set: a } = ve(this.prototype, t) ?? { get() {
       return this[e];
-    }, set(a) {
-      this[e] = a;
+    }, set(o) {
+      this[e] = o;
     } };
-    return { get: s, set(a) {
-      const d = s?.call(this);
-      n?.call(this, a), this.requestUpdate(t, d, i);
+    return { get: s, set(o) {
+      const c = s?.call(this);
+      a?.call(this, o), this.requestUpdate(t, c, i);
     }, configurable: !0, enumerable: !0 };
   }
   static getPropertyOptions(t) {
-    return this.elementProperties.get(t) ?? bt;
+    return this.elementProperties.get(t) ?? jt;
   }
   static _$Ei() {
-    if (this.hasOwnProperty(F("elementProperties"))) return;
-    const t = Gt(this);
+    if (this.hasOwnProperty(st("elementProperties"))) return;
+    const t = we(this);
     t.finalize(), t.l !== void 0 && (this.l = [...t.l]), this.elementProperties = new Map(t.elementProperties);
   }
   static finalize() {
-    if (this.hasOwnProperty(F("finalized"))) return;
-    if (this.finalized = !0, this._$Ei(), this.hasOwnProperty(F("properties"))) {
-      const e = this.properties, i = [...Vt(e), ...Kt(e)];
+    if (this.hasOwnProperty(st("finalized"))) return;
+    if (this.finalized = !0, this._$Ei(), this.hasOwnProperty(st("properties"))) {
+      const e = this.properties, i = [...xe(e), ...ye(e)];
       for (const s of i) this.createProperty(s, e[s]);
     }
     const t = this[Symbol.metadata];
@@ -119,8 +119,8 @@ let L = class extends HTMLElement {
     const e = [];
     if (Array.isArray(t)) {
       const i = new Set(t.flat(1 / 0).reverse());
-      for (const s of i) e.unshift(gt(s));
-    } else t !== void 0 && e.push(gt(t));
+      for (const s of i) e.unshift(Pt(s));
+    } else t !== void 0 && e.push(Pt(t));
     return e;
   }
   static _$Eu(t, e) {
@@ -146,7 +146,7 @@ let L = class extends HTMLElement {
   }
   createRenderRoot() {
     const t = this.shadowRoot ?? this.attachShadow(this.constructor.shadowRootOptions);
-    return Ft(t, this.constructor.elementStyles), t;
+    return ge(t, this.constructor.elementStyles), t;
   }
   connectedCallback() {
     this.renderRoot ??= this.createRenderRoot(), this.enableUpdating(!0), this._$EO?.forEach((t) => t.hostConnected?.());
@@ -162,29 +162,29 @@ let L = class extends HTMLElement {
   _$ET(t, e) {
     const i = this.constructor.elementProperties.get(t), s = this.constructor._$Eu(t, i);
     if (s !== void 0 && i.reflect === !0) {
-      const n = (i.converter?.toAttribute !== void 0 ? i.converter : at).toAttribute(e, i.type);
-      this._$Em = t, n == null ? this.removeAttribute(s) : this.setAttribute(s, n), this._$Em = null;
+      const a = (i.converter?.toAttribute !== void 0 ? i.converter : Ct).toAttribute(e, i.type);
+      this._$Em = t, a == null ? this.removeAttribute(s) : this.setAttribute(s, a), this._$Em = null;
     }
   }
   _$AK(t, e) {
     const i = this.constructor, s = i._$Eh.get(t);
     if (s !== void 0 && this._$Em !== s) {
-      const n = i.getPropertyOptions(s), a = typeof n.converter == "function" ? { fromAttribute: n.converter } : n.converter?.fromAttribute !== void 0 ? n.converter : at;
+      const a = i.getPropertyOptions(s), o = typeof a.converter == "function" ? { fromAttribute: a.converter } : a.converter?.fromAttribute !== void 0 ? a.converter : Ct;
       this._$Em = s;
-      const d = a.fromAttribute(e, n.type);
-      this[s] = d ?? this._$Ej?.get(s) ?? d, this._$Em = null;
+      const c = o.fromAttribute(e, a.type);
+      this[s] = c ?? this._$Ej?.get(s) ?? c, this._$Em = null;
     }
   }
-  requestUpdate(t, e, i, s = !1, n) {
+  requestUpdate(t, e, i, s = !1, a) {
     if (t !== void 0) {
-      const a = this.constructor;
-      if (s === !1 && (n = this[t]), i ??= a.getPropertyOptions(t), !((i.hasChanged ?? Lt)(n, e) || i.useDefault && i.reflect && n === this._$Ej?.get(t) && !this.hasAttribute(a._$Eu(t, i)))) return;
+      const o = this.constructor;
+      if (s === !1 && (a = this[t]), i ??= o.getPropertyOptions(t), !((i.hasChanged ?? ne)(a, e) || i.useDefault && i.reflect && a === this._$Ej?.get(t) && !this.hasAttribute(o._$Eu(t, i)))) return;
       this.C(t, e, i);
     }
     this.isUpdatePending === !1 && (this._$ES = this._$EP());
   }
-  C(t, e, { useDefault: i, reflect: s, wrapped: n }, a) {
-    i && !(this._$Ej ??= /* @__PURE__ */ new Map()).has(t) && (this._$Ej.set(t, a ?? e ?? this[t]), n !== !0 || a !== void 0) || (this._$AL.has(t) || (this.hasUpdated || i || (e = void 0), this._$AL.set(t, e)), s === !0 && this._$Em !== t && (this._$Eq ??= /* @__PURE__ */ new Set()).add(t));
+  C(t, e, { useDefault: i, reflect: s, wrapped: a }, o) {
+    i && !(this._$Ej ??= /* @__PURE__ */ new Map()).has(t) && (this._$Ej.set(t, o ?? e ?? this[t]), a !== !0 || o !== void 0) || (this._$AL.has(t) || (this.hasUpdated || i || (e = void 0), this._$AL.set(t, e)), s === !0 && this._$Em !== t && (this._$Eq ??= /* @__PURE__ */ new Set()).add(t));
   }
   async _$EP() {
     this.isUpdatePending = !0;
@@ -203,13 +203,13 @@ let L = class extends HTMLElement {
     if (!this.isUpdatePending) return;
     if (!this.hasUpdated) {
       if (this.renderRoot ??= this.createRenderRoot(), this._$Ep) {
-        for (const [s, n] of this._$Ep) this[s] = n;
+        for (const [s, a] of this._$Ep) this[s] = a;
         this._$Ep = void 0;
       }
       const i = this.constructor.elementProperties;
-      if (i.size > 0) for (const [s, n] of i) {
-        const { wrapped: a } = n, d = this[s];
-        a !== !0 || this._$AL.has(s) || d === void 0 || this.C(s, void 0, n, d);
+      if (i.size > 0) for (const [s, a] of i) {
+        const { wrapped: o } = a, c = this[s];
+        o !== !0 || this._$AL.has(s) || c === void 0 || this.C(s, void 0, a, c);
       }
     }
     let t = !1;
@@ -246,70 +246,70 @@ let L = class extends HTMLElement {
   firstUpdated(t) {
   }
 };
-L.elementStyles = [], L.shadowRootOptions = { mode: "open" }, L[F("elementProperties")] = /* @__PURE__ */ new Map(), L[F("finalized")] = /* @__PURE__ */ new Map(), Jt?.({ ReactiveElement: L }), (X.reactiveElementVersions ??= []).push("2.1.2");
-const rt = globalThis, xt = (o) => o, K = rt.trustedTypes, vt = K ? K.createPolicy("lit-html", { createHTML: (o) => o }) : void 0, Dt = "$lit$", C = `lit$${Math.random().toFixed(9).slice(2)}$`, Ut = "?" + C, Qt = `<${Ut}>`, H = document, Y = () => H.createComment(""), W = (o) => o === null || typeof o != "object" && typeof o != "function", lt = Array.isArray, te = (o) => lt(o) || typeof o?.[Symbol.iterator] == "function", et = `[ 	
-\f\r]`, q = /<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g, yt = /-->/g, $t = />/g, T = RegExp(`>|${et}(?:([^\\s"'>=/]+)(${et}*=${et}*(?:[^ 	
-\f\r"'\`<>=]|("|')|))|$)`, "g"), wt = /'/g, kt = /"/g, It = /^(?:script|style|textarea|title)$/i, Nt = (o) => (t, ...e) => ({ _$litType$: o, strings: t, values: e }), r = Nt(1), D = Nt(2), _ = /* @__PURE__ */ Symbol.for("lit-noChange"), h = /* @__PURE__ */ Symbol.for("lit-nothing"), _t = /* @__PURE__ */ new WeakMap(), O = H.createTreeWalker(H, 129);
-function Pt(o, t) {
-  if (!lt(o) || !o.hasOwnProperty("raw")) throw Error("invalid template strings array");
-  return vt !== void 0 ? vt.createHTML(t) : t;
+Y.elementStyles = [], Y.shadowRootOptions = { mode: "open" }, Y[st("elementProperties")] = /* @__PURE__ */ new Map(), Y[st("finalized")] = /* @__PURE__ */ new Map(), ke?.({ ReactiveElement: Y }), (gt.reactiveElementVersions ??= []).push("2.1.2");
+const Rt = globalThis, Ft = (n) => n, ht = Rt.trustedTypes, Wt = ht ? ht.createPolicy("lit-html", { createHTML: (n) => n }) : void 0, oe = "$lit$", I = `lit$${Math.random().toFixed(9).slice(2)}$`, re = "?" + I, _e = `<${re}>`, V = document, at = () => V.createComment(""), nt = (n) => n === null || typeof n != "object" && typeof n != "function", Dt = Array.isArray, Ae = (n) => Dt(n) || typeof n?.[Symbol.iterator] == "function", _t = `[ 	
+\f\r]`, Q = /<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g, Bt = /-->/g, Vt = />/g, q = RegExp(`>|${_t}(?:([^\\s"'>=/]+)(${_t}*=${_t}*(?:[^ 	
+\f\r"'\`<>=]|("|')|))|$)`, "g"), Zt = /'/g, Yt = /"/g, le = /^(?:script|style|textarea|title)$/i, ce = (n) => (t, ...e) => ({ _$litType$: n, strings: t, values: e }), r = ce(1), F = ce(2), M = /* @__PURE__ */ Symbol.for("lit-noChange"), p = /* @__PURE__ */ Symbol.for("lit-nothing"), Kt = /* @__PURE__ */ new WeakMap(), B = V.createTreeWalker(V, 129);
+function de(n, t) {
+  if (!Dt(n) || !n.hasOwnProperty("raw")) throw Error("invalid template strings array");
+  return Wt !== void 0 ? Wt.createHTML(t) : t;
 }
-const ee = (o, t) => {
-  const e = o.length - 1, i = [];
-  let s, n = t === 2 ? "<svg>" : t === 3 ? "<math>" : "", a = q;
-  for (let d = 0; d < e; d++) {
-    const l = o[d];
-    let p, u, c = -1, m = 0;
-    for (; m < l.length && (a.lastIndex = m, u = a.exec(l), u !== null); ) m = a.lastIndex, a === q ? u[1] === "!--" ? a = yt : u[1] !== void 0 ? a = $t : u[2] !== void 0 ? (It.test(u[2]) && (s = RegExp("</" + u[2], "g")), a = T) : u[3] !== void 0 && (a = T) : a === T ? u[0] === ">" ? (a = s ?? q, c = -1) : u[1] === void 0 ? c = -2 : (c = a.lastIndex - u[2].length, p = u[1], a = u[3] === void 0 ? T : u[3] === '"' ? kt : wt) : a === kt || a === wt ? a = T : a === yt || a === $t ? a = q : (a = T, s = void 0);
-    const f = a === T && o[d + 1].startsWith("/>") ? " " : "";
-    n += a === q ? l + Qt : c >= 0 ? (i.push(p), l.slice(0, c) + Dt + l.slice(c) + C + f) : l + C + (c === -2 ? d : f);
+const Se = (n, t) => {
+  const e = n.length - 1, i = [];
+  let s, a = t === 2 ? "<svg>" : t === 3 ? "<math>" : "", o = Q;
+  for (let c = 0; c < e; c++) {
+    const l = n[c];
+    let d, u, h = -1, m = 0;
+    for (; m < l.length && (o.lastIndex = m, u = o.exec(l), u !== null); ) m = o.lastIndex, o === Q ? u[1] === "!--" ? o = Bt : u[1] !== void 0 ? o = Vt : u[2] !== void 0 ? (le.test(u[2]) && (s = RegExp("</" + u[2], "g")), o = q) : u[3] !== void 0 && (o = q) : o === q ? u[0] === ">" ? (o = s ?? Q, h = -1) : u[1] === void 0 ? h = -2 : (h = o.lastIndex - u[2].length, d = u[1], o = u[3] === void 0 ? q : u[3] === '"' ? Yt : Zt) : o === Yt || o === Zt ? o = q : o === Bt || o === Vt ? o = Q : (o = q, s = void 0);
+    const g = o === q && n[c + 1].startsWith("/>") ? " " : "";
+    a += o === Q ? l + _e : h >= 0 ? (i.push(d), l.slice(0, h) + oe + l.slice(h) + I + g) : l + I + (h === -2 ? c : g);
   }
-  return [Pt(o, n + (o[e] || "<?>") + (t === 2 ? "</svg>" : t === 3 ? "</math>" : "")), i];
+  return [de(n, a + (n[e] || "<?>") + (t === 2 ? "</svg>" : t === 3 ? "</math>" : "")), i];
 };
-class Z {
+class ot {
   constructor({ strings: t, _$litType$: e }, i) {
     let s;
     this.parts = [];
-    let n = 0, a = 0;
-    const d = t.length - 1, l = this.parts, [p, u] = ee(t, e);
-    if (this.el = Z.createElement(p, i), O.currentNode = this.el.content, e === 2 || e === 3) {
-      const c = this.el.content.firstChild;
-      c.replaceWith(...c.childNodes);
+    let a = 0, o = 0;
+    const c = t.length - 1, l = this.parts, [d, u] = Se(t, e);
+    if (this.el = ot.createElement(d, i), B.currentNode = this.el.content, e === 2 || e === 3) {
+      const h = this.el.content.firstChild;
+      h.replaceWith(...h.childNodes);
     }
-    for (; (s = O.nextNode()) !== null && l.length < d; ) {
+    for (; (s = B.nextNode()) !== null && l.length < c; ) {
       if (s.nodeType === 1) {
-        if (s.hasAttributes()) for (const c of s.getAttributeNames()) if (c.endsWith(Dt)) {
-          const m = u[a++], f = s.getAttribute(c).split(C), v = /([.?@])?(.*)/.exec(m);
-          l.push({ type: 1, index: n, name: v[2], strings: f, ctor: v[1] === "." ? se : v[1] === "?" ? ae : v[1] === "@" ? oe : J }), s.removeAttribute(c);
-        } else c.startsWith(C) && (l.push({ type: 6, index: n }), s.removeAttribute(c));
-        if (It.test(s.tagName)) {
-          const c = s.textContent.split(C), m = c.length - 1;
+        if (s.hasAttributes()) for (const h of s.getAttributeNames()) if (h.endsWith(oe)) {
+          const m = u[o++], g = s.getAttribute(h).split(I), b = /([.?@])?(.*)/.exec(m);
+          l.push({ type: 1, index: a, name: b[2], strings: g, ctor: b[1] === "." ? Ee : b[1] === "?" ? Te : b[1] === "@" ? ze : ft }), s.removeAttribute(h);
+        } else h.startsWith(I) && (l.push({ type: 6, index: a }), s.removeAttribute(h));
+        if (le.test(s.tagName)) {
+          const h = s.textContent.split(I), m = h.length - 1;
           if (m > 0) {
-            s.textContent = K ? K.emptyScript : "";
-            for (let f = 0; f < m; f++) s.append(c[f], Y()), O.nextNode(), l.push({ type: 2, index: ++n });
-            s.append(c[m], Y());
+            s.textContent = ht ? ht.emptyScript : "";
+            for (let g = 0; g < m; g++) s.append(h[g], at()), B.nextNode(), l.push({ type: 2, index: ++a });
+            s.append(h[m], at());
           }
         }
-      } else if (s.nodeType === 8) if (s.data === Ut) l.push({ type: 2, index: n });
+      } else if (s.nodeType === 8) if (s.data === re) l.push({ type: 2, index: a });
       else {
-        let c = -1;
-        for (; (c = s.data.indexOf(C, c + 1)) !== -1; ) l.push({ type: 7, index: n }), c += C.length - 1;
+        let h = -1;
+        for (; (h = s.data.indexOf(I, h + 1)) !== -1; ) l.push({ type: 7, index: a }), h += I.length - 1;
       }
-      n++;
+      a++;
     }
   }
   static createElement(t, e) {
-    const i = H.createElement("template");
+    const i = V.createElement("template");
     return i.innerHTML = t, i;
   }
 }
-function I(o, t, e = o, i) {
-  if (t === _) return t;
+function J(n, t, e = n, i) {
+  if (t === M) return t;
   let s = i !== void 0 ? e._$Co?.[i] : e._$Cl;
-  const n = W(t) ? void 0 : t._$litDirective$;
-  return s?.constructor !== n && (s?._$AO?.(!1), n === void 0 ? s = void 0 : (s = new n(o), s._$AT(o, e, i)), i !== void 0 ? (e._$Co ??= [])[i] = s : e._$Cl = s), s !== void 0 && (t = I(o, s._$AS(o, t.values), s, i)), t;
+  const a = nt(t) ? void 0 : t._$litDirective$;
+  return s?.constructor !== a && (s?._$AO?.(!1), a === void 0 ? s = void 0 : (s = new a(n), s._$AT(n, e, i)), i !== void 0 ? (e._$Co ??= [])[i] = s : e._$Cl = s), s !== void 0 && (t = J(n, s._$AS(n, t.values), s, i)), t;
 }
-class ie {
+class Ce {
   constructor(t, e) {
     this._$AV = [], this._$AN = void 0, this._$AD = t, this._$AM = e;
   }
@@ -320,29 +320,29 @@ class ie {
     return this._$AM._$AU;
   }
   u(t) {
-    const { el: { content: e }, parts: i } = this._$AD, s = (t?.creationScope ?? H).importNode(e, !0);
-    O.currentNode = s;
-    let n = O.nextNode(), a = 0, d = 0, l = i[0];
+    const { el: { content: e }, parts: i } = this._$AD, s = (t?.creationScope ?? V).importNode(e, !0);
+    B.currentNode = s;
+    let a = B.nextNode(), o = 0, c = 0, l = i[0];
     for (; l !== void 0; ) {
-      if (a === l.index) {
-        let p;
-        l.type === 2 ? p = new N(n, n.nextSibling, this, t) : l.type === 1 ? p = new l.ctor(n, l.name, l.strings, this, t) : l.type === 6 && (p = new ne(n, this, t)), this._$AV.push(p), l = i[++d];
+      if (o === l.index) {
+        let d;
+        l.type === 2 ? d = new G(a, a.nextSibling, this, t) : l.type === 1 ? d = new l.ctor(a, l.name, l.strings, this, t) : l.type === 6 && (d = new Me(a, this, t)), this._$AV.push(d), l = i[++c];
       }
-      a !== l?.index && (n = O.nextNode(), a++);
+      o !== l?.index && (a = B.nextNode(), o++);
     }
-    return O.currentNode = H, s;
+    return B.currentNode = V, s;
   }
   p(t) {
     let e = 0;
     for (const i of this._$AV) i !== void 0 && (i.strings !== void 0 ? (i._$AI(t, i, e), e += i.strings.length - 2) : i._$AI(t[e])), e++;
   }
 }
-class N {
+class G {
   get _$AU() {
     return this._$AM?._$AU ?? this._$Cv;
   }
   constructor(t, e, i, s) {
-    this.type = 2, this._$AH = h, this._$AN = void 0, this._$AA = t, this._$AB = e, this._$AM = i, this.options = s, this._$Cv = s?.isConnected ?? !0;
+    this.type = 2, this._$AH = p, this._$AN = void 0, this._$AA = t, this._$AB = e, this._$AM = i, this.options = s, this._$Cv = s?.isConnected ?? !0;
   }
   get parentNode() {
     let t = this._$AA.parentNode;
@@ -356,7 +356,7 @@ class N {
     return this._$AB;
   }
   _$AI(t, e = this) {
-    t = I(this, t, e), W(t) ? t === h || t == null || t === "" ? (this._$AH !== h && this._$AR(), this._$AH = h) : t !== this._$AH && t !== _ && this._(t) : t._$litType$ !== void 0 ? this.$(t) : t.nodeType !== void 0 ? this.T(t) : te(t) ? this.k(t) : this._(t);
+    t = J(this, t, e), nt(t) ? t === p || t == null || t === "" ? (this._$AH !== p && this._$AR(), this._$AH = p) : t !== this._$AH && t !== M && this._(t) : t._$litType$ !== void 0 ? this.$(t) : t.nodeType !== void 0 ? this.T(t) : Ae(t) ? this.k(t) : this._(t);
   }
   O(t) {
     return this._$AA.parentNode.insertBefore(t, this._$AB);
@@ -365,92 +365,92 @@ class N {
     this._$AH !== t && (this._$AR(), this._$AH = this.O(t));
   }
   _(t) {
-    this._$AH !== h && W(this._$AH) ? this._$AA.nextSibling.data = t : this.T(H.createTextNode(t)), this._$AH = t;
+    this._$AH !== p && nt(this._$AH) ? this._$AA.nextSibling.data = t : this.T(V.createTextNode(t)), this._$AH = t;
   }
   $(t) {
-    const { values: e, _$litType$: i } = t, s = typeof i == "number" ? this._$AC(t) : (i.el === void 0 && (i.el = Z.createElement(Pt(i.h, i.h[0]), this.options)), i);
+    const { values: e, _$litType$: i } = t, s = typeof i == "number" ? this._$AC(t) : (i.el === void 0 && (i.el = ot.createElement(de(i.h, i.h[0]), this.options)), i);
     if (this._$AH?._$AD === s) this._$AH.p(e);
     else {
-      const n = new ie(s, this), a = n.u(this.options);
-      n.p(e), this.T(a), this._$AH = n;
+      const a = new Ce(s, this), o = a.u(this.options);
+      a.p(e), this.T(o), this._$AH = a;
     }
   }
   _$AC(t) {
-    let e = _t.get(t.strings);
-    return e === void 0 && _t.set(t.strings, e = new Z(t)), e;
+    let e = Kt.get(t.strings);
+    return e === void 0 && Kt.set(t.strings, e = new ot(t)), e;
   }
   k(t) {
-    lt(this._$AH) || (this._$AH = [], this._$AR());
+    Dt(this._$AH) || (this._$AH = [], this._$AR());
     const e = this._$AH;
     let i, s = 0;
-    for (const n of t) s === e.length ? e.push(i = new N(this.O(Y()), this.O(Y()), this, this.options)) : i = e[s], i._$AI(n), s++;
+    for (const a of t) s === e.length ? e.push(i = new G(this.O(at()), this.O(at()), this, this.options)) : i = e[s], i._$AI(a), s++;
     s < e.length && (this._$AR(i && i._$AB.nextSibling, s), e.length = s);
   }
   _$AR(t = this._$AA.nextSibling, e) {
     for (this._$AP?.(!1, !0, e); t !== this._$AB; ) {
-      const i = xt(t).nextSibling;
-      xt(t).remove(), t = i;
+      const i = Ft(t).nextSibling;
+      Ft(t).remove(), t = i;
     }
   }
   setConnected(t) {
     this._$AM === void 0 && (this._$Cv = t, this._$AP?.(t));
   }
 }
-class J {
+class ft {
   get tagName() {
     return this.element.tagName;
   }
   get _$AU() {
     return this._$AM._$AU;
   }
-  constructor(t, e, i, s, n) {
-    this.type = 1, this._$AH = h, this._$AN = void 0, this.element = t, this.name = e, this._$AM = s, this.options = n, i.length > 2 || i[0] !== "" || i[1] !== "" ? (this._$AH = Array(i.length - 1).fill(new String()), this.strings = i) : this._$AH = h;
+  constructor(t, e, i, s, a) {
+    this.type = 1, this._$AH = p, this._$AN = void 0, this.element = t, this.name = e, this._$AM = s, this.options = a, i.length > 2 || i[0] !== "" || i[1] !== "" ? (this._$AH = Array(i.length - 1).fill(new String()), this.strings = i) : this._$AH = p;
   }
   _$AI(t, e = this, i, s) {
-    const n = this.strings;
-    let a = !1;
-    if (n === void 0) t = I(this, t, e, 0), a = !W(t) || t !== this._$AH && t !== _, a && (this._$AH = t);
+    const a = this.strings;
+    let o = !1;
+    if (a === void 0) t = J(this, t, e, 0), o = !nt(t) || t !== this._$AH && t !== M, o && (this._$AH = t);
     else {
-      const d = t;
-      let l, p;
-      for (t = n[0], l = 0; l < n.length - 1; l++) p = I(this, d[i + l], e, l), p === _ && (p = this._$AH[l]), a ||= !W(p) || p !== this._$AH[l], p === h ? t = h : t !== h && (t += (p ?? "") + n[l + 1]), this._$AH[l] = p;
+      const c = t;
+      let l, d;
+      for (t = a[0], l = 0; l < a.length - 1; l++) d = J(this, c[i + l], e, l), d === M && (d = this._$AH[l]), o ||= !nt(d) || d !== this._$AH[l], d === p ? t = p : t !== p && (t += (d ?? "") + a[l + 1]), this._$AH[l] = d;
     }
-    a && !s && this.j(t);
+    o && !s && this.j(t);
   }
   j(t) {
-    t === h ? this.element.removeAttribute(this.name) : this.element.setAttribute(this.name, t ?? "");
+    t === p ? this.element.removeAttribute(this.name) : this.element.setAttribute(this.name, t ?? "");
   }
 }
-class se extends J {
+class Ee extends ft {
   constructor() {
     super(...arguments), this.type = 3;
   }
   j(t) {
-    this.element[this.name] = t === h ? void 0 : t;
+    this.element[this.name] = t === p ? void 0 : t;
   }
 }
-class ae extends J {
+class Te extends ft {
   constructor() {
     super(...arguments), this.type = 4;
   }
   j(t) {
-    this.element.toggleAttribute(this.name, !!t && t !== h);
+    this.element.toggleAttribute(this.name, !!t && t !== p);
   }
 }
-class oe extends J {
-  constructor(t, e, i, s, n) {
-    super(t, e, i, s, n), this.type = 5;
+class ze extends ft {
+  constructor(t, e, i, s, a) {
+    super(t, e, i, s, a), this.type = 5;
   }
   _$AI(t, e = this) {
-    if ((t = I(this, t, e, 0) ?? h) === _) return;
-    const i = this._$AH, s = t === h && i !== h || t.capture !== i.capture || t.once !== i.once || t.passive !== i.passive, n = t !== h && (i === h || s);
-    s && this.element.removeEventListener(this.name, this, i), n && this.element.addEventListener(this.name, this, t), this._$AH = t;
+    if ((t = J(this, t, e, 0) ?? p) === M) return;
+    const i = this._$AH, s = t === p && i !== p || t.capture !== i.capture || t.once !== i.once || t.passive !== i.passive, a = t !== p && (i === p || s);
+    s && this.element.removeEventListener(this.name, this, i), a && this.element.addEventListener(this.name, this, t), this._$AH = t;
   }
   handleEvent(t) {
     typeof this._$AH == "function" ? this._$AH.call(this.options?.host ?? this.element, t) : this._$AH.handleEvent(t);
   }
 }
-class ne {
+class Me {
   constructor(t, e, i) {
     this.element = t, this.type = 6, this._$AN = void 0, this._$AM = e, this.options = i;
   }
@@ -458,22 +458,22 @@ class ne {
     return this._$AM._$AU;
   }
   _$AI(t) {
-    I(this, t);
+    J(this, t);
   }
 }
-const re = { I: N }, le = rt.litHtmlPolyfillSupport;
-le?.(Z, N), (rt.litHtmlVersions ??= []).push("3.3.3");
-const de = (o, t, e) => {
+const Re = { I: G }, De = Rt.litHtmlPolyfillSupport;
+De?.(ot, G), (Rt.litHtmlVersions ??= []).push("3.3.3");
+const Le = (n, t, e) => {
   const i = e?.renderBefore ?? t;
   let s = i._$litPart$;
   if (s === void 0) {
-    const n = e?.renderBefore ?? null;
-    i._$litPart$ = s = new N(t.insertBefore(Y(), n), n, void 0, e ?? {});
+    const a = e?.renderBefore ?? null;
+    i._$litPart$ = s = new G(t.insertBefore(at(), a), a, void 0, e ?? {});
   }
-  return s._$AI(o), s;
+  return s._$AI(n), s;
 };
-const dt = globalThis;
-let A = class extends L {
+const Lt = globalThis;
+let S = class extends Y {
   constructor() {
     super(...arguments), this.renderOptions = { host: this }, this._$Do = void 0;
   }
@@ -483,7 +483,7 @@ let A = class extends L {
   }
   update(t) {
     const e = this.render();
-    this.hasUpdated || (this.renderOptions.isConnected = this.isConnected), super.update(t), this._$Do = de(e, this.renderRoot, this.renderOptions);
+    this.hasUpdated || (this.renderOptions.isConnected = this.isConnected), super.update(t), this._$Do = Le(e, this.renderRoot, this.renderOptions);
   }
   connectedCallback() {
     super.connectedCallback(), this._$Do?.setConnected(!0);
@@ -492,15 +492,15 @@ let A = class extends L {
     super.disconnectedCallback(), this._$Do?.setConnected(!1);
   }
   render() {
-    return _;
+    return M;
   }
 };
-A._$litElement$ = !0, A.finalized = !0, dt.litElementHydrateSupport?.({ LitElement: A });
-const ce = dt.litElementPolyfillSupport;
-ce?.({ LitElement: A });
-(dt.litElementVersions ??= []).push("4.2.2");
-const R = { ATTRIBUTE: 1, CHILD: 2, PROPERTY: 3, BOOLEAN_ATTRIBUTE: 4 }, ct = (o) => (...t) => ({ _$litDirective$: o, values: t });
-let ht = class {
+S._$litElement$ = !0, S.finalized = !0, Lt.litElementHydrateSupport?.({ LitElement: S });
+const Oe = Lt.litElementPolyfillSupport;
+Oe?.({ LitElement: S });
+(Lt.litElementVersions ??= []).push("4.2.2");
+const W = { ATTRIBUTE: 1, CHILD: 2, PROPERTY: 3, BOOLEAN_ATTRIBUTE: 4 }, Ot = (n) => (...t) => ({ _$litDirective$: n, values: t });
+let Nt = class {
   constructor(t) {
   }
   get _$AU() {
@@ -516,109 +516,109 @@ let ht = class {
     return this.render(...e);
   }
 };
-const { I: he } = re, At = (o) => o, pe = (o) => o.strings === void 0, St = () => document.createComment(""), j = (o, t, e) => {
-  const i = o._$AA.parentNode, s = t === void 0 ? o._$AB : t._$AA;
+const { I: Ne } = Re, Jt = (n) => n, Ie = (n) => n.strings === void 0, Gt = () => document.createComment(""), tt = (n, t, e) => {
+  const i = n._$AA.parentNode, s = t === void 0 ? n._$AB : t._$AA;
   if (e === void 0) {
-    const n = i.insertBefore(St(), s), a = i.insertBefore(St(), s);
-    e = new he(n, a, o, o.options);
+    const a = i.insertBefore(Gt(), s), o = i.insertBefore(Gt(), s);
+    e = new Ne(a, o, n, n.options);
   } else {
-    const n = e._$AB.nextSibling, a = e._$AM, d = a !== o;
-    if (d) {
+    const a = e._$AB.nextSibling, o = e._$AM, c = o !== n;
+    if (c) {
       let l;
-      e._$AQ?.(o), e._$AM = o, e._$AP !== void 0 && (l = o._$AU) !== a._$AU && e._$AP(l);
+      e._$AQ?.(n), e._$AM = n, e._$AP !== void 0 && (l = n._$AU) !== o._$AU && e._$AP(l);
     }
-    if (n !== s || d) {
+    if (a !== s || c) {
       let l = e._$AA;
-      for (; l !== n; ) {
-        const p = At(l).nextSibling;
-        At(i).insertBefore(l, s), l = p;
+      for (; l !== a; ) {
+        const d = Jt(l).nextSibling;
+        Jt(i).insertBefore(l, s), l = d;
       }
     }
   }
   return e;
-}, M = (o, t, e = o) => (o._$AI(t, e), o), ue = {}, pt = (o, t = ue) => o._$AH = t, me = (o) => o._$AH, it = (o) => {
-  o._$AR(), o._$AA.remove();
+}, j = (n, t, e = n) => (n._$AI(t, e), n), He = {}, It = (n, t = He) => n._$AH = t, Ue = (n) => n._$AH, At = (n) => {
+  n._$AR(), n._$AA.remove();
 };
-const Et = ct(class extends ht {
+const Xt = Ot(class extends Nt {
   constructor() {
-    super(...arguments), this.key = h;
+    super(...arguments), this.key = p;
   }
-  render(o, t) {
-    return this.key = o, t;
+  render(n, t) {
+    return this.key = n, t;
   }
-  update(o, [t, e]) {
-    return t !== this.key && (pt(o), this.key = t), e;
-  }
-});
-const U = ct(class extends ht {
-  constructor(o) {
-    if (super(o), o.type !== R.PROPERTY && o.type !== R.ATTRIBUTE && o.type !== R.BOOLEAN_ATTRIBUTE) throw Error("The `live` directive is not allowed on child or event bindings");
-    if (!pe(o)) throw Error("`live` bindings can only contain a single expression");
-  }
-  render(o) {
-    return o;
-  }
-  update(o, [t]) {
-    if (t === _ || t === h) return t;
-    const e = o.element, i = o.name;
-    if (o.type === R.PROPERTY) {
-      if (t === e[i]) return _;
-    } else if (o.type === R.BOOLEAN_ATTRIBUTE) {
-      if (!!t === e.hasAttribute(i)) return _;
-    } else if (o.type === R.ATTRIBUTE && e.getAttribute(i) === t + "") return _;
-    return pt(o), t;
+  update(n, [t, e]) {
+    return t !== this.key && (It(n), this.key = t), e;
   }
 });
-const Ct = (o, t, e) => {
+const K = Ot(class extends Nt {
+  constructor(n) {
+    if (super(n), n.type !== W.PROPERTY && n.type !== W.ATTRIBUTE && n.type !== W.BOOLEAN_ATTRIBUTE) throw Error("The `live` directive is not allowed on child or event bindings");
+    if (!Ie(n)) throw Error("`live` bindings can only contain a single expression");
+  }
+  render(n) {
+    return n;
+  }
+  update(n, [t]) {
+    if (t === M || t === p) return t;
+    const e = n.element, i = n.name;
+    if (n.type === W.PROPERTY) {
+      if (t === e[i]) return M;
+    } else if (n.type === W.BOOLEAN_ATTRIBUTE) {
+      if (!!t === e.hasAttribute(i)) return M;
+    } else if (n.type === W.ATTRIBUTE && e.getAttribute(i) === t + "") return M;
+    return It(n), t;
+  }
+});
+const Qt = (n, t, e) => {
   const i = /* @__PURE__ */ new Map();
-  for (let s = t; s <= e; s++) i.set(o[s], s);
+  for (let s = t; s <= e; s++) i.set(n[s], s);
   return i;
-}, Tt = ct(class extends ht {
-  constructor(o) {
-    if (super(o), o.type !== R.CHILD) throw Error("repeat() can only be used in text expressions");
+}, pt = Ot(class extends Nt {
+  constructor(n) {
+    if (super(n), n.type !== W.CHILD) throw Error("repeat() can only be used in text expressions");
   }
-  dt(o, t, e) {
+  dt(n, t, e) {
     let i;
     e === void 0 ? e = t : t !== void 0 && (i = t);
-    const s = [], n = [];
-    let a = 0;
-    for (const d of o) s[a] = i ? i(d, a) : a, n[a] = e(d, a), a++;
-    return { values: n, keys: s };
+    const s = [], a = [];
+    let o = 0;
+    for (const c of n) s[o] = i ? i(c, o) : o, a[o] = e(c, o), o++;
+    return { values: a, keys: s };
   }
-  render(o, t, e) {
-    return this.dt(o, t, e).values;
+  render(n, t, e) {
+    return this.dt(n, t, e).values;
   }
-  update(o, [t, e, i]) {
-    const s = me(o), { values: n, keys: a } = this.dt(t, e, i);
-    if (!Array.isArray(s)) return this.ut = a, n;
-    const d = this.ut ??= [], l = [];
-    let p, u, c = 0, m = s.length - 1, f = 0, v = n.length - 1;
-    for (; c <= m && f <= v; ) if (s[c] === null) c++;
+  update(n, [t, e, i]) {
+    const s = Ue(n), { values: a, keys: o } = this.dt(t, e, i);
+    if (!Array.isArray(s)) return this.ut = o, a;
+    const c = this.ut ??= [], l = [];
+    let d, u, h = 0, m = s.length - 1, g = 0, b = a.length - 1;
+    for (; h <= m && g <= b; ) if (s[h] === null) h++;
     else if (s[m] === null) m--;
-    else if (d[c] === a[f]) l[f] = M(s[c], n[f]), c++, f++;
-    else if (d[m] === a[v]) l[v] = M(s[m], n[v]), m--, v--;
-    else if (d[c] === a[v]) l[v] = M(s[c], n[v]), j(o, l[v + 1], s[c]), c++, v--;
-    else if (d[m] === a[f]) l[f] = M(s[m], n[f]), j(o, s[c], s[m]), m--, f++;
-    else if (p === void 0 && (p = Ct(a, f, v), u = Ct(d, c, m)), p.has(d[c])) if (p.has(d[m])) {
-      const b = u.get(a[f]), x = b !== void 0 ? s[b] : null;
-      if (x === null) {
-        const w = j(o, s[c]);
-        M(w, n[f]), l[f] = w;
-      } else l[f] = M(x, n[f]), j(o, s[c], x), s[b] = null;
-      f++;
-    } else it(s[m]), m--;
-    else it(s[c]), c++;
-    for (; f <= v; ) {
-      const b = j(o, l[v + 1]);
-      M(b, n[f]), l[f++] = b;
+    else if (c[h] === o[g]) l[g] = j(s[h], a[g]), h++, g++;
+    else if (c[m] === o[b]) l[b] = j(s[m], a[b]), m--, b--;
+    else if (c[h] === o[b]) l[b] = j(s[h], a[b]), tt(n, l[b + 1], s[h]), h++, b--;
+    else if (c[m] === o[g]) l[g] = j(s[m], a[g]), tt(n, s[h], s[m]), m--, g++;
+    else if (d === void 0 && (d = Qt(o, g, b), u = Qt(c, h, m)), d.has(c[h])) if (d.has(c[m])) {
+      const x = u.get(o[g]), C = x !== void 0 ? s[x] : null;
+      if (C === null) {
+        const y = tt(n, s[h]);
+        j(y, a[g]), l[g] = y;
+      } else l[g] = j(C, a[g]), tt(n, s[h], C), s[x] = null;
+      g++;
+    } else At(s[m]), m--;
+    else At(s[h]), h++;
+    for (; g <= b; ) {
+      const x = tt(n, l[b + 1]);
+      j(x, a[g]), l[g++] = x;
     }
-    for (; c <= m; ) {
-      const b = s[c++];
-      b !== null && it(b);
+    for (; h <= m; ) {
+      const x = s[h++];
+      x !== null && At(x);
     }
-    return this.ut = a, pt(o, l), _;
+    return this.ut = o, It(n, l), M;
   }
-}), ge = S`
+}), Pe = _`
   :host {
     display: block;
     --paper: #f4f3ee;
@@ -1564,7 +1564,7 @@ const Ct = (o, t, e) => {
       top: 7px;
       bottom: 7px;
       left: 7px;
-      width: calc((100% - 20px) / 4);
+      width: calc((100% - 14px - (var(--tab-count, 4) - 1) * 2px) / var(--tab-count, 4));
       background: var(--mint);
       border-radius: 20px;
       transform: translateX(calc(var(--active) * (100% + 2px)));
@@ -1732,7 +1732,7 @@ const Ct = (o, t, e) => {
       transform: none !important;
     }
   }
-`, fe = S`
+`, qe = _`
   .list-tile .tile-label {
     min-width: 0;
     overflow: hidden;
@@ -2261,7 +2261,7 @@ const Ct = (o, t, e) => {
     .app {
       display: grid;
       grid-template-columns: minmax(0, 1fr);
-      grid-template-rows: auto minmax(0, 1fr) auto;
+      grid-template-rows: auto minmax(0, 1fr);
       height: calc(100dvh - var(--signal-header-height, 56px));
       min-height: 0;
       overflow: hidden;
@@ -2275,7 +2275,7 @@ const Ct = (o, t, e) => {
       overflow-y: auto;
       overscroll-behavior-y: contain;
       scrollbar-width: none;
-      padding: 19px 18px 24px;
+      padding: 19px 18px calc(112px + env(safe-area-inset-bottom, 0px));
       scroll-padding-top: 12px;
     }
     .app main::-webkit-scrollbar {
@@ -2362,33 +2362,33 @@ const Ct = (o, t, e) => {
       font-size: 12px;
     }
     .bottom-nav {
-      position: relative;
+      position: fixed;
       inset: auto;
-      left: auto;
-      bottom: auto;
-      transform: none;
-      width: 100%;
+      left: 50%;
+      bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+      transform: translateX(-50%);
+      width: min(calc(100% - 24px), 470px);
       max-width: none;
       margin: 0;
-      border-radius: 0;
-      background: var(--paper);
+      border-radius: 28px;
+      background: var(--surface);
       color: var(--muted);
-      border-top: 1px solid var(--line);
-      box-shadow: 0 -5px 18px #00000005;
-      padding: 8px 18px max(8px, env(safe-area-inset-bottom));
+      border: 1px solid var(--line);
+      box-shadow: 0 8px 28px #00000020, 0 2px 6px #0000000a;
+      padding: 7px;
       gap: 4px;
-      min-height: 70px;
+      min-height: 68px;
+      z-index: 30;
+      overscroll-behavior: none;
     }
     .nav-indicator {
-      top: 8px;
-      bottom: max(8px, env(safe-area-inset-bottom));
-      left: 18px;
-      width: calc((100% - 48px) / 4);
-      border-radius: 18px;
-      background: var(--surface);
-      box-shadow:
-        inset 0 1px 0 #ffffff26,
-        0 2px 6px #0000000c;
+      top: 7px;
+      bottom: 7px;
+      left: 7px;
+      width: calc((100% - 14px - (var(--tab-count, 4) - 1) * 4px) / var(--tab-count, 4));
+      border-radius: 21px;
+      background: var(--mint);
+      box-shadow: none;
       transform: translateX(calc(var(--active) * (100% + 4px)));
     }
     .bottom-nav button {
@@ -2398,7 +2398,7 @@ const Ct = (o, t, e) => {
       min-height: 52px;
     }
     .bottom-nav button[aria-current="page"] {
-      color: var(--ink);
+      color: #172d27;
     }
     .bottom-nav button[aria-current="page"] svg {
       stroke-width: 2;
@@ -2445,7 +2445,7 @@ const Ct = (o, t, e) => {
       transform: none !important;
     }
   }
-`, Q = S`
+`, bt = _`
   :host {
     --signal-press: 90ms;
     --signal-settle: 240ms;
@@ -2484,7 +2484,7 @@ const Ct = (o, t, e) => {
       scale: none !important;
     }
   }
-`, be = S`
+`, je = _`
   .page {
     animation: signal-page-in 240ms var(--signal-ease) both;
   }
@@ -2605,14 +2605,14 @@ const Ct = (o, t, e) => {
     flex: 1;
   }
 `;
-let B;
-class xe {
+let et;
+class Fe {
   constructor() {
     this.metas = /* @__PURE__ */ new Map(), this.color = "", this.frame = 0;
   }
   sync(t, e) {
-    if (B && B !== this) return;
-    B = this;
+    if (et && et !== this) return;
+    et = this;
     const i = t ? "#1a2320" : "#f4f3ee", s = this.color !== i || this.bridge !== e;
     if (this.bridge = e, this.style || (this.style = document.createElement("style"), this.style.dataset.signalChrome = "", document.head.append(this.style), this.observer = new MutationObserver(() => this.syncMeta()), this.observer.observe(document.head, {
       subtree: !0,
@@ -2621,10 +2621,10 @@ class xe {
       attributeFilter: ["content", "name", "media"]
     })), !s) return;
     this.color = i;
-    const n = t ? "#f0f2e9" : "#222b28";
+    const a = t ? "#f0f2e9" : "#222b28";
     this.style.textContent = `html {
       --app-header-background-color: ${i} !important;
-      --app-header-text-color: ${n} !important;
+      --app-header-text-color: ${a} !important;
       --app-theme-color: ${i} !important;
       --primary-background-color: ${i} !important;
     }
@@ -2652,41 +2652,46 @@ class xe {
     });
   }
   release() {
-    if (B === this) {
-      B = void 0, this.observer?.disconnect(), this.style?.remove(), this.style = void 0;
+    if (et === this) {
+      et = void 0, this.observer?.disconnect(), this.style?.remove(), this.style = void 0;
       for (const [t, { previous: e }] of this.metas)
         t.content === this.color && (e === null ? t.removeAttribute("content") : t.content = e);
       this.createdMeta?.remove(), this.createdMeta = void 0, this.metas.clear(), this.color = "", this.notify();
     }
   }
 }
-const Mt = [
+const te = [
   "auto",
   "system",
   "light",
   "dark"
 ];
-function qt(o, t) {
+function ut(n, t) {
   try {
     return Number(
       new Intl.DateTimeFormat("en-GB", {
         hour: "numeric",
         hourCycle: "h23",
         timeZone: t
-      }).format(o)
+      }).format(n)
     );
   } catch {
-    return o.getHours();
+    return n.getHours();
   }
 }
-function ve(o, t, e, i) {
-  if (o === "system") return t;
-  if (o !== "auto") return o === "dark";
-  const s = qt(e, i);
+function We(n, t, e, i) {
+  if (n === "system") return t;
+  if (n !== "auto") return n === "dark";
+  const s = ut(e, i);
   return s < 7 || s >= 19;
 }
-const zt = {
+const ee = {
+  more: "M4 11h2v2H4ZM11 11h2v2h-2ZM18 11h2v2h-2Z",
+  camera: "M3 6h12v12H3ZM15 10l6-4v12l-6-4",
+  phone: "M7 3h3l2 5-2 2c1.3 2.5 3.5 4.7 6 6l2-2 5 2v3c0 1.1-.9 2-2 2C11.1 21 3 12.9 3 3c0-1.1.9-2 2-2Z",
+  microphone: "M9 5a3 3 0 0 1 6 0v7a3 3 0 0 1-6 0ZM5 11v1a7 7 0 0 0 14 0v-1M12 19v3M8 22h8",
   trash: "M4 7h16M9 7V4h6v3M6 7l1 14h10l1-14M10 11v6M14 11v6",
+  sparkle: "m12 2 2.2 6.8L21 11l-6.8 2.2L12 20l-2.2-6.8L3 11l6.8-2.2L12 2Z",
   music: "M9 18V5l12-3v13M9 7l12-3M9 18a3 3 0 1 1-3-3c1.5 0 3 1 3 3ZM21 15a3 3 0 1 1-3-3c1.5 0 3 1 3 3Z",
   cover: "M4 3h16v18H4ZM4 7h16M4 11h16M4 15h16",
   lock: "M7 10V7a5 5 0 0 1 10 0v3M5 10h14v11H5ZM12 14v3",
@@ -2701,6 +2706,7 @@ const zt = {
   home: "m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1Z",
   climate: "M9 14.5V5a3 3 0 0 1 6 0v9.5a5 5 0 1 1-6 0ZM12 9v9",
   shield: "M12 3 3 7v5c0 5 9 9 9 9s9-4 9-9V7ZM8 12l3 3 5-6",
+  door: "M4 21V3h16v18M7 21V5h10v16M14 13h.01",
   list: "M9 6h12M9 12h12M9 18h12M3 6h1M3 12h1M3 18h1",
   arrow: "M5 12h14m-6-6 6 6-6 6",
   sun: "M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5 19 19M5 19l1.5-1.5M17.5 6.5 19 5M16 12a4 4 0 1 1-8 0 4 4 0 0 1 8 0",
@@ -2716,8 +2722,8 @@ const zt = {
   settings: "M4 7h16M4 17h16M8 4v6M16 14v6",
   wind: "M3 8h13a3 3 0 1 0-3-3M3 12h16a3 3 0 1 1-3 3M3 16h6a3 3 0 1 1-3 3",
   warn: "m12 3 10 18H2ZM12 9v5M12 17v.5"
-}, g = (o) => D`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d=${zt[o] || zt.home}></path></svg>`, $ = (o) => !!o && !["unknown", "unavailable"].includes(o.state), y = (o) => o != null && o !== "" && Number.isFinite(Number(o)) ? Number(o) : void 0, k = (o) => o === "partlycloudy" ? "Partly cloudy" : (o || "Unavailable").replaceAll("_", " ").replaceAll("-", " "), Rt = (o) => typeof o == "string" ? { entity: o } : o;
-class ye extends A {
+}, f = (n) => F`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d=${ee[n] || ee.home}></path></svg>`, $ = (n) => !!n && !["unknown", "unavailable"].includes(n.state), w = (n) => n != null && n !== "" && Number.isFinite(Number(n)) ? Number(n) : void 0, D = (n) => n === "partlycloudy" ? "Partly cloudy" : (n || "Unavailable").replaceAll("_", " ").replaceAll("-", " "), Et = (n) => typeof n == "string" ? { entity: n } : n;
+class Be extends S {
   constructor() {
     super(...arguments), this.config = { type: "custom:signal-home" };
   }
@@ -2725,7 +2731,7 @@ class ye extends A {
     this.properties = { hass: { attribute: !1 }, config: { state: !0 } };
   }
   static {
-    this.styles = S`
+    this.styles = _`
     :host {
       display: block;
     }
@@ -2791,7 +2797,8 @@ class ye extends A {
         selector: { entity: { domain: e } }
       })),
       { name: "humidity", selector: { entity: { domain: "sensor" } } },
-      { name: "favorites", selector: { entity: { multiple: !0 } } }
+      { name: "favorites", selector: { entity: { multiple: !0 } } },
+      { name: "cameras", selector: { entity: { domain: "camera", multiple: !0 } } }
     ];
     return r`<p>
         <strong>Welcome to Signal.</strong> Select your entities below. For the
@@ -2804,7 +2811,7 @@ class ye extends A {
         .hass=${this.hass}
         .data=${this.config}
         .schema=${t}
-        .computeLabel=${(e) => ({ todo: "Default to-do list (all lists are available)", greeting: "Custom greeting (optional)", favorites: "Shortcut entities", humidity: "Humidity sensor (optional)" })[e.name] || e.name[0].toUpperCase() + e.name.slice(1)}
+        .computeLabel=${(e) => ({ todo: "Default to-do list (all lists are available)", greeting: "Custom greeting (optional)", favorites: "Shortcut entities", cameras: "Frigate cameras (live, events, and playback)", humidity: "Humidity sensor (optional)" })[e.name] || e.name[0].toUpperCase() + e.name.slice(1)}
         @value-changed=${(e) => this.change({ ...this.config, ...e.detail.value })}
       ></ha-form>
       <details>
@@ -2835,7 +2842,7 @@ class ye extends A {
         ...this.config,
         sensors: i.map(
           (s) => (this.config.sensors || []).find(
-            (n) => (typeof n == "string" ? n : n.entity) === s
+            (a) => (typeof a == "string" ? a : a.entity) === s
           ) || s
         )
       });
@@ -2844,8 +2851,374 @@ class ye extends A {
       </details>`;
   }
 }
-customElements.get("signal-home-editor") || customElements.define("signal-home-editor", ye);
-const ut = S`
+customElements.get("signal-home-editor") || customElements.define("signal-home-editor", Be);
+class Ve extends S {
+  constructor() {
+    super(...arguments), this.eventId = "", this.kind = "event", this.camera = "", this.instance = "frigate", this.url = "", this.error = "", this.loading = !0, this.signature = "", this.generation = 0, this.load = async () => {
+      const t = ++this.generation;
+      clearTimeout(this.playerTimer), this.loading = !0, this.error = "", this.url = "", this.event = void 0;
+      const e = () => this.isConnected && t === this.generation;
+      try {
+        if (!/^\d{10}(?:\.\d+)?-[a-zA-Z0-9]+$/.test(this.eventId) || this.eventId.length > 80 || !/^[a-zA-Z0-9_-]+$/.test(this.instance) || !/^[a-z0-9_]+$/.test(this.camera)) throw new Error("invalid_link");
+        const i = Number(this.eventId.split("-")[0]), s = await this.hass.callWS({ type: "frigate/reviews/get", instance_id: this.instance, cameras: [this.camera], after: Math.floor(i) - 60, ...this.kind === "review" ? { before: Math.ceil(i) + 1 } : {}, limit: 500 });
+        if (!e()) return;
+        const a = typeof s == "string" ? JSON.parse(s) : s, o = Array.isArray(a) ? a.find((h) => h.camera === this.camera && (this.kind === "review" ? h.id === this.eventId : h.data?.detections?.includes(this.eventId))) : void 0;
+        if (!o) throw new Error("event_missing");
+        this.event = o;
+        const c = Math.floor(o.start_time - 5), l = o.end_time == null ? Math.floor(Date.now() / 1e3) : Math.floor(o.end_time + 5);
+        if (!Number.isFinite(c) || !Number.isFinite(l) || l <= c) throw new Error("invalid_media");
+        const d = { url: `/api/frigate/${this.instance}/vod/${this.camera}/start/${c}/end/${l}/index.m3u8` }, u = await this.hass.callWS({ type: "auth/sign_path", path: d.url, expires: 3600 });
+        if (!e() || (customElements.get("ha-hls-player") || await Promise.race([
+          customElements.whenDefined("ha-hls-player"),
+          new Promise((h, m) => {
+            this.playerTimer = setTimeout(() => m(new Error("player_missing")), 1e4);
+          })
+        ]), !e())) return;
+        this.url = new URL(u.path, location.origin).href;
+      } catch (i) {
+        if (!e()) return;
+        const s = i instanceof Error ? i.message : "";
+        this.error = s === "event_missing" ? "This event is no longer available. Its footage may have expired or been removed." : s === "invalid_link" ? "This event link isn’t valid." : this.event?.end_time === null ? "This event is still recording. Try again in a moment to load the footage." : "We couldn’t load this recording. Check your connection and try again.";
+      } finally {
+        e() && (clearTimeout(this.playerTimer), this.loading = !1);
+      }
+    };
+  }
+  static {
+    this.properties = {
+      hass: { attribute: !1 },
+      eventId: {},
+      kind: {},
+      camera: {},
+      instance: {},
+      event: { state: !0 },
+      url: { state: !0 },
+      error: { state: !0 },
+      loading: { state: !0 }
+    };
+  }
+  static {
+    this.styles = _`
+    :host { display:block; min-width:0; }
+    * { box-sizing:border-box; }
+    .panel { border:1px solid var(--line); border-radius:26px; overflow:hidden; background:var(--surface); }
+    .heading { padding:24px; }
+    .badge { display:inline-flex; padding:6px 10px; border-radius:20px; background:color-mix(in srgb,#d19b50 18%,var(--surface)); color:var(--ink); font-size:11px; white-space:nowrap; font-weight:700; letter-spacing:.3px; }
+    h2 { margin:14px 0 6px; color:var(--ink); font-size:clamp(21px,3vw,28px); font-weight:600; letter-spacing:-.7px; }
+    p { margin:0; color:var(--muted); font-size:13px; line-height:1.6; }
+    time { color:var(--ink); font-weight:600; }
+    .player { background:#142019; aspect-ratio:4/3; }
+    ha-hls-player { display:block; width:100%; height:100%; }
+    .footer { padding:16px 24px; display:flex; align-items:center; justify-content:space-between; gap:12px; }
+    .notice { padding:44px 24px; min-height:220px; display:grid; align-content:center; gap:12px; text-align:center; border-top:1px solid var(--line); }
+    .notice strong { color:var(--ink); font-size:16px; font-weight:600; }
+    button { font:inherit; min-height:44px; padding:10px 15px; border:1px solid var(--line); border-radius:12px; background:var(--surface); color:var(--ink); cursor:pointer; }
+    button:focus-visible { outline:2px solid var(--ink); outline-offset:3px; }
+    .notice button { justify-self:center; }
+    @media(max-width:480px) { .heading { padding:18px; } .footer { padding:14px 18px; } .panel { border-radius:22px; } }
+  `;
+  }
+  connectedCallback() {
+    super.connectedCallback(), this.signature = "";
+  }
+  disconnectedCallback() {
+    super.disconnectedCallback(), this.generation++, clearTimeout(this.playerTimer), this.url = "";
+  }
+  willUpdate(t) {
+    const e = JSON.stringify([this.instance, this.camera, this.kind, this.eventId]);
+    this.hass && (e !== this.signature || this.connection !== this.hass.connection || this.user !== this.hass.user?.id) && (this.signature = e, this.connection = this.hass.connection, this.user = this.hass.user?.id, this.load());
+  }
+  date() {
+    const t = this.event?.start_time ?? Number(this.eventId.split("-")[0]);
+    return Number.isFinite(t) ? new Intl.DateTimeFormat(this.hass?.locale?.language || void 0, { dateStyle: "medium", timeStyle: "short", timeZone: this.hass?.config?.time_zone }).format(new Date(t * 1e3)) : "";
+  }
+  render() {
+    const t = this.event?.data?.objects?.some((e) => e.startsWith("doorbell")) ? "Doorbell ring" : this.event?.data?.objects?.includes("person") ? "Person detected" : "Recorded event";
+    return r`<section class="panel" aria-label="Recorded event">
+      <div class="heading"><span class="badge">${this.event?.end_time === null ? "Visit in progress · Recorded footage" : "Recorded event"}</span><h2>${t}</h2><p><time>${this.date()}</time> · ${this.camera.replaceAll("_", " ")}</p>${this.event?.end_time != null ? r`<p>${Math.round(this.event.end_time - this.event.start_time)}-second visit · includes 5s before and 5s after</p>` : ""}</div>
+      ${this.loading ? r`<div class="notice" role="status"><strong>Opening this recording…</strong><p>Loading the event from your notification.</p></div>` : this.error ? r`<div class="notice" role="alert"><strong>Recording unavailable</strong><p>${this.error}</p><button @click=${this.load}>Try again</button></div>` : r`<div class="player"><ha-hls-player .hass=${this.hass} .url=${this.url} .controls=${!0} .autoPlay=${!0} .muted=${!0} .playsInline=${!0} .allowExoPlayer=${!1} .aspectRatio=${4 / 3}></ha-hls-player></div>${this.event?.end_time === null ? r`<div class="footer"><button @click=${this.load}>Refresh recording</button></div>` : ""}`}
+    </section>`;
+  }
+}
+customElements.get("signal-camera-event") || customElements.define("signal-camera-event", Ve);
+class Ze extends S {
+  constructor() {
+    super(...arguments), this.camera = "", this.events = [], this.loading = !1, this.error = "", this.more = !1, this.limit = 24, this.signature = "", this.generation = 0, this.load = async () => {
+      const t = ++this.generation;
+      clearTimeout(this.timer), this.loading = !0, this.error = "";
+      const e = () => this.isConnected && t === this.generation;
+      try {
+        if (!/^[a-z0-9_]+$/.test(this.camera)) throw new Error();
+        const i = await this.hass.callWS({ type: "frigate/reviews/get", instance_id: "frigate", cameras: [this.camera], after: Date.now() / 1e3 - 3 * 86400, limit: this.limit });
+        if (!e()) return;
+        const s = typeof i == "string" ? JSON.parse(i) : i;
+        if (!Array.isArray(s)) throw new Error();
+        this.more = s.length >= this.limit;
+        const a = s.filter((c) => c.camera === this.camera && /^\d{10}(?:\.\d+)?-[a-zA-Z0-9]+$/.test(c.id)).sort((c, l) => l.start_time - c.start_time), o = await Promise.all(a.map(async (c) => {
+          try {
+            const l = await this.hass.callWS({ type: "auth/sign_path", path: `/api/frigate/frigate/notifications/${c.id}/${this.camera}/review_thumbnail.webp`, expires: 3600 });
+            return { ...c, image: new URL(l.path, location.origin).href };
+          } catch {
+            return { ...c, image: void 0 };
+          }
+        }));
+        e() && (this.events = o);
+      } catch {
+        e() && (this.error = "Events couldn’t load. Tap Refresh to try again.");
+      } finally {
+        e() && (this.loading = !1, this.scheduleRefresh());
+      }
+    };
+  }
+  static {
+    this.properties = { hass: { attribute: !1 }, camera: {}, events: { state: !0 }, loading: { state: !0 }, error: { state: !0 }, more: { state: !0 } };
+  }
+  static {
+    this.styles = _`
+    :host { display:block; min-width:0; }
+    * { box-sizing:border-box; }
+    .heading { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:18px; }
+    h3 { margin:0; font-size:20px; font-weight:600; letter-spacing:-.5px; color:var(--ink); }
+    button { font:inherit; color:var(--ink); cursor:pointer; border:0; background:transparent; min-height:44px; }
+    button:focus-visible { outline:2px solid var(--ink); outline-offset:4px; }
+    button:disabled { opacity:.5; cursor:default; }
+    .refresh,.more { padding:10px 14px; border:1px solid var(--line); border-radius:12px; font-size:12px; }
+    .grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:18px 12px; }
+    .tile { display:block; min-width:0; width:100%; padding:0; text-align:left; border-radius:14px; }
+    .picture { display:block; aspect-ratio:4/3; position:relative; overflow:hidden; border-radius:14px; background:color-mix(in srgb,var(--line) 50%,var(--surface)); }
+    img { display:block; width:100%; height:100%; object-fit:cover; transition:transform .2s; }
+    @media(hover:hover) { .tile:hover img { transform:scale(1.035); } }
+    .placeholder { position:absolute; inset:0; display:grid; place-items:center; font-size:12px; color:var(--muted); }
+    .caption { display:flex; justify-content:space-between; align-items:baseline; flex-wrap:wrap; gap:3px 8px; padding:9px 2px 0; }
+    time { font-size:14px; font-weight:600; color:var(--ink); }
+    .date { font-size:11px; color:var(--muted); }
+    .status { color:var(--muted); font-size:13px; padding:24px 0; line-height:1.6; }
+    .more { display:block; margin:24px auto 0; }
+    @media(min-width:1200px) { .grid { grid-template-columns:repeat(3,minmax(0,1fr)); } }
+    @media(prefers-reduced-motion:reduce) { img { transition:none; } }
+  `;
+  }
+  connectedCallback() {
+    super.connectedCallback(), this.signature = "";
+  }
+  disconnectedCallback() {
+    super.disconnectedCallback(), this.generation++, clearTimeout(this.timer);
+  }
+  willUpdate() {
+    this.hass && (this.signature !== this.camera || this.connection !== this.hass.connection || this.user !== this.hass.user?.id) && (this.signature = this.camera, this.connection = this.hass.connection, this.user = this.hass.user?.id, this.events = [], this.limit = 24, this.load());
+  }
+  scheduleRefresh() {
+    this.timer = setTimeout(() => {
+      document.visibilityState === "visible" ? this.load() : this.scheduleRefresh();
+    }, 6e4);
+  }
+  format(t, e = !1) {
+    return new Intl.DateTimeFormat(this.hass?.locale?.language || void 0, { timeZone: this.hass?.config?.time_zone, ...e ? { month: "short", day: "numeric" } : { hour: "numeric", minute: "2-digit" } }).format(new Date(t.start_time * 1e3));
+  }
+  duration(t) {
+    const e = Math.max(1, Math.round(t.end_time - t.start_time));
+    return e < 60 ? `${e}s` : `${Math.floor(e / 60)}m ${e % 60}s`;
+  }
+  open(t) {
+    this.dispatchEvent(new CustomEvent("signal-open-event", { detail: { id: t.id, camera: t.camera }, bubbles: !0, composed: !0 }));
+  }
+  render() {
+    return r`
+    <div class="heading"><h3>Recent events</h3><button class="refresh" ?disabled=${this.loading} @click=${this.load} aria-label="Refresh events">Refresh</button></div>
+    ${this.error ? r`<p class="status" role="alert">${this.error}</p>` : ""}
+    ${this.events.length ? r`<div class="grid">${pt(this.events, (t) => t.id, (t) => r`<button class="tile" aria-label=${`Watch ${t.data?.objects?.some((e) => e.startsWith("doorbell")) ? "doorbell" : "person"} event, ${this.format(t, !0)} at ${this.format(t)}`} @click=${() => this.open(t)}><span class="picture"><span class="placeholder">Preview unavailable</span>${t.image ? r`<img src=${t.image} alt="" loading="lazy" style="position:relative" @error=${(e) => {
+      e.target.style.visibility = "hidden";
+    }}>` : ""}</span><span class="caption"><time datetime=${new Date(t.start_time * 1e3).toISOString()}>${this.format(t)}</time><span class="date">${this.format(t, !0)} · ${t.end_time == null ? "In progress" : this.duration(t)}</span></span></button>`)}</div>` : r`<p class="status" role="status">${this.loading ? "Loading events…" : this.error ? "" : "No recent events."}</p>`}
+    ${this.more ? r`<button class="more" ?disabled=${this.loading} @click=${() => {
+      this.limit += 24, this.load();
+    }}>Load more events</button>` : ""}`;
+  }
+}
+customElements.get("signal-camera-grid") || customElements.define("signal-camera-grid", Ze);
+const Ye = 2e3;
+class Ke extends S {
+  constructor() {
+    super(...arguments), this.cameras = [], this.eventId = "", this.eventCamera = "", this.eventInstance = "frigate", this.eventKind = "event", this.selected = "", this.error = "", this.ready = !1, this.voiceActive = !1, this.talking = !1, this.liveSignature = "", this.generation = 0, this.toggleVoice = () => {
+      if (this.voiceActive) {
+        this.stopVoice();
+        return;
+      }
+      this.cardAction("call_start"), this.voiceActive = !0;
+    }, this.startTalking = (t) => {
+      if (!(!this.voiceActive || this.talking)) {
+        t.preventDefault();
+        try {
+          t.currentTarget.setPointerCapture(t.pointerId);
+        } catch {
+        }
+        clearTimeout(this.echoTimer), this.cardAction("mute"), this.cardAction("microphone_unmute"), this.talking = !0;
+      }
+    }, this.stopTalking = (t) => {
+      this.talking && (t.preventDefault(), this.cardAction("microphone_mute"), this.talking = !1, this.echoTimer = setTimeout(() => {
+        this.voiceActive && !this.talking && this.cardAction("unmute");
+      }, Ye));
+    }, this.syncEventRoute = () => {
+      const t = new URLSearchParams(location.search), e = t.get("signal_review") || t.get("signal_event") || "", i = t.has("signal_review") ? "review" : "event", s = t.get("signal_camera") || "front_door", a = t.get("signal_instance") || "frigate";
+      (i !== this.eventKind || e !== this.eventId || s !== this.eventCamera || a !== this.eventInstance) && (this.releaseViewers(), this.eventId = e, this.eventCamera = s, this.eventInstance = a, this.eventKind = i, e && this.cameras.includes(`camera.${s}`) && (this.selected = `camera.${s}`));
+    }, this.openEvent = (t) => {
+      const e = new URL(location.href);
+      e.searchParams.delete("signal_event"), e.searchParams.set("signal_review", t.detail.id), e.searchParams.set("signal_camera", t.detail.camera), e.searchParams.set("signal_instance", "frigate"), history.pushState(history.state, "", e), this.syncEventRoute(), this.dispatchEvent(new CustomEvent("signal-camera-navigation", { bubbles: !0, composed: !0 }));
+    }, this.leaveEvent = () => {
+      const t = new URL(location.href);
+      for (const e of ["signal_review", "signal_event", "signal_camera", "signal_instance"]) t.searchParams.delete(e);
+      history.pushState(history.state, "", t), this.syncEventRoute(), this.dispatchEvent(new CustomEvent("signal-camera-navigation", { bubbles: !0, composed: !0 }));
+    }, this.loadViewer = () => {
+      const t = ++this.generation;
+      clearTimeout(this.timer), this.error = "", this.ready = !!customElements.get("advanced-camera-card"), !this.ready && (this.timer = setTimeout(() => {
+        t === this.generation && (this.error = "The camera viewer couldn’t load. Try again or refresh Signal.");
+      }, 1e4), customElements.whenDefined("advanced-camera-card").then(() => {
+        !this.isConnected || t !== this.generation || (clearTimeout(this.timer), this.error = "", this.ready = !0);
+      }));
+    }, this.retry = () => {
+      this.releaseViewers(), this.loadViewer(), this.requestUpdate();
+    };
+  }
+  static {
+    this.properties = {
+      hass: { attribute: !1 },
+      cameras: { attribute: !1 },
+      eventId: { state: !0 },
+      eventCamera: { state: !0 },
+      eventInstance: { state: !0 },
+      eventKind: { state: !0 },
+      selected: { state: !0 },
+      error: { state: !0 },
+      ready: { state: !0 },
+      voiceActive: { state: !0 },
+      talking: { state: !0 }
+    };
+  }
+  static {
+    this.styles = _`
+    :host { display:block; min-width:0; color:var(--ink); }
+    * { box-sizing:border-box; }
+    .event-layout { max-width:900px; margin:0 auto; }
+    .event-toolbar { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:16px; }
+    .event-toolbar button { border:1px solid var(--line); background:var(--surface); color:var(--ink); }
+    .recorded-mode { color:var(--ink); font-size:14px; font-weight:700; }
+    .event-toolbar .live-action { background:var(--mint); color:#172d27; border-color:transparent; }
+    .layout { display:grid; grid-template-columns:minmax(0,1.15fr) minmax(0,1fr); gap:24px; align-items:start; }
+    .camera-panel,.history-panel { min-width:0; border:1px solid var(--line); border-radius:28px; background:var(--surface); overflow:hidden; }
+    .camera-heading { padding:22px 24px 18px; display:flex; align-items:center; justify-content:space-between; gap:16px; }
+    .identity { display:flex; align-items:center; gap:12px; min-width:0; }
+    .camera-icon { display:grid; place-items:center; flex-shrink:0; width:46px; height:46px; border-radius:16px; background:var(--mint); color:#172d27; }
+    svg { width:22px; height:22px; }
+    h2,p { margin:0; }
+    h2 { font-size:20px; letter-spacing:-.6px; line-height:1.3; }
+    .eyebrow { display:block; font-size:10px; font-weight:700; letter-spacing:1.6px; text-transform:uppercase; color:var(--muted); margin-bottom:5px; }
+    .live-label { display:flex; align-items:center; gap:6px; font-size:11px; font-weight:700; white-space:nowrap; }
+    .dot { width:6px; height:6px; border-radius:50%; background:#43886a; }
+    .offline .dot { background:var(--muted); }
+    .viewer { min-width:0; --ha-card-border-radius:0px; --ha-card-border-width:0px; --ha-card-background:var(--surface); --primary-text-color:var(--ink); --secondary-text-color:var(--muted); --card-background-color:var(--surface); }
+    .live-viewer { background:#17231d; }
+    .voice-controls { display:grid; grid-template-columns:1fr 1.25fr; gap:10px; padding:14px 18px; border-top:1px solid var(--line); background:var(--surface); }
+    .voice-controls button { display:flex; align-items:center; justify-content:center; gap:9px; min-height:52px; padding:12px 14px; border:1px solid var(--line); border-radius:15px; background:var(--surface); color:var(--ink); font-weight:700; touch-action:none; user-select:none; -webkit-touch-callout:none; }
+    .voice-controls button svg { width:19px; height:19px; }
+    .voice-controls .session.active { background:#fee6e2; border-color:#e8b7ae; color:#802f28; }
+    .voice-controls .push { background:var(--mint); border-color:transparent; color:#172d27; }
+    .voice-controls .push.talking { background:#246b52; color:white; transform:scale(.985); }
+    .voice-controls button:disabled { opacity:.48; cursor:not-allowed; }
+    .voice-status { grid-column:1/-1; min-height:18px; margin:0; text-align:center; color:var(--muted); font-size:12px; }
+    .talk-help { padding:12px 24px 16px; color:var(--muted); font-size:12px; line-height:1.5; border-top:1px solid var(--line); }
+    signal-camera-grid { display:block; padding:22px; }
+    nav { display:flex; gap:4px; padding:4px; margin:18px 0 0; border-radius:14px; background:color-mix(in srgb,var(--line) 38%,transparent); }
+    button { font:inherit; font-size:13px; color:var(--muted); background:transparent; border:0; border-radius:11px; padding:11px 12px; min-height:44px; cursor:pointer; }
+    nav button { flex:1; }
+    button[aria-pressed="true"] { background:var(--surface); color:var(--ink); box-shadow:0 2px 6px #00000008; }
+    button:focus-visible,select:focus-visible { outline:2px solid var(--ink); outline-offset:3px; }
+    .selector { margin-bottom:20px; display:flex; align-items:center; gap:12px; color:var(--muted); font-size:13px; }
+    select { font:inherit; font-size:16px; border:1px solid var(--line); border-radius:12px; padding:10px 14px; background:var(--surface); color:var(--ink); max-width:100%; }
+    .notice { padding:24px; background:var(--surface); border:1px solid var(--line); border-radius:20px; line-height:1.6; }
+    .notice p { margin-bottom:10px; }
+    @media(max-width:1000px) { .layout { grid-template-columns:1fr; gap:22px; } }
+    @media(max-width:480px) { .camera-heading { padding:18px; } signal-camera-grid { padding:16px; } .camera-panel,.history-panel { border-radius:22px; } .talk-help { padding:12px 18px 16px; } h2 { font-size:18px; } .camera-icon { width:40px; height:40px; border-radius:13px; } }
+  `;
+  }
+  connectedCallback() {
+    super.connectedCallback(), this.syncEventRoute(), this.loadViewer();
+    for (const t of ["popstate", "hashchange", "location-changed"]) window.addEventListener(t, this.syncEventRoute);
+  }
+  disconnectedCallback() {
+    super.disconnectedCallback(), this.generation++, clearTimeout(this.timer), this.releaseViewers();
+    for (const t of ["popstate", "hashchange", "location-changed"]) window.removeEventListener(t, this.syncEventRoute);
+  }
+  cardAction(t) {
+    this.liveCard?.dispatchEvent(new CustomEvent("ll-custom", { detail: { action: "fire-dom-event", advanced_camera_card_action: t }, bubbles: !0, composed: !0 }));
+  }
+  stopVoice() {
+    clearTimeout(this.echoTimer), this.talking && this.cardAction("microphone_mute"), this.voiceActive && this.cardAction("call_end"), this.talking = !1, this.voiceActive = !1;
+  }
+  releaseViewers() {
+    this.stopVoice(), this.liveCard = void 0, this.liveSignature = "";
+  }
+  createViewer() {
+    const t = document.createElement("advanced-camera-card");
+    t.hass = this.hass;
+    const e = this.selected === "camera.front_door" && window.isSecureContext, i = Object.fromEntries(["iris", "live", "clips", "reviews", "recordings", "timeline", "mute", "fullscreen", "call", "microphone", "camera_ui", "cameras", "display_mode", "download", "folders", "gallery", "info", "media_player", "set_review", "substreams"].map((a) => [a, { enabled: a === "mute" || a === "fullscreen" }])), s = [{ camera_entity: this.selected, live_provider: "go2rtc", engine: "frigate", go2rtc: { modes: ["webrtc", "mse"], ...this.selected === "camera.front_door" ? { stream: "front_door" } : {} }, ...e ? { capabilities: { force: ["2-way-audio"] } } : {} }];
+    return t.setConfig({
+      type: "custom:advanced-camera-card",
+      cameras: s,
+      view: { default: "live", theme: { overrides: {
+        "--advanced-camera-card-menu-override-background": "var(--surface)",
+        "--advanced-camera-card-menu-override-button-inactive-color": "var(--muted)",
+        "--advanced-camera-card-menu-override-button-background": "transparent",
+        "--advanced-camera-card-background": "var(--surface)",
+        "--advanced-camera-card-text-color": "var(--ink)",
+        "--advanced-camera-card-timeline-tool-color": "var(--ink)",
+        "--advanced-camera-card-divider-color": "var(--line)"
+      } } },
+      live: { auto_play: ["selected", "visible"], auto_pause: ["unselected", "hidden"], auto_mute: ["unselected", "hidden", ...e ? ["call"] : []], auto_unmute: e ? ["call"] : [], microphone: e ? { auto_unmute: [] } : void 0, draggable: !1, controls: { builtin: !0, call: { enabled: !1, lock: !1 }, wheel: !1, next_previous: { style: "none" }, timeline: { mode: "none" }, thumbnails: { mode: "none" } } },
+      menu: { style: "outside", position: "bottom", auto_hide: [], buttons: i }
+    }), t;
+  }
+  willUpdate(t) {
+    if (this.cameras.includes(this.selected) || (this.selected = this.cameras[0] || ""), (this.connection !== this.hass?.connection || this.user !== this.hass?.user?.id) && (this.releaseViewers(), this.connection = this.hass?.connection, this.user = this.hass?.user?.id), this.eventId) {
+      this.releaseViewers();
+      return;
+    }
+    if (!(!this.ready || !this.selected || !this.hass))
+      try {
+        (this.liveSignature !== this.selected || !this.liveCard) && (this.liveCard = this.createViewer(), this.liveSignature = this.selected), this.liveCard && (this.liveCard.hass = this.hass), this.error = "";
+      } catch {
+        this.releaseViewers(), this.error = "The camera viewer couldn’t open. Try again.";
+      }
+  }
+  name(t) {
+    return this.hass?.states[t]?.attributes.friendly_name || t.replace(/^camera\./, "").replaceAll("_", " ");
+  }
+  render() {
+    if (!this.cameras.length) return r`<div class="notice"><p>No cameras added yet.</p>Select your Frigate cameras in Signal’s editor to see them here.</div>`;
+    if (this.eventId) return r`<div class="event-layout"><nav class="event-toolbar" aria-label="Event navigation"><span class="recorded-mode">Recorded event</span><button class="live-action" aria-label="Back to live & events" @click=${this.leaveEvent}>← Back to live & events</button></nav>${this.cameras.includes(`camera.${this.eventCamera}`) ? r`<signal-camera-event .hass=${this.hass} .eventId=${this.eventId} .kind=${this.eventKind} .camera=${this.eventCamera} .instance=${this.eventInstance}></signal-camera-event>` : r`<div class="notice" role="alert">This camera isn’t available on this dashboard.</div>`}</div>`;
+    if (this.error) return r`<div class="notice" role="alert"><p>${this.error}</p><button @click=${this.retry}>Retry camera viewer</button></div>`;
+    const t = this.hass?.states[this.selected]?.state, e = !t || ["unavailable", "unknown"].includes(t);
+    return r`
+      ${this.cameras.length > 1 ? r`<label class="selector">Camera<select aria-label="Camera" .value=${this.selected} @change=${(i) => {
+      this.selected = i.target.value;
+    }}>${this.cameras.map((i) => r`<option value=${i}>${this.name(i)}</option>`)}</select></label>` : ""}
+      <div class="layout">
+        <section class="camera-panel" aria-label="Live camera">
+          <div class="camera-heading"><div class="identity"><span class="camera-icon">${f("camera")}</span><div><h2>${this.name(this.selected)}</h2></div></div><span class="live-label ${e ? "offline" : ""}"><span class="dot"></span>${e ? "Unavailable" : "LIVE · Now"}</span></div>
+          <div class="viewer live-viewer">${this.liveCard || r`<div class="notice" role="status">Connecting to camera…</div>`}</div>
+          ${this.selected === "camera.front_door" ? window.isSecureContext ? r`
+            <div class="voice-controls" role="group" aria-label="Doorbell voice controls">
+              <button class="session ${this.voiceActive ? "active" : ""}" aria-pressed=${this.voiceActive} @click=${this.toggleVoice}>${f("phone")} ${this.voiceActive ? "End voice" : "Start voice"}</button>
+              <button class="push ${this.talking ? "talking" : ""}" ?disabled=${!this.voiceActive} @pointerdown=${this.startTalking} @pointerup=${this.stopTalking} @pointercancel=${this.stopTalking} @lostpointercapture=${this.stopTalking}>${f("microphone")} ${this.talking ? "Speaking…" : "Hold to talk"}</button>
+              <p class="voice-status" role="status">${this.voiceActive ? this.talking ? "Your microphone is live" : "Voice connected · hold to speak" : "Start voice, then hold to talk"}</p>
+            </div>` : r`<p class="talk-help" role="note">Doorbell talk needs a secure HTTPS connection. Open Signal through your Home Assistant Cloud address to use the microphone.</p>` : ""}
+        </section>
+        <section class="history-panel" aria-label="Camera history">
+          <signal-camera-grid .hass=${this.hass} .camera=${this.selected.replace(/^camera\./, "")} @signal-open-event=${this.openEvent}></signal-camera-grid>
+        </section>
+      </div>`;
+  }
+}
+customElements.get("signal-cameras") || customElements.define("signal-cameras", Ke);
+const Ht = _`
   :host {
     display: block;
     height: 100%;
@@ -3018,7 +3391,7 @@ const ut = S`
     }
   }
 `;
-class $e extends A {
+class Je extends S {
   constructor() {
     super(...arguments), this.open = !1, this.heading = "Details", this.dark = !1, this.compact = !1, this.sheetId = `signal-sheet-${Date.now()}-${Math.random().toString(36).slice(2)}`, this.closing = !1, this.closeRequested = !1, this.startY = 0, this.entryTransform = "translateY(12px)", this.mobileSheet = !1, this.motionSequence = 0, this.pop = () => {
       this.open && history.state?.signalSheet !== this.sheetId && this.finish();
@@ -3034,7 +3407,7 @@ class $e extends A {
   }
   static {
     this.styles = [
-      S`
+      _`
       :host {
         font-family: var(--signal-font, system-ui, sans-serif);
       }
@@ -3161,31 +3534,31 @@ class $e extends A {
         }
       }
     `,
-      Q
+      bt
     ];
   }
   cancelMotion() {
     this.motionSequence++, this.entryAnimation?.cancel(), this.backdropAnimation?.cancel(), this.exitAnimation?.cancel();
   }
-  fadeBackdrop(t, e, i, s, n) {
+  fadeBackdrop(t, e, i, s, a) {
     this.backdropAnimation?.cancel(), this.backdropAnimation = t.animate(
       [{ opacity: e }, { opacity: i }],
       {
         pseudoElement: "::backdrop",
         duration: s,
-        easing: n,
+        easing: a,
         fill: "both"
       }
     );
   }
   trapTab(t) {
     if (t.key !== "Tab") return;
-    const e = [], i = (a) => {
-      a instanceof HTMLElement && a.matches("button,a[href],input,select,textarea,[tabindex]") && !a.matches(':disabled,[tabindex="-1"],[hidden]') && a.getClientRects().length && e.push(a), (a instanceof HTMLSlotElement ? a.assignedElements({ flatten: !0 }) : a.shadowRoot ? Array.from(a.shadowRoot.children) : Array.from(a.children)).forEach(i);
+    const e = [], i = (o) => {
+      o instanceof HTMLElement && o.matches("button,a[href],input,select,textarea,[tabindex]") && !o.matches(':disabled,[tabindex="-1"],[hidden]') && o.getClientRects().length && e.push(o), (o instanceof HTMLSlotElement ? o.assignedElements({ flatten: !0 }) : o.shadowRoot ? Array.from(o.shadowRoot.children) : Array.from(o.children)).forEach(i);
     };
     if (i(this.renderRoot.querySelector("dialog")), !e.length) return;
-    const s = t.composedPath()[0], n = e.indexOf(s);
-    t.shiftKey && n <= 0 ? (t.preventDefault(), e.at(-1).focus()) : !t.shiftKey && (n === e.length - 1 || n === -1) && (t.preventDefault(), e[0].focus());
+    const s = t.composedPath()[0], a = e.indexOf(s);
+    t.shiftKey && a <= 0 ? (t.preventDefault(), e.at(-1).focus()) : !t.shiftKey && (a === e.length - 1 || a === -1) && (t.preventDefault(), e[0].focus());
   }
   connectedCallback() {
     super.connectedCallback(), window.addEventListener("popstate", this.pop);
@@ -3214,8 +3587,8 @@ class $e extends A {
         if (matchMedia("(prefers-reduced-motion: reduce)").matches)
           s();
         else {
-          const n = "cubic-bezier(.2,.8,.2,1)";
-          this.fadeBackdrop(e, "0", "1", 280, n), this.entryAnimation = e.animate(
+          const a = "cubic-bezier(.2,.8,.2,1)";
+          this.fadeBackdrop(e, "0", "1", 280, a), this.entryAnimation = e.animate(
             [
               {
                 opacity: this.mobileSheet ? 1 : 0,
@@ -3223,7 +3596,7 @@ class $e extends A {
               },
               { opacity: 1, transform: "none" }
             ],
-            { duration: 280, easing: n }
+            { duration: 280, easing: a }
           ), this.entryAnimation.finished.then(s, () => {
           });
         }
@@ -3236,19 +3609,19 @@ class $e extends A {
   async finish() {
     if (this.closing) return;
     this.closing = !0;
-    const t = this.renderRoot.querySelector("dialog"), e = getComputedStyle(t), i = { opacity: e.opacity, transform: e.transform }, s = getComputedStyle(t, "::backdrop").opacity, n = ++this.motionSequence;
+    const t = this.renderRoot.querySelector("dialog"), e = getComputedStyle(t), i = { opacity: e.opacity, transform: e.transform }, s = getComputedStyle(t, "::backdrop").opacity, a = ++this.motionSequence;
     if (this.entryAnimation?.cancel(), t.open && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      const a = "cubic-bezier(.4,0,1,1)";
-      this.fadeBackdrop(t, s, "0", 200, a), this.exitAnimation = t.animate(
+      const o = "cubic-bezier(.4,0,1,1)";
+      this.fadeBackdrop(t, s, "0", 200, o), this.exitAnimation = t.animate(
         [
           i,
           { opacity: this.mobileSheet ? 1 : 0, transform: this.entryTransform }
         ],
-        { duration: 200, easing: a, fill: "both" }
+        { duration: 200, easing: o, fill: "both" }
       ), await this.exitAnimation.finished.catch(() => {
       });
     }
-    n !== this.motionSequence || !this.isConnected || (t.close(), this.cancelMotion(), this.closing = !1, this.dispatchEvent(
+    a !== this.motionSequence || !this.isConnected || (t.close(), this.cancelMotion(), this.closing = !1, this.dispatchEvent(
       new CustomEvent("signal-close", { bubbles: !0, composed: !0 })
     ));
   }
@@ -3276,15 +3649,15 @@ class $e extends A {
         <span class="handle" aria-hidden="true"></span>
         <h2 id="sheet-heading">${this.heading}</h2>
         <button aria-label="Close details" @click=${() => this.requestClose()}>
-          ${g("close")}
+          ${f("close")}
         </button>
       </header>
       <div class="body"><slot></slot></div>
     </dialog>`;
   }
 }
-customElements.define("signal-sheet", $e);
-class we extends A {
+customElements.define("signal-sheet", Je);
+class Ge extends S {
   constructor() {
     super(...arguments), this.entity = "", this.dark = !1, this.name = "", this.custom = !1, this.battery = "", this.advanced = !1, this.records = [], this.loading = !1, this.loadError = "", this.sequence = 0;
   }
@@ -3302,7 +3675,7 @@ class we extends A {
     };
   }
   static {
-    this.styles = S`
+    this.styles = _`
     :host {
       display: block;
     }
@@ -3428,14 +3801,14 @@ class we extends A {
     this.loading = !0, this.loadError = "";
     try {
       if (e === "weather") {
-        const s = y(this.hass.states[t]?.attributes.supported_features) || 0, n = s & 1 ? "daily" : s & 2 ? "hourly" : s & 4 ? "twice_daily" : "daily", a = await this.hass.callWS({
+        const s = w(this.hass.states[t]?.attributes.supported_features) || 0, a = s & 1 ? "daily" : s & 2 ? "hourly" : s & 4 ? "twice_daily" : "daily", o = await this.hass.callWS({
           type: "call_service",
           domain: "weather",
           service: "get_forecasts",
-          service_data: { entity_id: t, type: n },
+          service_data: { entity_id: t, type: a },
           return_response: !0
         });
-        i === this.sequence && (this.records = (a.response?.[t]?.forecast || []).slice(
+        i === this.sequence && (this.records = (o.response?.[t]?.forecast || []).slice(
           0,
           7
         ));
@@ -3450,7 +3823,7 @@ class we extends A {
           significant_changes_only: !0
         });
         i === this.sequence && (this.records = (s[t] || []).filter(
-          (n, a, d) => a === 0 || (n.s ?? n.state) !== (d[a - 1].s ?? d[a - 1].state)
+          (a, o, c) => o === 0 || (a.s ?? a.state) !== (c[o - 1].s ?? c[o - 1].state)
         ).slice(-10).reverse());
       }
     } catch {
@@ -3461,7 +3834,7 @@ class we extends A {
   }
   historyLabel(t) {
     const e = this.hass.states[this.entity]?.attributes.device_class === "moisture";
-    return t === "on" ? e ? "Water detected" : "Active" : t === "off" ? e ? "Dry" : "Clear" : k(t);
+    return t === "on" ? e ? "Water detected" : "Active" : t === "off" ? e ? "Dry" : "Clear" : D(t);
   }
   native() {
     this.advanced = !0, this.renderRoot.querySelector("signal-sheet").requestClose();
@@ -3480,7 +3853,7 @@ class we extends A {
     ));
   }
   render() {
-    const t = this.hass?.states[this.entity], e = t?.attributes || {}, i = this.entity.split(".")[0], s = $(t), n = i === "binary_sensor", a = e.device_class === "moisture", d = s ? n ? t.state === "on" ? a ? "Water detected" : "Active" : a ? "Dry" : "Clear" : k(t.state) : "Unavailable", l = [
+    const t = this.hass?.states[this.entity], e = t?.attributes || {}, i = this.entity.split(".")[0], s = $(t), a = i === "binary_sensor", o = e.device_class === "moisture", c = s ? a ? t.state === "on" ? o ? "Water detected" : "Active" : o ? "Dry" : "Clear" : D(t.state) : "Unavailable", l = [
       "light",
       "switch",
       "fan",
@@ -3496,7 +3869,7 @@ class we extends A {
       "select",
       "input_select",
       "lock"
-    ].includes(i), p = i === "sensor" && (y(t?.state) !== void 0 || !!e.unit_of_measurement), u = this.hass?.states[this.battery];
+    ].includes(i), d = i === "sensor" && (w(t?.state) !== void 0 || !!e.unit_of_measurement), u = this.hass?.states[this.battery];
     return r`<signal-sheet
       .open=${!!this.entity}
       .heading=${this.name || e.friendly_name || "Device details"}
@@ -3507,20 +3880,20 @@ class we extends A {
                   .hass=${this.hass}
                   .configuration=${{ type: "custom:signal-control", entity: this.entity, name: this.name || void 0, appearance: this.dark ? "dark" : "light", detail: !0 }}
                 ></signal-control>` : r`<div
-                    class=${`summary ${s ? n && t.state === "on" ? "alert" : "" : "unavailable"}`}
+                    class=${`summary ${s ? a && t.state === "on" ? "alert" : "" : "unavailable"}`}
                   >
                     <div class="caption">
-                      ${n ? "LIVE SENSOR STATUS" : "CURRENT READING"}
+                      ${a ? "LIVE SENSOR STATUS" : "CURRENT READING"}
                     </div>
                     <div class="value">
-                      ${p ? s ? t.state : "—" : d}
-                      ${p && e.unit_of_measurement || ""}
+                      ${d ? s ? t.state : "—" : c}
+                      ${d && e.unit_of_measurement || ""}
                     </div>
                     <div class="caption">
-                      ${s ? n && t.state === "on" ? "Check this area. Open advanced details for more information." : "Reported by Home Assistant" : "This device cannot currently confirm its state."}
+                      ${s ? a && t.state === "on" ? "Check this area. Open advanced details for more information." : "Reported by Home Assistant" : "This device cannot currently confirm its state."}
                     </div>
                   </div>
-                  ${u ? r`<div class="fact"><span>Battery</span>${$(u) ? u.state + "%" : "Unavailable"}</div>` : h}${p ? r`<signal-graph .hass=${this.hass} .configuration=${{ type: "custom:signal-graph", entity: this.entity, appearance: this.dark ? "dark" : "light" }}></signal-graph>` : h}${!l && !n && !p ? r`<p class="hint">Additional controls for this device are available in advanced details.</p>` : h}`}
+                  ${u ? r`<div class="fact"><span>Battery</span>${$(u) ? u.state + "%" : "Unavailable"}</div>` : p}${d ? r`<signal-graph .hass=${this.hass} .configuration=${{ type: "custom:signal-graph", entity: this.entity, appearance: this.dark ? "dark" : "light" }}></signal-graph>` : p}${!l && !a && !d ? r`<p class="hint">Additional controls for this device are available in advanced details.</p>` : p}`}
         ${["weather", "binary_sensor"].includes(i) ? r`<section class="records">
                 <h3>
                   ${i === "weather" ? "The days ahead" : "Recent history · 24 hours"}
@@ -3528,22 +3901,22 @@ class we extends A {
                 ${this.loading ? r`<p class="hint" role="status">Loading…</p>` : this.loadError ? r`<p class="hint" role="status">${this.loadError}</p>
                           <button class="retry" @click=${this.load}>
                             Try again
-                          </button>` : this.records.length ? this.records.map((c) => {
-      const m = c.datetime ?? c.lu ?? c.last_updated ?? c.lc ?? c.last_changed, f = new Date(
+                          </button>` : this.records.length ? this.records.map((h) => {
+      const m = h.datetime ?? h.lu ?? h.last_updated ?? h.lc ?? h.last_changed, g = new Date(
         typeof m == "number" ? m * 1e3 : m
       );
       return r`<div class="record">
                               <div>
-                                ${i === "weather" ? f.toLocaleDateString(this.hass.locale?.language, { weekday: "short", month: "short", day: "numeric" }) : this.historyLabel(c.s ?? c.state)}<small
-                                  >${i === "weather" ? k(c.condition) : f.toLocaleString(this.hass.locale?.language, { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })}</small
+                                ${i === "weather" ? g.toLocaleDateString(this.hass.locale?.language, { weekday: "short", month: "short", day: "numeric" }) : this.historyLabel(h.s ?? h.state)}<small
+                                  >${i === "weather" ? D(h.condition) : g.toLocaleString(this.hass.locale?.language, { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })}</small
                                 >
                               </div>
-                              ${i === "weather" ? r`<strong>${y(c.temperature) ?? "—"}° ${c.templow !== void 0 ? r`<small>Low ${c.templow}°</small>` : h}</strong>` : h}
+                              ${i === "weather" ? r`<strong>${w(h.temperature) ?? "—"}° ${h.templow !== void 0 ? r`<small>Low ${h.templow}°</small>` : p}</strong>` : p}
                             </div>`;
     }) : r`<p class="hint">
                             ${i === "weather" ? "No forecast is available from this provider." : "No recorded history in this period."}
                           </p>`}
-              </section>` : h}
+              </section>` : p}
         <button class="advanced" @click=${this.native}>
           Advanced in Home Assistant ↗
         </button>
@@ -3551,8 +3924,8 @@ class we extends A {
     >`;
   }
 }
-customElements.define("signal-details", we);
-class ke extends A {
+customElements.define("signal-details", Ge);
+class Xe extends S {
   constructor() {
     super(...arguments), this.config = { type: "custom:signal-control", entity: "" }, this.pending = !1, this.acknowledged = !1, this.detailsOpen = !1, this.error = "", this.confirmUnlock = !1, this.preview = {};
   }
@@ -3570,8 +3943,8 @@ class ke extends A {
   }
   static {
     this.styles = [
-      ut,
-      S`
+      Ht,
+      _`
       .control-top {
         display: flex;
         justify-content: space-between;
@@ -3590,6 +3963,8 @@ class ke extends A {
           background 0.3s,
           transform 0.4s;
       }
+      .lamp.on { background:color-mix(in srgb,var(--card) 82%,#ffce7b); }
+      .lamp.on .entity-icon { background:#ffdc94; color:#604007; box-shadow:0 0 26px #ffc15e65; }
       .on .entity-icon {
         transform: rotate(-7deg);
       }
@@ -3854,7 +4229,7 @@ class ke extends A {
         }
       }
     `,
-      Q
+      bt
     ];
   }
   disconnectedCallback() {
@@ -3909,9 +4284,9 @@ class ke extends A {
   async send(t, e = {}) {
     if (this.pending || !this.isReady()) return;
     this.pending = !0, this.acknowledged = !1, clearTimeout(this.feedbackTimer), this.error = "";
-    const i = this.config.entity, [s, n] = t.split(".");
+    const i = this.config.entity, [s, a] = t.split(".");
     try {
-      await this.hass.callService(s, n, {
+      await this.hass.callService(s, a, {
         entity_id: i,
         ...e
       }), i === this.config.entity && this.isConnected && (this.confirmUnlock = !1, this.acknowledged = !0, this.feedbackTimer = setTimeout(
@@ -3924,13 +4299,13 @@ class ke extends A {
       this.pending = !1, this.preview = {};
     }
   }
-  slider(t, e, i, s, n, a, d, l, p = !1) {
-    const u = this.preview[e] ?? i, c = n - s, m = u === void 0 || c <= 0 ? 0 : Math.max(0, Math.min(100, (u - s) / c * 100));
+  slider(t, e, i, s, a, o, c, l, d = !1) {
+    const u = this.preview[e] ?? i, h = a - s, m = u === void 0 || h <= 0 ? 0 : Math.max(0, Math.min(100, (u - s) / h * 100));
     return r`<div class="slider-block">
       <div class="slider-heading">
         <span>${t}</span
         ><span class="slider-value"
-          >${u === void 0 ? "—" : Math.round(u * 10) / 10}${d}</span
+          >${u === void 0 ? "—" : Math.round(u * 10) / 10}${c}</span
         >
       </div>
       <input
@@ -3938,76 +4313,76 @@ class ke extends A {
         type="range"
         aria-label=${t}
         min=${s}
-        max=${n}
-        step=${a}
-        .value=${U(String(u ?? s))}
+        max=${a}
+        step=${o}
+        .value=${K(String(u ?? s))}
         style=${`--fill:${m}%`}
-        ?disabled=${p || this.pending}
-        @input=${(f) => this.preview = { ...this.preview, [e]: Number(f.target.value) }}
-        @change=${(f) => l(Math.max(s, Math.min(n, Number(f.target.value))))}
+        ?disabled=${d || this.pending}
+        @input=${(g) => this.preview = { ...this.preview, [e]: Number(g.target.value) }}
+        @change=${(g) => l(Math.max(s, Math.min(a, Number(g.target.value))))}
       />
     </div>`;
   }
   render() {
     if (!this.hass) return r`<div class="widget">Connecting…</div>`;
-    const t = this.hass.states[this.config.entity], e = this.isReady(), i = t?.attributes || {}, s = this.config.entity.split(".")[0], n = t?.state === "on", a = y(i.supported_features) ?? 0, d = ["light", "switch", "fan", "input_boolean"].includes(
+    const t = this.hass.states[this.config.entity], e = this.isReady(), i = t?.attributes || {}, s = this.config.entity.split(".")[0], a = t?.state === "on", o = w(i.supported_features) ?? 0, c = ["light", "switch", "fan", "input_boolean"].includes(
       s
-    ), l = s === "media_player", p = s === "cover", u = s === "light" ? "bulb" : p ? "cover" : l ? "music" : s === "lock" ? "lock" : s === "fan" ? "wind" : "power", c = Array.isArray(i.supported_color_modes) ? i.supported_color_modes : [], m = s === "light" && (i.brightness !== void 0 || c.some((b) => !["onoff", "unknown"].includes(b))), v = "#" + (Array.isArray(i.rgb_color) ? i.rgb_color : [255, 255, 255]).map((b) => Math.round(b).toString(16).padStart(2, "0")).join("");
+    ), l = s === "media_player", d = s === "cover", u = s === "light" || this.config.lamp ? "bulb" : d ? "cover" : l ? "music" : s === "lock" ? "lock" : s === "fan" ? "wind" : "power", h = Array.isArray(i.supported_color_modes) ? i.supported_color_modes : [], m = s === "light" && (i.brightness !== void 0 || h.some((x) => !["onoff", "unknown"].includes(x))), b = "#" + (Array.isArray(i.rgb_color) ? i.rgb_color : [255, 255, 255]).map((x) => Math.round(x).toString(16).padStart(2, "0")).join("");
     return r`<article
-        class=${`widget ${this.config.appearance || "auto"} ${this.config.accent || "mint"} ${n ? "on" : ""} ${this.acknowledged ? "acknowledged" : ""}`}
+        class=${`widget ${this.config.appearance || "auto"} ${this.config.accent || "mint"} ${a ? "on" : ""} ${s === "light" || this.config.lamp ? "lamp" : ""} ${this.acknowledged ? "acknowledged" : ""}`}
         aria-busy=${this.pending}
       >
         <div class="control-top">
-          ${this.config.detail ? r`<span class="entity-icon">${g(u)}</span>` : r`<button
+          ${this.config.detail ? r`<span class="entity-icon">${f(u)}</span>` : r`<button
                   class="entity-icon"
                   aria-label="Device details"
                   @click=${this.more}
                 >
-                  ${g(u)}
+                  ${f(u)}
                 </button>`}
-          ${d ? r`<button class="switch" role="switch" aria-label=${this.config.name || i.friendly_name || this.config.entity} aria-checked=${n} ?disabled=${!e || this.pending} @click=${() => this.send(`${s}.${n ? "turn_off" : "turn_on"}`)}><span class="thumb">${g(n ? "check" : "power")}</span></button>` : this.config.detail ? h : r`<button class="icon-button" aria-label="Open full controls" @click=${this.more}>${g("arrow")}</button>`}
+          ${c ? r`<button class="switch" role="switch" aria-label=${this.config.name || i.friendly_name || this.config.entity} aria-checked=${a} ?disabled=${!e || this.pending} @click=${() => this.send(`${s}.${a ? "turn_off" : "turn_on"}`)}><span class="thumb">${f(a ? "check" : "power")}</span></button>` : this.config.detail ? p : r`<button class="icon-button" aria-label="Open full controls" @click=${this.more}>${f("arrow")}</button>`}
         </div>
         <h2>${this.config.name || i.friendly_name || this.config.entity}</h2>
         <div class="state-line">
           <span class="state-dot"></span
-          >${e ? k(t.state) : "Unavailable"}<span
+          >${e ? D(t.state) : "Unavailable"}<span
             class="command-feedback"
             role="status"
-            >${this.pending ? "Sending…" : this.acknowledged ? r`${g("check")} Sent` : h}</span
+            >${this.pending ? "Sending…" : this.acknowledged ? r`${f("check")} Sent` : p}</span
           >
         </div>
-        ${m ? this.slider("Brightness", "brightness", n ? (y(i.brightness) ?? 0) / 255 * 100 : 0, 0, 100, 1, "%", (b) => this.send(b === 0 ? "light.turn_off" : "light.turn_on", b ? { brightness_pct: Math.round(b) } : {}), !e) : h}
-        ${s === "light" && c.includes("color_temp") && y(i.min_color_temp_kelvin) !== void 0 && y(i.max_color_temp_kelvin) !== void 0 ? this.slider("Color temperature", "kelvin", y(i.color_temp_kelvin), Number(i.min_color_temp_kelvin), Number(i.max_color_temp_kelvin), 50, " K", (b) => this.send("light.turn_on", { color_temp_kelvin: b }), !e) : h}
-        ${s === "light" && c.some(
-      (b) => ["rgb", "rgbw", "rgbww", "hs", "xy"].includes(b)
+        ${m ? this.slider("Brightness", "brightness", a ? (w(i.brightness) ?? 0) / 255 * 100 : 0, 0, 100, 1, "%", (x) => this.send(x === 0 ? "light.turn_off" : "light.turn_on", x ? { brightness_pct: Math.round(x) } : {}), !e) : p}
+        ${s === "light" && h.includes("color_temp") && w(i.min_color_temp_kelvin) !== void 0 && w(i.max_color_temp_kelvin) !== void 0 ? this.slider("Color temperature", "kelvin", w(i.color_temp_kelvin), Number(i.min_color_temp_kelvin), Number(i.max_color_temp_kelvin), 50, " K", (x) => this.send("light.turn_on", { color_temp_kelvin: x }), !e) : p}
+        ${s === "light" && h.some(
+      (x) => ["rgb", "rgbw", "rgbww", "hs", "xy"].includes(x)
     ) ? r`<label class="color-control"
                 >Light color<input
                   type="color"
                   aria-label="Light color"
-                  .value=${U(v)}
+                  .value=${K(b)}
                   ?disabled=${!e || this.pending}
-                  @change=${(b) => {
-      const x = b.target.value;
+                  @change=${(x) => {
+      const C = x.target.value;
       this.send("light.turn_on", {
         rgb_color: [1, 3, 5].map(
-          (w) => parseInt(x.slice(w, w + 2), 16)
+          (y) => parseInt(C.slice(y, y + 2), 16)
         )
       });
     }}
-              /></label>` : h}
-        ${s === "fan" && a & 1 ? this.slider("Fan speed", "speed", y(i.percentage), 0, 100, y(i.percentage_step) || 1, "%", (b) => this.send("fan.set_percentage", { percentage: Math.round(b) }), !e) : h}
-        ${p ? r`<div class="cover-window" aria-hidden="true">
+              /></label>` : p}
+        ${s === "fan" && o & 1 ? this.slider("Fan speed", "speed", w(i.percentage), 0, 100, w(i.percentage_step) || 1, "%", (x) => this.send("fan.set_percentage", { percentage: Math.round(x) }), !e) : p}
+        ${d ? r`<div class="cover-window" aria-hidden="true">
                   <div
                     class="cover-blind"
-                    style=${`--closed:${100 - (y(i.current_position) ?? (t?.state === "closed" ? 0 : 100))}%`}
+                    style=${`--closed:${100 - (w(i.current_position) ?? (t?.state === "closed" ? 0 : 100))}%`}
                   ></div>
                 </div>
                 <div class="button-row">
-                  ${a & 1 ? r`<button class="action" ?disabled=${!e || this.pending} aria-label="Open cover" @click=${() => this.send("cover.open_cover")}>${g("up")}</button>` : h}${a & 8 ? r`<button class="action secondary" ?disabled=${!e || this.pending} aria-label="Stop cover" @click=${() => this.send("cover.stop_cover")}>${g("stop")}</button>` : h}${a & 2 ? r`<button class="action" ?disabled=${!e || this.pending} aria-label="Close cover" @click=${() => this.send("cover.close_cover")}>${g("down")}</button>` : h}
+                  ${o & 1 ? r`<button class="action" ?disabled=${!e || this.pending} aria-label="Open cover" @click=${() => this.send("cover.open_cover")}>${f("up")}</button>` : p}${o & 8 ? r`<button class="action secondary" ?disabled=${!e || this.pending} aria-label="Stop cover" @click=${() => this.send("cover.stop_cover")}>${f("stop")}</button>` : p}${o & 2 ? r`<button class="action" ?disabled=${!e || this.pending} aria-label="Close cover" @click=${() => this.send("cover.close_cover")}>${f("down")}</button>` : p}
                 </div>
-                ${a & 4 ? this.slider("Cover position", "cover", y(i.current_position), 0, 100, 1, "%", (b) => this.send("cover.set_cover_position", { position: Math.round(b) }), !e) : h}` : h}
+                ${o & 4 ? this.slider("Cover position", "cover", w(i.current_position), 0, 100, 1, "%", (x) => this.send("cover.set_cover_position", { position: Math.round(x) }), !e) : p}` : p}
         ${l ? r`<div class="media-meta">
-                  ${i.entity_picture ? r`<img class="art" src=${i.entity_picture} alt="" loading="lazy" />` : h}
+                  ${i.entity_picture ? r`<img class="art" src=${i.entity_picture} alt="" loading="lazy" />` : p}
                   <div>
                     <h2 class="track-title" title=${i.media_title || ""}>
                       ${i.media_title || "Nothing playing"}
@@ -4018,27 +4393,27 @@ class ke extends A {
                   </div>
                 </div>
                 <div class="button-row">
-                  ${a & 16 ? r`<button class="action secondary" aria-label="Previous track" ?disabled=${!e || this.pending} @click=${() => this.send("media_player.media_previous_track")}>${g("previous")}</button>` : h}${a & 16385 ? r`<button class="action" aria-label=${t?.state === "playing" ? "Pause" : "Play"} ?disabled=${!e || this.pending || (t?.state === "playing" ? !(a & 1) : !(a & 16384))} @click=${() => this.send(`media_player.${t?.state === "playing" ? "media_pause" : "media_play"}`)}>${g(t?.state === "playing" ? "pause" : "play")}</button>` : h}${a & 32 ? r`<button class="action secondary" aria-label="Next track" ?disabled=${!e || this.pending} @click=${() => this.send("media_player.media_next_track")}>${g("next")}</button>` : h}
+                  ${o & 16 ? r`<button class="action secondary" aria-label="Previous track" ?disabled=${!e || this.pending} @click=${() => this.send("media_player.media_previous_track")}>${f("previous")}</button>` : p}${o & 16385 ? r`<button class="action" aria-label=${t?.state === "playing" ? "Pause" : "Play"} ?disabled=${!e || this.pending || (t?.state === "playing" ? !(o & 1) : !(o & 16384))} @click=${() => this.send(`media_player.${t?.state === "playing" ? "media_pause" : "media_play"}`)}>${f(t?.state === "playing" ? "pause" : "play")}</button>` : p}${o & 32 ? r`<button class="action secondary" aria-label="Next track" ?disabled=${!e || this.pending} @click=${() => this.send("media_player.media_next_track")}>${f("next")}</button>` : p}
                 </div>
-                ${a & 4 ? this.slider("Volume", "volume", y(i.volume_level) === void 0 ? void 0 : Number(i.volume_level) * 100, 0, 100, 1, "%", (b) => this.send("media_player.volume_set", { volume_level: b / 100 }), !e) : h}` : h}
-        ${["number", "input_number"].includes(s) ? this.slider("Value", "number", y(t?.state), y(i.min) ?? 0, y(i.max) ?? 100, y(i.step) || 1, i.unit_of_measurement || "", (b) => this.send(`${s}.set_value`, { value: b }), !e) : h}
+                ${o & 4 ? this.slider("Volume", "volume", w(i.volume_level) === void 0 ? void 0 : Number(i.volume_level) * 100, 0, 100, 1, "%", (x) => this.send("media_player.volume_set", { volume_level: x / 100 }), !e) : p}` : p}
+        ${["number", "input_number"].includes(s) ? this.slider("Value", "number", w(t?.state), w(i.min) ?? 0, w(i.max) ?? 100, w(i.step) || 1, i.unit_of_measurement || "", (x) => this.send(`${s}.set_value`, { value: x }), !e) : p}
         ${["select", "input_select"].includes(s) ? r`<select
                 class="select"
                 aria-label=${this.config.name || i.friendly_name || "Option"}
-                .value=${U(t?.state || "")}
+                .value=${K(t?.state || "")}
                 ?disabled=${!e || this.pending}
-                @change=${(b) => this.send(`${s}.select_option`, { option: b.target.value })}
+                @change=${(x) => this.send(`${s}.select_option`, { option: x.target.value })}
               >
-                ${(i.options || []).map((b) => r`<option value=${b} .selected=${U(t?.state === b)}>${b}</option>`)}
-              </select>` : h}
-        ${["scene", "button", "input_button", "script"].includes(s) ? r`<div class="button-row"><button class="action" ?disabled=${!e || this.pending} @click=${() => this.send(`${s}.${s.includes("button") ? "press" : "turn_on"}`)}>${g("play")} ${s.includes("button") ? "Press" : s === "scene" ? "Activate" : "Run"}</button></div>` : h}
+                ${(i.options || []).map((x) => r`<option value=${x} .selected=${K(t?.state === x)}>${x}</option>`)}
+              </select>` : p}
+        ${["scene", "button", "input_button", "script"].includes(s) ? r`<div class="button-row"><button class="action" ?disabled=${!e || this.pending} @click=${() => this.send(`${s}.${s.includes("button") ? "press" : "turn_on"}`)}>${f("play")} ${s.includes("button") ? "Press" : s === "scene" ? "Activate" : "Run"}</button></div>` : p}
         ${s === "lock" ? r`<div class="button-row">
                   <button
                     class="action"
                     ?disabled=${!e || this.pending}
                     @click=${() => t.state === "locked" ? this.confirmUnlock = !0 : this.send("lock.lock")}
                   >
-                    ${g("lock")}
+                    ${f("lock")}
                     ${t?.state === "locked" ? "Unlock…" : "Lock"}
                   </button>
                 </div>
@@ -4061,32 +4436,1270 @@ class ke extends A {
                             Unlock
                           </button>
                         </div>
-                      </div>` : h}` : h}
-        ${this.error ? r`<p class="error" role="alert">${this.error}</p>` : h}
+                      </div>` : p}` : p}
+        ${this.error ? r`<p class="error" role="alert">${this.error}</p>` : p}
       </article>
-      ${this.config.detail ? h : r`<signal-details .hass=${this.hass} .entity=${this.detailsOpen ? this.config.entity : ""} .name=${this.config.name || ""} .dark=${this.config.appearance === "dark" || this.config.appearance !== "light" && matchMedia("(prefers-color-scheme: dark)").matches} @signal-close=${() => this.detailsOpen = !1}></signal-details>`}`;
+      ${this.config.detail ? p : r`<signal-details .hass=${this.hass} .entity=${this.detailsOpen ? this.config.entity : ""} .name=${this.config.name || ""} .dark=${this.config.appearance === "dark" || this.config.appearance !== "light" && matchMedia("(prefers-color-scheme: dark)").matches} @signal-close=${() => this.detailsOpen = !1}></signal-details>`}`;
   }
 }
-customElements.define("signal-control", ke);
-function _e(o) {
-  return o.map((t) => {
+customElements.define("signal-control", Xe);
+function he(n, t = Date.now()) {
+  if (!$(n)) return;
+  const e = Date.parse(String(n.attributes.next_change_at || ""));
+  if (!Number.isFinite(e) || e <= t) return;
+  const i = n.state.trim();
+  return i && i !== "none" ? i : void 0;
+}
+class Qe extends S {
+  constructor() {
+    super(...arguments), this.rooms = [], this.dark = !1, this.selected = "", this.pending = !1, this.error = "";
+  }
+  static {
+    this.properties = {
+      hass: { attribute: !1 },
+      rooms: { attribute: !1 },
+      dark: { type: Boolean },
+      selected: { state: !0 },
+      pending: { state: !0 },
+      error: { state: !0 }
+    };
+  }
+  static {
+    this.styles = _`
+    :host {
+      display: block;
+      color: var(--ink);
+    }
+    * {
+      box-sizing: border-box;
+    }
+    svg {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+    }
+    button {
+      font: inherit;
+      color: inherit;
+      cursor: pointer;
+    }
+    button:disabled {
+      cursor: default;
+      opacity: 0.5;
+    }
+    button:focus-visible {
+      outline: 3px solid var(--ink);
+      outline-offset: 4px;
+    }
+    .rooms,
+    .individual {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+      gap: 18px;
+    }
+    .room {
+      position: relative;
+      border: 1px solid var(--line);
+      background: var(--surface);
+      padding: 0;
+      border-radius: 28px;
+      transition:
+        background 0.3s,
+        box-shadow 0.3s;
+    }
+    .room.on {
+      background: color-mix(in srgb, var(--surface) 80%, #ffc56b);
+      box-shadow: inset 0 0 45px #ffc56b18;
+    }
+    .room-open {
+      display: block;
+      width: 100%;
+      text-align: left;
+      padding: 24px;
+      background: transparent;
+      border: 0;
+      border-radius: 28px;
+      min-height: 180px;
+    }
+    .room-open h2 {
+      padding-right: 72px;
+    }
+    .room-open .hint {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 18px;
+    }
+    .room > .switch {
+      position: absolute;
+      right: 24px;
+      top: 34px;
+    }
+    .room-detail {
+      padding: 24px;
+    }
+    .top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+    .bulb {
+      display: grid;
+      place-items: center;
+      width: 68px;
+      height: 68px;
+      border-radius: 24px;
+      background: var(--line);
+      color: var(--muted);
+      transition:
+        background 0.3s,
+        box-shadow 0.3s;
+    }
+    .on .bulb {
+      background: #ffdc94;
+      color: #604007;
+      box-shadow: 0 0 30px #ffc15e65;
+    }
+    .bulb svg {
+      width: 36px;
+      height: 36px;
+    }
+    h2 {
+      font-size: 24px;
+      margin: 20px 0 6px;
+    }
+    p {
+      color: var(--muted);
+      line-height: 1.5;
+    }
+    .switch {
+      width: 76px;
+      height: 44px;
+      border: 0;
+      background: var(--line);
+      border-radius: 30px;
+      padding: 5px;
+    }
+    .switch span {
+      display: block;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: var(--surface);
+      box-shadow: 0 2px 5px #0002;
+      transition: transform 0.25s;
+    }
+    .switch[aria-checked="true"] {
+      background: #d6a240;
+    }
+    .switch[aria-checked="true"] span {
+      transform: translateX(32px);
+    }
+    .details,
+    .back,
+    .scene {
+      min-height: 44px;
+      border: 1px solid var(--line);
+      border-radius: 15px;
+      padding: 12px 16px;
+      background: var(--surface);
+      display: inline-flex;
+      gap: 10px;
+      align-items: center;
+    }
+    .details {
+      width: 100%;
+      justify-content: space-between;
+      margin-top: 12px;
+    }
+    .back {
+      margin-bottom: 18px;
+    }
+    .scenes {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin: 16px 0 24px;
+    }
+    .note {
+      font-size: 14px;
+    }
+    .error {
+      color: var(--danger, #b33b36);
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        transition: none !important;
+      }
+    }
+  `;
+  }
+  async run(t) {
+    if (!this.pending) {
+      this.pending = !0, this.error = "";
+      try {
+        await this.hass.callService(t.split(".")[0], "turn_on", {
+          entity_id: t
+        });
+      } catch {
+        this.error = "That didn’t go through. Try again.";
+      } finally {
+        this.pending = !1;
+      }
+    }
+  }
+  note(t) {
+    const e = he(
+      this.hass.states[t.automation_note_entity || ""]
+    );
+    return e ? r`<p class="note">${e}</p>` : p;
+  }
+  roomCard(t, e = !1) {
+    const i = t.entities.map((h) => this.hass.states[h]), s = i.filter((h) => h?.state === "on").length, a = i.filter((h) => !$(h)).length, o = a === i.length ? "Unavailable" : s ? `${s} of ${i.length} on` : a ? "Available lights off" : "All off", c = s ? t.off_script : t.on_script, l = r`<button
+      class="switch"
+      role="switch"
+      aria-label=${`${t.name} lights`}
+      aria-checked=${s > 0}
+      ?disabled=${this.pending || a === i.length || !$(this.hass.states[c]) || this.hass.connection?.connected === !1}
+      @click=${() => this.run(c)}
+    >
+      <span></span>
+    </button>`, d = r`<div class="bulb" aria-hidden="true">
+      ${f("bulb")}
+    </div>`, u = r`<h2>${t.name}</h2>
+      <p role="status">
+        ${o}${a && a !== i.length ? ` · ${a} unavailable` : ""}${this.pending ? " · Sending…" : ""}
+      </p>
+      ${this.note(t)}`;
+    return e ? r`<article
+          class=${`room room-detail ${s ? "on" : ""}`}
+          aria-busy=${this.pending}
+        >
+          <div class="top">${d}${l}</div>
+          ${u}
+        </article>` : r`<article
+          class=${`room ${s ? "on" : ""}`}
+          aria-busy=${this.pending}
+        >
+          <button
+            class="room-open"
+            aria-label=${`Open ${t.name}`}
+            @click=${() => {
+      this.selected = t.id, this.error = "";
+    }}
+          >
+            ${d}${u}<span class="hint"
+              >Lights${t.scenes?.length ? " & scenes" : ""}
+              ${f("arrow")}</span
+            ></button
+          >${l}
+        </article>`;
+  }
+  render() {
+    if (!this.hass) return p;
+    const t = this.rooms.find((e) => e.id === this.selected);
+    return r`${t ? r`<button
+              class="back"
+              @click=${() => {
+      this.selected = "", this.error = "";
+    }}
+            >
+              ← All lighting</button
+            >${this.roomCard(t, !0)}
+            ${t.scenes?.length ? r`<h2>Scenes</h2>
+                    <div class="scenes">
+                      ${t.scenes.map((e) => r`<button class="scene" ?disabled=${this.pending || !this.hass.states[e.entity] || this.hass.states[e.entity].state === "unavailable"} @click=${() => this.run(e.entity)}>${f("play")} ${e.name}</button>`)}
+                    </div>` : p}
+            <h2>Individual lights</h2>
+            <div class="individual">
+              ${t.entities.map((e) => r`<signal-control .hass=${this.hass} .configuration=${{ type: "custom:signal-control", entity: e, name: this.hass.states[e]?.attributes.friendly_name?.replace(/ \(Smart Outlet\)$/, ""), appearance: this.dark ? "dark" : "light", accent: "apricot", lamp: !0 }}></signal-control>`)}
+            </div>` : r`<div class="rooms">
+              ${this.rooms.map((e) => this.roomCard(e))}
+            </div>
+            ${this.rooms.length ? p : r`<p>No rooms configured yet.</p>`}`}
+    ${this.error ? r`<p class="error" role="alert">${this.error}</p>` : p}`;
+  }
+}
+customElements.define("signal-lights", Qe);
+const it = (n) => {
+  const t = n.map((e) => e?.last_reported || e?.last_updated).filter((e) => !!e && Number.isFinite(Date.parse(e)));
+  return t.length === n.length && t.length ? t.sort((e, i) => Date.parse(e) - Date.parse(i))[0] : void 0;
+}, ti = (n, t) => n?.attributes.friendly_name || t;
+function ei(n, t, e, i = /* @__PURE__ */ new Date()) {
+  const s = n.states, a = (t.sensors || []).map(Et).map((v) => ({
+    id: v.entity,
+    name: v.name || ti(s[v.entity], v.entity),
+    e: s[v.entity],
+    unverified: !!v.unverified
+  })), o = a.filter(
+    (v) => ["door", "window", "opening", "garage_door"].includes(
+      v.e?.attributes.device_class
+    ) || v.id.startsWith("lock.")
+  ), c = a.filter(
+    (v) => v.e?.attributes.device_class === "moisture"
+  ), l = a.filter(
+    (v) => !o.includes(v) && !c.includes(v)
+  ), d = [], u = (v, A, z, O, L, wt) => {
+    const N = z.filter((k) => !$(k.e)), P = z.filter(
+      (k) => k.id.startsWith("lock.") ? $(k.e) && k.e.state !== "locked" : k.e?.state === "on"
+    ), $t = P.map(
+      (k) => `${k.name} ${v === "water" ? "reports water" : k.id.startsWith("lock.") ? k.e.state : v === "doors" ? "open" : "active"}`
+    ).join("; "), kt = N.map((k) => `${k.name} offline`).join("; "), R = z.filter((k) => k.unverified && $(k.e) && !P.includes(k)), ue = R.length ? `${R.map((k) => k.name).join(" and ")} ${R.length === 1 ? "needs" : "need"} verification (last reported ${R.every((k) => k.e?.state === "off") ? "closed" : "state only"})` : "";
+    d.push({
+      id: v,
+      label: A,
+      text: [$t, kt, ue].filter(Boolean).join(" · ") || (z.length ? O : L),
+      route: "safety",
+      icon: wt,
+      priority: P.length ? v === "water" ? 100 : 90 : N.length ? 80 : R.length ? 65 : z.length ? 15 : 1,
+      tone: P.length ? "alert" : N.length || R.length ? "notice" : void 0,
+      stamp: it(z.map((k) => k.e)),
+      timeLabel: R.length ? "Last report" : void 0
+    });
+  }, h = o.filter((v) => v.id.startsWith("lock.")), m = o.filter((v) => !v.id.startsWith("lock.")), g = m.some((v) => v.e?.attributes.device_class === "window");
+  u(
+    "doors",
+    "Doors & windows",
+    o,
+    h.length && m.length ? "All monitored doors closed and locks locked" : h.length ? "All monitored locks locked" : g ? "All monitored doors & windows closed" : "All monitored doors closed",
+    "No door or lock sensors connected",
+    "lock"
+  ), u(
+    "water",
+    "Water",
+    c,
+    "All monitored sensors dry",
+    "No water sensors connected",
+    "drop"
+  ), l.length && u(
+    "sensors",
+    "Other sensors",
+    l,
+    "No active sensors",
+    "No sensors connected",
+    "shield"
+  );
+  const b = s[t.home_mode || ""];
+  d.push({
+    id: "mode",
+    label: "Household mode",
+    text: $(b) ? `${b.state} · saved preference` : "Mode unavailable · saved preference",
+    route: "safety",
+    icon: "home",
+    priority: $(b) ? 10 : 45,
+    stamp: it([b])
+  });
+  const x = [
+    ...new Set((t.light_rooms || []).flatMap((v) => v.entities))
+  ], C = x.map((v) => s[v]), y = C.filter((v) => v?.state === "on").length, E = C.filter((v) => !$(v)).length, T = (t.light_rooms || []).filter(
+    (v) => v.entities.some((A) => s[A]?.state === "on")
+  ), H = ut(i, n.config?.time_zone) >= 22 || ut(i, n.config?.time_zone) < 6, X = y > 0 && (["Sleeping", "Away"].includes(b?.state || "") || H);
+  d.push({
+    id: "lights",
+    label: "Lighting",
+    text: x.length ? `${y ? `${y} ${y === 1 ? "light" : "lights"} on${T.length === 1 ? " in " + T[0].name : ""}` : E ? "Available lights off" : "All lights off"}${E ? ` · ${E} unavailable` : ""}` : "No lights connected",
+    route: "rooms",
+    icon: "bulb",
+    priority: E ? 70 : X ? 50 : 12,
+    tone: E || X ? "notice" : void 0,
+    stamp: it(C),
+    action: X && t.all_lights_off ? "lights" : void 0
+  });
+  const U = s[t.climate || ""], vt = U?.attributes || {}, rt = w(vt.current_temperature), pe = typeof vt.hvac_action == "string" ? vt.hvac_action.replaceAll("_", " ") : U?.state === "off" ? "off" : "activity unknown";
+  d.push({
+    id: "climate",
+    label: "Climate",
+    text: $(U) ? `${rt === void 0 ? "Temperature unavailable" : `${rt}°`}, ${pe}` : "Thermostat unavailable",
+    route: "climate",
+    icon: "climate",
+    priority: !$(U) || rt === void 0 ? 65 : 11,
+    tone: !$(U) || rt === void 0 ? "notice" : void 0,
+    stamp: it([U]),
+    action: $(U) ? "climate" : void 0
+  });
+  const lt = Object.values(s).filter(
+    (v) => v.entity_id.startsWith("todo.")
+  ), ct = lt.filter((v) => !$(v)), xt = lt.reduce(
+    (v, A) => v + ($(A) && w(A.state) || 0),
+    0
+  );
+  d.push({
+    id: "lists",
+    label: "Lists",
+    text: lt.length ? ct.length ? `${ct.length} ${ct.length === 1 ? "list" : "lists"} unavailable` : xt ? `${xt} ${xt === 1 ? "task" : "tasks"} on your lists` : "Nothing left on your lists" : "No lists connected",
+    route: "lists",
+    icon: "list",
+    priority: ct.length ? 35 : 5,
+    stamp: it(lt)
+  });
+  const yt = t.doorbell;
+  if (yt) {
+    const v = Date.parse(
+      s[yt.activity_entity || ""]?.attributes.last_triggered || ""
+    ), A = e.review, z = A ? A.start_time * 1e3 : NaN, O = Math.max(
+      Number.isFinite(v) ? v : 0,
+      Number.isFinite(z) ? z : 0
+    ), L = O > 0 && O <= i.getTime() && i.getTime() - O < 2 * 36e5, wt = s[yt.entity], N = !$(wt), P = Math.max(0, Math.floor((i.getTime() - O) / 6e4)), $t = P < 1 ? "just now" : `${P} min ago`, kt = v >= z || !Number.isFinite(z) && Number.isFinite(v) || A?.doorbell, R = !!A && (z >= v || v >= z && v <= (A.end_time ? A.end_time * 1e3 : i.getTime()) + 1e4);
+    d.push({
+      id: "doorbell",
+      label: "Front door",
+      text: L ? `${kt ? "Doorbell rang" : "Activity detected"} ${$t}${N ? " · camera unavailable" : ""}` : N ? "Camera unavailable" : e.error ? "Recent activity unavailable" : e.checked ? O ? "No activity in the last 2 hours" : "No activity recorded in the last 24 hours" : "Checking recent activity…",
+      route: "cameras",
+      icon: "camera",
+      priority: L ? 75 : N || e.error ? 60 : 8,
+      tone: L || N || e.error ? "notice" : void 0,
+      stamp: L ? new Date(O).toISOString() : e.checked,
+      timeLabel: L ? "At" : "Checked",
+      image: L && R ? A?.image : void 0,
+      review: L && R ? A?.id : void 0
+    });
+  }
+  return d.sort((v, A) => A.priority - v.priority);
+}
+function ii(n, t = !0) {
+  if (!t) return "Connection lost. Showing last received states.";
+  const e = n.find((u) => u.tone === "alert");
+  if (e) return e.text + ".";
+  const i = n.find((u) => /offline|unavailable/i.test(u.text));
+  if (i) return i.text + ".";
+  const s = n.find((u) => u.id === "doorbell" && u.priority === 75);
+  if (s) return s.text + ".";
+  if (n.find((u) => u.id === "doors" && /\bneeds? verification\b/.test(u.text))) return "Door sensor status needs verification.";
+  const o = n.find((u) => u.id === "climate"), c = n.find((u) => u.id === "lights"), l = c?.text.match(/^\d+ lights? on/)?.[0] || (c?.text === "All lights off" ? "lights off" : ""), d = o?.text.replace(", ", " and ") || "";
+  return `Quiet.${[l, d].filter(Boolean).length ? " " + [l, d].filter(Boolean).join(", ") + "." : ""}`;
+}
+const Z = (n) => new Intl.DateTimeFormat("en-CA", {
+  timeZone: "America/New_York",
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit"
+}).format(n), ie = Z, Tt = (n, t) => {
+  const e = /* @__PURE__ */ new Date(`${Z(n)}T12:00:00Z`);
+  return e.setUTCDate(e.getUTCDate() + t), Z(e);
+}, si = (n, t = "15217") => {
+  const e = Z(n), i = Tt(n, 30);
+  return `https://www.hebcal.com/hebcal?${new URLSearchParams({
+    v: "1",
+    cfg: "json",
+    start: e,
+    end: i,
+    maj: "on",
+    min: "on",
+    mod: "on",
+    ss: "on",
+    s: "on",
+    leyning: "off",
+    c: "on",
+    M: "on",
+    geo: "zip",
+    zip: t,
+    i: "off"
+  })}`;
+};
+function ai(n, t) {
+  if (!$(n)) return [];
+  if (Array.isArray(n.attributes.events)) {
+    const s = Z(t);
+    return n.attributes.events.flatMap((a) => !a || typeof a.date != "string" || !/^\d{4}-\d{2}-\d{2}$/.test(a.date) || a.date < s || !["trash", "recycling", "yard"].includes(a.kind) ? [] : [{
+      id: `pghst-${a.kind}-${a.date}`,
+      date: a.date,
+      title: a.kind === "trash" ? "Trash pickup" : a.kind === "recycling" ? "Recycling pickup" : "Yard pickup",
+      kind: a.kind,
+      source: "pghst",
+      url: "https://pgh.st/"
+    }]);
+  }
+  const e = [
+    ["next_pickup_date", "Trash pickup", "trash"],
+    ["next_recycling_date", "Recycling pickup", "recycling"],
+    ["next_yard_date", "Yard pickup", "yard"]
+  ], i = Z(t);
+  return e.flatMap(([s, a, o]) => {
+    const c = s === "next_pickup_date" ? n.state : n.attributes[s];
+    if (typeof c != "string" || !/^\d{1,2}-\d{1,2}-\d{4}$/.test(c)) return [];
+    const [l, d, u] = c.split("-").map(Number), h = `${u}-${String(l).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+    return Number.isNaN(Date.parse(`${h}T12:00:00Z`)) || h < i ? [] : [{ id: `pghst-${o}-${h}`, date: h, title: a, kind: o, source: "pghst", url: "https://pgh.st/" }];
+  });
+}
+function ni(n, t) {
+  if (!n || typeof n != "object" || !Array.isArray(n.items)) return [];
+  const e = Z(t);
+  return n.items.flatMap((i) => {
+    if (!i || typeof i.title != "string" || typeof i.date != "string") return [];
+    const s = i.date.slice(0, 10);
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(s) || s < e) return [];
+    const a = i.category === "candles" ? "candles" : i.category === "havdalah" ? "havdalah" : i.category === "parashat" ? "shabbat" : i.category === "holiday" ? "holiday" : null;
+    if (!a) return [];
+    const o = a === "candles" ? "Candle lighting" : a === "havdalah" ? "Havdalah" : a === "shabbat" ? "Shabbat" : i.title, c = /T\d{2}:\d{2}/.test(i.date) ? i.date : void 0;
+    return [{
+      id: `hebcal-${a}-${s}-${i.title}`,
+      date: s,
+      title: o,
+      detail: a === "shabbat" ? i.title : a === "candles" && i.memo ? i.memo : void 0,
+      kind: a,
+      source: "hebcal",
+      time: c,
+      url: typeof i.link == "string" && i.link.startsWith("https://") ? i.link : "https://www.hebcal.com/shabbat?geo=zip&zip=15217"
+    }];
+  });
+}
+function oi(n) {
+  return [...n].sort((t, e) => t.date.localeCompare(e.date) || (t.time || "").localeCompare(e.time || "") || t.title.localeCompare(e.title));
+}
+const se = /* @__PURE__ */ new Map(), ri = {
+  trash: "trash",
+  recycling: "recycling",
+  yard: "yard",
+  candles: "candles",
+  havdalah: "havdalah",
+  shabbat: "shabbat",
+  holiday: "holiday"
+}, li = (n) => n === "trash" || n === "recycling" || n === "yard" ? "trash" : n === "candles" ? "sun" : n === "havdalah" ? "moon" : "sparkle";
+class ci extends S {
+  constructor() {
+    super(...arguments), this.config = { type: "custom:signal-home" }, this.events = [], this.status = "loading", this.now = /* @__PURE__ */ new Date(), this.expanded = !1, this.requestKey = "", this.requestedAt = 0, this.onVisibility = () => {
+      document.visibilityState === "visible" && (this.now = /* @__PURE__ */ new Date(), this.refresh());
+    };
+  }
+  static {
+    this.properties = {
+      hass: { attribute: !1 },
+      config: { attribute: !1 },
+      events: { state: !0 },
+      status: { state: !0 },
+      now: { state: !0 },
+      expanded: { state: !0 }
+    };
+  }
+  static {
+    this.styles = _`
+    :host { display:block; margin-top:28px; }
+    * { box-sizing:border-box; }
+    .heading { display:flex; align-items:baseline; justify-content:space-between; gap:12px; margin:0 2px 13px; }
+    h2 { margin:0; font-size:20px; font-weight:650; letter-spacing:-.5px; }
+    .heading small { color:var(--muted); font-size:11px; }
+    .shell { border:1px solid var(--line); border-radius:24px; overflow:hidden; background:var(--surface); }
+    .range { display:flex; align-items:center; justify-content:center; gap:7px; width:100%; min-height:48px; padding:9px 16px; border:0; border-top:1px solid var(--line); background:color-mix(in srgb,var(--surface) 95%,var(--lilac)); color:var(--ink); font:inherit; font-size:12px; font-weight:650; cursor:pointer; }
+    .range:hover { background:color-mix(in srgb,var(--surface) 87%,var(--lilac)); }
+    .range svg { width:15px; height:15px; }
+    .empty { margin:0; padding:23px; color:var(--muted); font-size:13px; line-height:1.5; }
+    .day { padding:10px 17px 8px; background:color-mix(in srgb,var(--surface) 94%,var(--lilac)); color:var(--muted); font-size:10px; font-weight:700; letter-spacing:1.1px; text-transform:uppercase; }
+    .event { display:flex; align-items:center; gap:13px; min-height:68px; padding:10px 16px; color:var(--ink); text-decoration:none; border-top:1px solid var(--line); transition:background .18s,transform .18s; }
+    .event:first-child { border-top:0; }
+    .event:hover { background:color-mix(in srgb,var(--surface) 91%,var(--lilac)); }
+    .event:focus-visible,.range:focus-visible,.credit a:focus-visible { outline:3px solid var(--ink); outline-offset:-3px; }
+    .glyph { display:grid; place-items:center; width:40px; height:40px; flex:none; border-radius:13px; }
+    .glyph svg { width:20px; height:20px; }
+    .trash .glyph { background:#d3eadf; color:#22654c; }
+    .recycling .glyph { background:#cae7f0; color:#1a667a; }
+    .yard .glyph { background:#def0c5; color:#4d6e29; }
+    .candles .glyph { background:#ffdfaa; color:#8c4d10; }
+    .havdalah .glyph { background:#dbd5f8; color:#574494; }
+    .shabbat .glyph,.holiday .glyph { background:#eedcf4; color:#794b8a; }
+    .copy { flex:1; min-width:0; }
+    .title { display:block; font-size:14px; font-weight:650; line-height:1.3; }
+    .detail { display:block; color:var(--muted); font-size:11px; line-height:1.4; margin-top:3px; }
+    .time { flex:none; font-size:13px; font-weight:700; font-variant-numeric:tabular-nums; }
+    .credit { display:flex; flex-wrap:wrap; gap:4px 12px; margin:10px 3px 0; color:var(--muted); font-size:10px; line-height:1.5; }
+    .credit a { color:inherit; text-underline-offset:2px; }
+    @media(max-width:450px) { .heading small { display:none; } .event { min-height:62px; } }
+    @media(prefers-reduced-motion:reduce) { * { transition:none !important; } }
+  `;
+  }
+  connectedCallback() {
+    super.connectedCallback(), this.refresh(), this.timer = setInterval(() => {
+      this.now = /* @__PURE__ */ new Date(), this.refresh();
+    }, 5 * 6e4), document.addEventListener("visibilitychange", this.onVisibility);
+  }
+  disconnectedCallback() {
+    super.disconnectedCallback(), clearInterval(this.timer), document.removeEventListener("visibilitychange", this.onVisibility);
+  }
+  updated(t) {
+    t.has("config") && this.refresh();
+  }
+  refresh() {
+    const t = this.config.upcoming?.hebcal_zip || "15217", e = `${ie(this.now)}:${t}`;
+    if (e === this.requestKey && Date.now() - this.requestedAt < (this.status === "error" ? 15 * 6e4 : 6 * 36e5)) return;
+    const i = se.get(e);
+    if (i && Date.now() - i.fetched < 6 * 36e5) {
+      this.requestKey = e, this.events = i.events, this.status = "ready";
+      return;
+    }
+    this.requestKey = e, this.requestedAt = Date.now(), this.status = "loading";
+    const s = new AbortController(), a = setTimeout(() => s.abort(), 1e4);
+    fetch(si(this.now, t), { signal: s.signal }).then((o) => {
+      if (!o.ok) throw new Error("Hebcal unavailable");
+      return o.json();
+    }).then((o) => {
+      this.requestKey === e && (this.events = ni(o, this.now), se.set(e, { fetched: Date.now(), events: this.events }), this.status = "ready");
+    }).catch(() => {
+      this.requestKey === e && (this.status = "error");
+    }).finally(() => clearTimeout(a));
+  }
+  dateLabel(t) {
+    const e = ie(this.now);
+    return t === e ? "Today" : t === Tt(this.now, 1) ? "Tomorrow" : new Intl.DateTimeFormat(this.hass?.locale?.language || "en-US", {
+      timeZone: "America/New_York",
+      weekday: "long",
+      month: "short",
+      day: "numeric"
+    }).format(/* @__PURE__ */ new Date(`${t}T12:00:00Z`));
+  }
+  timeLabel(t) {
+    return t ? new Intl.DateTimeFormat(this.hass?.locale?.language || "en-US", {
+      timeZone: "America/New_York",
+      hour: "numeric",
+      minute: "2-digit"
+    }).format(new Date(t)) : "";
+  }
+  render() {
+    const t = this.config.upcoming?.waste_entity ? this.hass?.states[this.config.upcoming.waste_entity] : void 0, e = oi([...ai(t, this.now), ...this.events]), i = Tt(this.now, this.expanded ? 30 : 7), s = e.filter((d) => d.date <= i), a = t?.attributes.checked_at || t?.last_reported || t?.last_updated, o = a && Date.now() - Date.parse(a) > 36 * 36e5, c = this.config.upcoming?.waste_entity ? $(t) ? o ? "Collection schedule may be out of date" : "" : "Collection schedule unavailable" : "Collection schedule not connected", l = this.status === "error" ? "Jewish calendar unavailable" : "";
+    return r`<section aria-labelledby="upcoming-title">
+      <div class="heading"><h2 id="upcoming-title">Coming up</h2><small>Pittsburgh · next ${this.expanded ? "30" : "7"} days</small></div>
+      <div class="shell">
+        <div id="upcoming-events">${s.length ? s.map((d, u) => r`
+          ${u === 0 || s[u - 1].date !== d.date ? r`<div class="day">${this.dateLabel(d.date)}</div>` : p}
+          <a class=${`event ${ri[d.kind]}`} href=${d.url} target="_blank" rel="noopener noreferrer" aria-label=${`${d.title}, ${this.dateLabel(d.date)}${d.time ? ` at ${this.timeLabel(d.time)}` : ""}; source ${d.source === "pghst" ? "PGH.ST" : "Hebcal"}`}>
+            <span class="glyph">${f(li(d.kind))}</span>
+            <span class="copy"><span class="title">${d.title}</span><span class="detail">${d.detail ? `${d.detail} · ` : ""}${d.source === "pghst" ? "City collection" : "Jewish calendar"}</span></span>
+            ${d.time ? r`<span class="time">${this.timeLabel(d.time)}</span>` : p}
+          </a>`) : r`<p class="empty">${this.status === "loading" ? "Finding what’s next…" : "Nothing on the calendar in this window."}</p>`}</div>
+        <button class="range" type="button" aria-expanded=${String(this.expanded)} aria-controls="upcoming-events" @click=${() => {
+      this.expanded = !this.expanded;
+    }}>${this.expanded ? "Show next week" : "Show next month"} ${f(this.expanded ? "up" : "down")}</button>
+      </div>
+      <div class="credit">
+        ${c ? r`<span>${c}</span>` : p}
+        ${l ? r`<span>${l}</span>` : p}
+        ${this.expanded && $(t) && !Array.isArray(t.attributes.events) ? r`<span>PGH.ST currently supplies only the next pickup of each kind.</span>` : p}
+        <span>Sources: <a href="https://pgh.st/" target="_blank" rel="noopener noreferrer">PGH.ST</a> and <a href="https://www.hebcal.com/" target="_blank" rel="noopener noreferrer">Hebcal</a> (CC BY 4.0)</span>
+      </div>
+    </section>`;
+  }
+}
+customElements.define("signal-upcoming", ci);
+class di extends S {
+  constructor() {
+    super(...arguments), this.config = { type: "custom:signal-home" }, this.front = {}, this.pending = "", this.error = "", this.now = /* @__PURE__ */ new Date(), this.signature = "", this.generation = 0, this.resume = () => {
+      document.visibilityState === "visible" && (this.now = /* @__PURE__ */ new Date(), this.loadFront());
+    };
+  }
+  static {
+    this.properties = {
+      hass: { attribute: !1 },
+      config: { attribute: !1 },
+      front: { state: !0 },
+      pending: { state: !0 },
+      error: { state: !0 },
+      now: { state: !0 }
+    };
+  }
+  static {
+    this.styles = _`
+    :host {
+      display: block;
+      color: var(--ink);
+      max-width: 960px;
+      margin: 0 auto;
+    }
+    * {
+      box-sizing: border-box;
+    }
+    h1,
+    p {
+      margin: 0;
+    }
+    button,
+    a {
+      font: inherit;
+      color: inherit;
+    }
+    button {
+      cursor: pointer;
+    }
+    button:disabled {
+      opacity: 0.45;
+      cursor: default;
+    }
+    button:focus-visible,
+    a:focus-visible {
+      outline: 3px solid var(--ink);
+      outline-offset: 3px;
+    }
+    svg {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+    }
+    .digest-heading {
+      padding: 6px 0 22px;
+    }
+    .eyebrow {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1.8px;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+    h1 {
+      font-size: clamp(26px, 3vw, 38px);
+      line-height: 1.22;
+      letter-spacing: -1.1px;
+      font-weight: 620;
+      max-width: 760px;
+      text-wrap: balance;
+    }
+    .digest-heading p {
+      font-size: 12px;
+      line-height: 1.5;
+      color: var(--muted);
+      margin-top: 12px;
+    }
+    .digest-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      background: var(--line);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      overflow: hidden;
+    }
+    .row {
+      position: relative;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0 12px;
+      padding: 0 18px;
+      background: var(--surface);
+      min-width: 0;
+      transition: background 0.25s;
+    }
+    .row.alert {
+      background: color-mix(in srgb, var(--surface) 90%, #df7461);
+      border-left: 4px solid #bb503c;
+      padding-left: 14px;
+    }
+    .row.notice {
+      background: color-mix(in srgb, var(--surface) 95%, #dfb45c);
+    }
+    .row.notable {
+      padding-top: 12px;
+      padding-bottom: 12px;
+    }
+    .row:not(.notable) .label {
+      display: inline;
+      font-size: 12px;
+      text-transform: none;
+      letter-spacing: 0;
+    }
+    .row:not(.notable) .label::after {
+      content: " · ";
+    }
+    .row:not(.notable) .text {
+      display: inline;
+      font-size: 13px;
+    }
+    .row-link {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+      flex: 1 1 100%;
+      min-width: 0;
+      text-decoration: none;
+      padding: 12px 0;
+      text-align: left;
+    }
+    .symbol {
+      width: 32px;
+      height: 32px;
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+      border-radius: 10px;
+      color: var(--muted);
+    }
+    .alert .symbol {
+      background: #b54a3420;
+      color: #b34b36;
+    }
+    .notice .symbol {
+      background: #b58b2f14;
+    }
+    .copy {
+      min-width: 0;
+      flex: 1;
+    }
+    .label {
+      display: block;
+      font-size: 10px;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 3px;
+    }
+    .text {
+      display: block;
+      font-size: 14px;
+      line-height: 1.45;
+      overflow-wrap: anywhere;
+      font-weight: 500;
+    }
+    .notable .text {
+      font-size: 17px;
+      font-weight: 600;
+    }
+    .timestamp {
+      display: block;
+      color: var(--muted);
+      font-size: 10px;
+      line-height: 1.4;
+      margin-top: 3px;
+      font-weight: 400;
+    }
+    .chevron {
+      color: var(--muted);
+      width: 16px;
+    }
+    .picture {
+      width: 100%;
+      margin: 0 0 10px 45px;
+      max-width: 350px;
+      aspect-ratio: 16/9;
+      border-radius: 14px;
+      overflow: hidden;
+      background: var(--line);
+      position: relative;
+    }
+    .picture img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      position: relative;
+    }
+    .picture span {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .inline-action {
+      background: transparent;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      min-height: 44px;
+      padding: 8px 12px;
+      font-size: 12px;
+      margin: 0 0 12px 45px;
+    }
+    .mode-options {
+      display: flex;
+      gap: 4px;
+      margin: 0 0 14px 45px;
+      width: calc(100% - 45px);
+      max-width: 360px;
+      padding: 3px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+    }
+    .mode-option {
+      flex: 1;
+      border: 0;
+      border-radius: 9px;
+      background: transparent;
+      font-size: 12px;
+      min-height: 40px;
+      padding: 8px;
+    }
+    .mode-option[aria-pressed="true"] {
+      background: var(--mint);
+      color: #17372c;
+      font-weight: 600;
+    }
+    .target {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin: 0 0 12px 45px;
+      font-size: 11px;
+      color: var(--muted);
+    }
+    .target span {
+      padding-right: 8px;
+    }
+    .target button {
+      display: grid;
+      place-items: center;
+      width: 44px;
+      height: 44px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: transparent;
+    }
+    .target svg {
+      width: 15px;
+      height: 15px;
+    }
+    @media (max-width: 649px) {
+      .row[data-row="climate"] .row-link {
+        flex: 1;
+        min-width: 140px;
+      }
+      .row[data-row="climate"] .target {
+        display: grid;
+        grid-template-columns: 40px 40px;
+        gap: 3px;
+        margin: 8px 0;
+      }
+      .row[data-row="climate"] .target span {
+        grid-column: 1/-1;
+        font-size: 10px;
+        padding: 0;
+        text-align: center;
+      }
+      .row[data-row="climate"] .target button {
+        width: 40px;
+        height: 44px;
+      }
+      .mode-options {
+        margin-bottom: 10px;
+      }
+      .row[data-row="mode"] .row-link {
+        padding-bottom: 8px;
+      }
+    }
+    .feedback {
+      font-size: 13px;
+      line-height: 1.5;
+      margin: 12px 0;
+    }
+    .error {
+      color: #ba4935;
+    }
+    .note {
+      width: 100%;
+      margin: 0 0 12px 45px;
+      font-size: 11px;
+      color: var(--muted);
+    }
+    @media (min-width: 650px) {
+      .row-link {
+        flex: 1;
+        min-width: 200px;
+      }
+      .target,
+      .inline-action {
+        margin: 0;
+      }
+      .row:not(.notable) .row-link {
+        padding: 17px 0;
+      }
+      .mode-options {
+        margin: 0;
+        width: 260px;
+      }
+      .picture {
+        max-width: 260px;
+        margin-left: 45px;
+        margin-bottom: 10px;
+      }
+      .row {
+        padding-left: 22px;
+        padding-right: 22px;
+      }
+      .row.alert {
+        padding-left: 18px;
+      }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        transition: none !important;
+      }
+    }
+  `;
+  }
+  connectedCallback() {
+    super.connectedCallback(), this.signature = "", this.timer = setInterval(() => {
+      this.now = /* @__PURE__ */ new Date(), document.visibilityState === "visible" && this.loadFront();
+    }, 6e4), document.addEventListener("visibilitychange", this.resume);
+  }
+  disconnectedCallback() {
+    super.disconnectedCallback(), this.generation++, clearInterval(this.timer), document.removeEventListener("visibilitychange", this.resume);
+  }
+  willUpdate() {
+    const t = JSON.stringify([
+      this.config.doorbell,
+      this.hass?.user?.id
+    ]);
+    this.hass && (t !== this.signature || this.connection !== this.hass.connection) && (this.signature = t, this.connection = this.hass.connection, this.front = {}, this.loadFront());
+  }
+  async loadFront() {
+    const t = this.config.doorbell;
+    if (!t || !this.hass || this.hass.connection?.connected === !1) return;
+    const e = ++this.generation, i = () => this.isConnected && e === this.generation, s = async (a) => {
+      let o;
+      try {
+        return await Promise.race([
+          this.hass.callWS(a),
+          new Promise((c, l) => {
+            o = setTimeout(() => l(new Error("timeout")), 1e4);
+          })
+        ]);
+      } finally {
+        clearTimeout(o);
+      }
+    };
+    try {
+      const a = await s({
+        type: "frigate/reviews/get",
+        instance_id: t.instance || "frigate",
+        cameras: [t.camera],
+        after: Date.now() / 1e3 - 86400,
+        limit: 1
+      });
+      if (!i()) return;
+      const o = typeof a == "string" ? JSON.parse(a) : a;
+      if (!Array.isArray(o)) throw new Error();
+      const c = o[0];
+      let l;
+      if (c) {
+        if (c.camera !== t.camera || !/^\d{10}(?:\.\d+)?-[a-zA-Z0-9]+$/.test(c.id) || !Number.isFinite(c.start_time) || c.start_time > Date.now() / 1e3 + 5)
+          throw new Error();
+        if (l = {
+          id: c.id,
+          start_time: c.start_time,
+          end_time: c.end_time,
+          doorbell: c.data?.objects?.some(
+            (d) => d.startsWith("doorbell")
+          )
+        }, Date.now() / 1e3 - c.start_time < 7200)
+          try {
+            const d = await s({
+              type: "auth/sign_path",
+              path: `/api/frigate/${t.instance || "frigate"}/notifications/${c.id}/${t.camera}/review_thumbnail.webp`,
+              expires: 300
+            });
+            l.image = new URL(d.path, location.origin).href;
+          } catch {
+          }
+      }
+      i() && (this.front = { checked: (/* @__PURE__ */ new Date()).toISOString(), review: l });
+    } catch {
+      i() && (this.front = { ...this.front, error: !0 });
+    }
+  }
+  go(t, e) {
+    e?.preventDefault(), this.dispatchEvent(
+      new CustomEvent("signal-digest-navigation", {
+        detail: { route: t.route, review: t.review },
+        bubbles: !0,
+        composed: !0
+      })
+    );
+  }
+  async send(t, e, i, s) {
+    if (!(this.pending || this.hass.connection?.connected === !1)) {
+      this.pending = t, this.error = "";
+      try {
+        await this.hass.callService(e, i, s);
+      } catch {
+        this.error = "That didn’t go through. Check the connection and try again.";
+      } finally {
+        this.pending = "";
+      }
+    }
+  }
+  time(t) {
+    if (!t.stamp)
+      return t.text.startsWith("No ") && t.text.endsWith("connected") ? "Not configured" : "Update time unavailable";
+    const e = new Date(t.stamp), i = {
+      hour: "numeric",
+      minute: "2-digit",
+      timeZone: this.hass.config?.time_zone
+    };
+    return this.now.getTime() - e.getTime() > 864e5 && (i.month = "short", i.day = "numeric"), `${t.timeLabel || "Updated"} ${e.toLocaleString(this.hass.locale?.language || void 0, i)}`;
+  }
+  target() {
+    const t = this.hass.states[this.config.climate || ""];
+    if (!$(t) || t.state === "off") return p;
+    const e = t.attributes, i = w(e.supported_features) || 0;
+    if (t.state === "heat_cool" && (!(i & 2) || w(e.target_temp_low) === void 0 || w(e.target_temp_high) === void 0))
+      return p;
+    const s = t.state === "heat_cool" && !!(i & 2), a = s && e.hvac_action === "cooling", o = s ? a ? "target_temp_high" : "target_temp_low" : "temperature", c = w(e[o]);
+    if (c === void 0 || !s && !(i & 1)) return p;
+    const l = w(e.min_temp) ?? 7, d = w(e.max_temp) ?? 35, u = s && a ? Math.max(l, w(e.target_temp_low) ?? l) : l, h = s && !a ? Math.min(d, w(e.target_temp_high) ?? d) : d, m = w(e.target_temp_step) || (this.hass.config?.unit_system?.temperature === "°F" ? 1 : 0.5), g = s ? a ? "Cool above" : "Heat below" : "Target", b = (x) => {
+      this.send("climate", "climate", "set_temperature", {
+        entity_id: this.config.climate,
+        [o]: Math.max(
+          u,
+          Math.min(h, Math.round((c + x * m) * 10) / 10)
+        ),
+        ...s ? {
+          [a ? "target_temp_low" : "target_temp_high"]: e[a ? "target_temp_low" : "target_temp_high"]
+        } : {}
+      });
+    };
+    return r`<div class="target">
+      <span>${g} ${c}°</span
+      ><button
+        aria-label=${`Decrease ${g.toLowerCase()} temperature`}
+        ?disabled=${!!this.pending || this.hass.connection?.connected === !1 || c <= u}
+        @click=${() => b(-1)}
+      >
+        ${f("minus")}</button
+      ><button
+        aria-label=${`Increase ${g.toLowerCase()} temperature`}
+        ?disabled=${!!this.pending || this.hass.connection?.connected === !1 || c >= h}
+        @click=${() => b(1)}
+      >
+        ${f("plus")}
+      </button>
+    </div>`;
+  }
+  row(t) {
+    const e = !!t.tone, i = r`<span class="symbol">${f(t.icon)}</span
+      ><span class="copy"
+        ><span class="label">${t.label}</span
+        ><span class="text">${t.text}</span
+        ><span class="timestamp"
+          >${this.time(t)}${t.id === "doorbell" && this.front.error ? " · refresh failed" : ""}</span
+        ></span
+      >${f("arrow")}`;
+    return r`<section
+      class=${`row ${t.tone || ""} ${e ? "notable" : ""}`}
+      data-row=${t.id}
+      aria-label=${t.label}
+    >
+      <a class="row-link" href=${`#signal/${t.route}`} @click=${(s) => this.go(t, s)}>${i}</a>
+      ${t.image ? r`<a class="picture" aria-label="View front door event" href="#signal/cameras" @click=${(s) => this.go(t, s)}><span>Preview unavailable</span><img src=${t.image} alt="Recorded front-door activity" @error=${(s) => s.target.style.visibility = "hidden"} /></a>` : p}
+      ${t.action === "lights" ? r`<button class="inline-action" ?disabled=${!!this.pending || !$(this.hass.states[this.config.all_lights_off || ""]) || this.hass.connection?.connected === !1} @click=${() => this.send("lights", "script", "turn_on", { entity_id: this.config.all_lights_off })}>Turn all off</button>` : p}
+      ${t.action === "climate" ? this.target() : p}
+      ${t.id === "lights" ? (this.config.light_rooms || []).map((s) => {
+      const a = he(
+        this.hass.states[s.automation_note_entity || ""]
+      );
+      return a ? r`<p class="note">${a}</p>` : p;
+    }) : p}
+    </section>`;
+  }
+  render() {
+    if (!this.hass) return p;
+    const t = this.hass.connection?.connected !== !1, e = ei(this.hass, this.config, this.front, this.now);
+    return r`<header class="digest-heading">
+        <div class="eyebrow">Your home</div>
+        <h1>${ii(e, t)}</h1>
+        ${t ? p : r`<p>Reconnect to see current conditions.</p>`}
+      </header>
+      <div class="digest-list">
+        ${pt(
+      e,
+      (i) => i.id,
+      (i) => this.row(i)
+    )}
+      </div>
+      <signal-upcoming .hass=${this.hass} .config=${this.config}></signal-upcoming>
+      ${this.pending ? r`<p class="feedback" role="status">Sending…</p>` : p}${this.error ? r`<p class="feedback error" role="alert">${this.error}</p>` : p}`;
+  }
+}
+customElements.define("signal-digest", di);
+const hi = _`
+  .more-links {display:grid;gap:12px;padding:0 6px 16px;}
+  .more-links button {display:flex;align-items:center;gap:14px;min-height:60px;padding:16px;border:1px solid var(--line);border-radius:16px;color:var(--ink);background:var(--surface);font:inherit;cursor:pointer;}
+  .more-links button span {flex:1;text-align:left;}
+  .more-links svg {width:22px;height:22px;}
+  button.status-pill {font:inherit;font-size:12px;cursor:pointer;color:var(--ink);background:var(--surface);}
+  button.status-pill.alert {color:#b73c30;}
+  button.status-pill.review {color:#78541f;border-color:#bd965c;background:color-mix(in srgb,var(--surface) 88%,#e8bb70);}
+  .dark button.status-pill.review {color:#f2cf98;border-color:#9b7847;background:color-mix(in srgb,var(--surface) 90%,#9b7847);}
+  .security-mode {border:1px solid var(--line);border-radius:28px;background:var(--surface);padding:24px;margin-bottom:20px;}
+  .security-mode-head {display:flex;align-items:end;justify-content:space-between;gap:12px;margin-bottom:20px;}
+  .security-mode-head h2 {font-size:24px;margin:6px 0 0;letter-spacing:-.6px;}
+  .mode-context {font-size:12px;color:var(--muted);text-align:right;max-width:180px;line-height:1.45;}
+  .security-mode-options {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;}
+  .security-mode-option {position:relative;display:flex;flex-direction:column;align-items:start;gap:7px;min-height:128px;padding:15px;border:2px solid transparent;border-radius:18px;color:#26332e;font:inherit;text-align:left;cursor:pointer;transition:transform .2s,background .2s,border-color .2s,box-shadow .2s;}
+  .security-mode-option:active:not(:disabled) {transform:scale(.97)}
+  .security-mode-option:focus-visible {outline:3px solid var(--ink);outline-offset:3px}
+  .security-mode-option:disabled {cursor:default;opacity:.6}
+  .security-mode-option strong {font-size:16px;line-height:1.2}
+  .security-mode-option small {font-size:11px;line-height:1.3;opacity:.78}
+  .security-mode-option .mode-icon {display:grid;place-items:center;width:30px;height:30px;border-radius:10px;background:#ffffff78}
+  .security-mode-option svg {width:19px;height:19px}
+  .mode-home {background:#e1f0e3}.mode-home[aria-pressed=true]{background:#b8dfc1;border-color:#4c9a6e;box-shadow:0 5px 18px #458e6433}
+  .mode-sleeping {background:#e6e8fa}.mode-sleeping[aria-pressed=true]{background:#c5c9f2;border-color:#656ebc;box-shadow:0 5px 18px #5b68ba33}
+  .mode-away {background:#f8e8d8}.mode-away[aria-pressed=true]{background:#f0c89b;border-color:#bd8242;box-shadow:0 5px 18px #bd824233}
+  .mode-check {position:absolute;right:10px;top:10px;opacity:.8}
+  .mode-check:empty {display:none}
+  .dark .security-mode-option {color:#22312b}
+  .sensor-sections {display:grid;gap:26px;}
+  .sensor-section h2 {font-size:17px;letter-spacing:-.35px;margin:0 0 12px 2px;}
+  .climate { transition:box-shadow .4s,background .4s; }
+  .climate[data-activity=heating] { background:color-mix(in srgb,var(--surface) 74%,#ffa85c); box-shadow:inset 0 0 55px #fa9c4533,0 5px 30px #fa9c4518; }
+  .climate[data-activity=cooling] { background:color-mix(in srgb,var(--surface) 74%,#80c8ff); box-shadow:inset 0 0 55px #59baff33,0 5px 30px #59baff18; }
+  .climate[data-activity=fan] { background:color-mix(in srgb,var(--surface) 74%,#99dec6); box-shadow:inset 0 0 55px #72d5b333; }
+  .climate[data-activity=heating] .dial-fill { stroke:#b85818; }
+  .climate[data-activity=cooling] .dial-fill { stroke:#227aba; }
+  .climate[data-activity=fan] .dial-fill { stroke:#31866c; }
+  .stepper>span { font-size:15px; }
+  @media(max-width:760px) {
+    .security-mode {padding:18px;}
+    .security-mode-options {gap:6px;}
+    .security-mode-option {min-height:120px;padding:10px;gap:7px;}
+    .security-mode-option strong {font-size:13px;}
+    .security-mode-option small {font-size:10px;}
+    .mode-context {font-size:10px;max-width:150px;}
+
+    .bottom-nav { gap:2px; padding:6px; width:min(calc(100% - 16px),470px); }
+    .bottom-nav button { min-width:0; font-size:10px; }
+    .nav-indicator { top:6px; bottom:6px; left:6px; width:calc((100% - 12px - (var(--tab-count,6) - 1)*2px)/var(--tab-count,6)); transform:translateX(calc(var(--active)*(100% + 2px))); }
+  }
+  @media(prefers-reduced-motion:reduce) { .climate,.security-mode-option { transition:none; } }
+`;
+function pi(n) {
+  return n.map((t) => {
     const e = t.lu ?? t.last_updated ?? t.lc ?? t.last_changed;
-    return { time: typeof e == "number" ? e * 1e3 : Date.parse(String(e)), value: y(t.s ?? t.state) ?? null };
+    return { time: typeof e == "number" ? e * 1e3 : Date.parse(String(e)), value: w(t.s ?? t.state) ?? null };
   }).filter((t) => Number.isFinite(t.time)).sort((t, e) => t.time - e.time);
 }
-function Ae(o, t = 600) {
-  if (o.length <= t) return o;
-  const e = Math.ceil(o.length / (t / 4)), i = [];
-  for (let s = 0; s < o.length; s += e) {
-    const n = o.slice(s, s + e), a = n.filter((p) => p.value !== null), d = /* @__PURE__ */ new Set([n[0], n[n.length - 1]]);
-    a.length && (d.add(a.reduce((p, u) => p.value < u.value ? p : u)), d.add(a.reduce((p, u) => p.value > u.value ? p : u)));
-    const l = n.find((p) => p.value === null);
-    l && d.add(l), i.push(...[...d].sort((p, u) => p.time - u.time));
+function ui(n, t = 600) {
+  if (n.length <= t) return n;
+  const e = Math.ceil(n.length / (t / 4)), i = [];
+  for (let s = 0; s < n.length; s += e) {
+    const a = n.slice(s, s + e), o = a.filter((d) => d.value !== null), c = /* @__PURE__ */ new Set([a[0], a[a.length - 1]]);
+    o.length && (c.add(o.reduce((d, u) => d.value < u.value ? d : u)), c.add(o.reduce((d, u) => d.value > u.value ? d : u)));
+    const l = a.find((d) => d.value === null);
+    l && c.add(l), i.push(...[...c].sort((d, u) => d.time - u.time));
   }
   return i;
 }
-const st = /* @__PURE__ */ new WeakMap();
-class Se extends A {
+function mi(n, t, e) {
+  const i = new Intl.DateTimeFormat("en-US", { hour: "numeric", hourCycle: "h23", timeZone: e }), s = (l) => {
+    const d = Number(i.format(new Date(l)));
+    return d >= 6 && d < 18;
+  }, a = [];
+  let o = n, c = s(n);
+  for (let l = Math.min(n + 30 * 6e4, t); l <= t; l = Math.min(l + 30 * 6e4, t)) {
+    const d = s(l);
+    if (d !== c) {
+      let u = l - 18e5, h = l;
+      for (; h - u > 6e4; ) {
+        const m = Math.floor((u + h) / 2);
+        s(m) === c ? u = m : h = m;
+      }
+      a.push({ start: o, end: h, day: c }), o = h, c = d;
+    }
+    if (l === t) break;
+  }
+  return a.push({ start: o, end: t, day: c }), a;
+}
+const St = /* @__PURE__ */ new WeakMap();
+class gi extends S {
   constructor() {
     super(...arguments), this.suspended = !1, this.config = { type: "custom:signal-graph", entity: "" }, this.points = [], this.loading = !1, this.error = "", this.hours = 24, this.displayedHours = 24, this.sequence = 0, this.queried = "", this.cacheUser = "", this.restored = "", this.end = Date.now(), this.start = this.end - 864e5;
   }
@@ -4104,8 +5717,8 @@ class Se extends A {
   }
   static {
     this.styles = [
-      ut,
-      S`
+      Ht,
+      _`
       .top {
         display: flex;
         justify-content: space-between;
@@ -4204,6 +5817,14 @@ class Se extends A {
         stroke-width: 1;
         vector-effect: non-scaling-stroke;
       }
+      .time-band.day { fill: #efc77f; opacity: .15; }
+      .time-band.night { fill: #657ba9; opacity: .18; }
+      .widget.dark .time-band.day { opacity: .1; }
+      .widget.dark .time-band.night { opacity: .22; }
+      .day-night-key { display:flex; justify-content:flex-end; align-items:center; gap:12px; color:var(--subtle); font-size:10px; margin-top:7px; }
+      .day-night-key span { display:inline-flex; align-items:center; gap:5px; }
+      .day-night-key i { display:inline-block; width:10px; height:10px; border-radius:3px; background:#efc77f; }
+      .day-night-key .night i { background:#657ba9; }
       .cursor-line {
         stroke: var(--subtle);
         stroke-width: 1;
@@ -4282,7 +5903,7 @@ class Se extends A {
         }
       }
     `,
-      Q
+      bt
     ];
   }
   setConfig(t) {
@@ -4325,7 +5946,7 @@ class Se extends A {
   static getStubConfig(t) {
     return {
       entity: Object.keys(t.states).find(
-        (e) => e.startsWith("sensor.") && y(t.states[e].state) !== void 0
+        (e) => e.startsWith("sensor.") && w(t.states[e].state) !== void 0
       )
     };
   }
@@ -4350,8 +5971,8 @@ class Se extends A {
       const s = `${this.config.entity}:${this.hours}`;
       if (this.restored !== s) {
         this.restored = s;
-        const n = st.get(e)?.get(`${i}:${s}`);
-        n && Date.now() - n.end < 6e4 && (this.points = n.points, this.start = n.start, this.end = n.end, this.displayedHours = n.hours, this.queried = s);
+        const a = St.get(e)?.get(`${i}:${s}`);
+        a && Date.now() - a.end < 6e4 && (this.points = a.points, this.start = a.start, this.end = a.end, this.displayedHours = a.hours, this.queried = s);
       }
     }
     this.hass && (t.has("hass") || t.has("config") || t.has("suspended")) && this.queried !== `${this.config.entity}:${this.hours}` && this.fetchHistory();
@@ -4363,7 +5984,7 @@ class Se extends A {
     this.queried = `${this.config.entity}:${this.hours}`, this.loading = !0, this.error = "", this.cursor = void 0;
     const e = Date.now(), i = this.hours, s = e - i * 36e5;
     try {
-      const n = await this.hass.callWS({
+      const a = await this.hass.callWS({
         type: "history/history_during_period",
         start_time: new Date(s).toISOString(),
         end_time: new Date(e).toISOString(),
@@ -4373,12 +5994,12 @@ class Se extends A {
         significant_changes_only: !1
       });
       if (t === this.sequence) {
-        this.points = _e(n[this.config.entity] || []), this.start = s, this.end = e, this.displayedHours = i;
-        const a = this.hass.connection || this.hass.callWS;
-        let d = st.get(a);
-        d || st.set(a, d = /* @__PURE__ */ new Map());
+        this.points = pi(a[this.config.entity] || []), this.start = s, this.end = e, this.displayedHours = i;
+        const o = this.hass.connection || this.hass.callWS;
+        let c = St.get(o);
+        c || St.set(o, c = /* @__PURE__ */ new Map());
         const l = `${this.cacheUser}:${this.queried}`;
-        d.delete(l), d.set(l, { points: this.points, start: s, end: e, hours: i }), d.size > 16 && d.delete(d.keys().next().value);
+        c.delete(l), c.set(l, { points: this.points, start: s, end: e, hours: i }), c.size > 16 && c.delete(c.keys().next().value);
       }
     } catch {
       t === this.sequence && (this.error = "History couldn’t be loaded.");
@@ -4392,8 +6013,8 @@ class Se extends A {
   pointer(t) {
     const e = t.currentTarget.getBoundingClientRect(), i = this.start + Math.max(0, Math.min(1, (t.clientX - e.left) / e.width)) * (this.end - this.start);
     let s = 0;
-    for (let n = 1; n < this.points.length; n++)
-      Math.abs(this.points[n].time - i) < Math.abs(this.points[s].time - i) && (s = n);
+    for (let a = 1; a < this.points.length; a++)
+      Math.abs(this.points[a].time - i) < Math.abs(this.points[s].time - i) && (s = a);
     this.cursor = s;
   }
   keyboard(t) {
@@ -4409,39 +6030,39 @@ class Se extends A {
     );
   }
   format(t) {
-    const e = y(t);
+    const e = w(t);
     return e === void 0 ? "—" : new Intl.NumberFormat(this.hass?.locale?.language || void 0, {
       maximumFractionDigits: 1
     }).format(e);
   }
   render() {
-    const t = this.hass?.states[this.config.entity], e = t?.attributes.unit_of_measurement || "", i = this.points.filter((x) => x.value !== null), s = i.map((x) => x.value), n = s.length ? s.reduce((x, w) => Math.min(x, w), 1 / 0) : 0, a = s.length ? s.reduce((x, w) => Math.max(x, w), -1 / 0) : 1, d = Math.max((a - n) * 0.16, 1), l = n - d, p = a + d, u = (x) => Math.max(
+    const t = this.hass?.states[this.config.entity], e = t?.attributes.unit_of_measurement || "", i = this.points.filter((y) => y.value !== null), s = i.map((y) => y.value), a = s.length ? s.reduce((y, E) => Math.min(y, E), 1 / 0) : 0, o = s.length ? s.reduce((y, E) => Math.max(y, E), -1 / 0) : 1, c = Math.max((o - a) * 0.16, 1), l = a - c, d = o + c, u = (y) => Math.max(
       0,
-      Math.min(600, (x.time - this.start) / (this.end - this.start) * 600)
-    ), c = (x) => 150 - (x.value - l) / (p - l) * 150, m = [];
-    let f = [];
-    for (const x of Ae(this.points))
-      x.value === null ? (f.length && m.push(f), f = []) : f.push(x);
-    f.length && m.push(f);
-    const v = this.cursor !== void 0 ? this.points[this.cursor] : void 0, b = v ? v.value : $(t) ? t.state : void 0;
+      Math.min(600, (y.time - this.start) / (this.end - this.start) * 600)
+    ), h = (y) => 150 - (y.value - l) / (d - l) * 150, m = [];
+    let g = [];
+    for (const y of ui(this.points))
+      y.value === null ? (g.length && m.push(g), g = []) : g.push(y);
+    g.length && m.push(g);
+    const b = this.cursor !== void 0 ? this.points[this.cursor] : void 0, x = mi(this.start, this.end, this.hass?.config?.time_zone), C = b ? b.value : $(t) ? t.state : void 0;
     return r`<article
       class=${`widget ${this.config.appearance || "auto"} ${this.config.accent || "lilac"}`}
     >
       <div class="top">
         <span class="header-title"
-          >${g("graph")}${this.config.name || t?.attributes.friendly_name || this.config.entity}</span
+          >${f("graph")}${this.config.name || t?.attributes.friendly_name || this.config.entity}</span
         >
         <div class="periods" aria-label="History period">
-          ${[6, 24, 168].map((x) => r`<button aria-pressed=${this.hours === x} @click=${() => this.period(x)}>${x === 168 ? "7d" : `${x}h`}</button>`)}
+          ${[6, 24, 168].map((y) => r`<button aria-pressed=${this.hours === y} @click=${() => this.period(y)}>${y === 168 ? "7d" : `${y}h`}</button>`)}
         </div>
       </div>
       <div class="reading">
         <div>
           <div class="value numeric">
-            ${this.format(b)}<small>${e}</small>
+            ${this.format(C)}<small>${e}</small>
           </div>
           <div class="time">
-            ${v ? new Date(v.time).toLocaleString(this.hass?.locale?.language || void 0, { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }) : $(t) ? "Right now" : "Current reading unavailable"}
+            ${b ? new Date(b.time).toLocaleString(this.hass?.locale?.language || void 0, { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }) : $(t) ? "Right now" : "Current reading unavailable"}
           </div>
         </div>
         <span class="subtle"
@@ -4463,7 +6084,7 @@ class Se extends A {
                     aria-valuemin="0"
                     aria-valuemax=${Math.max(0, this.points.length - 1)}
                     aria-valuenow=${this.cursor ?? this.points.length - 1}
-                    aria-valuetext=${`${this.format(b)} ${e}`}
+                    aria-valuetext=${`${this.format(C)} ${e}`}
                     @pointermove=${this.pointer}
                     @pointerdown=${this.pointer}
                     @pointerleave=${() => this.cursor = void 0}
@@ -4475,14 +6096,15 @@ class Se extends A {
                       preserveAspectRatio="none"
                       aria-hidden="true"
                     >
-                      ${[25, 75, 125].map((x) => D`<line class="grid-line" x1="0" y1=${x} x2="600" y2=${x}/>`)}${m.map(
-      (x) => {
-        const w = x.map(
-          (P, E) => `${E ? "L" : "M"}${u(P).toFixed(2)},${c(P).toFixed(2)}`
+                      ${x.map((y) => F`<rect class=${`time-band ${y.day ? "day" : "night"}`} x=${Math.max(0, (y.start - this.start) / (this.end - this.start) * 600)} y="0" width=${Math.max(0, (y.end - y.start) / (this.end - this.start) * 600)} height="160"/>`)}
+                      ${[25, 75, 125].map((y) => F`<line class="grid-line" x1="0" y1=${y} x2="600" y2=${y}/>`)}${m.map(
+      (y) => {
+        const E = y.map(
+          (T, H) => `${H ? "L" : "M"}${u(T).toFixed(2)},${h(T).toFixed(2)}`
         ).join(" ");
-        return D`<path class="fill" d=${`${w} L${u(x[x.length - 1])},160 L${u(x[0])},160 Z`}/><path class="line" d=${w}/>${x.length === 1 ? D`<circle cx=${u(x[0])} cy=${c(x[0])} r="3" fill="var(--accent-ink)"/>` : h}`;
+        return F`<path class="fill" d=${`${E} L${u(y[y.length - 1])},160 L${u(y[0])},160 Z`}/><path class="line" d=${E}/>${y.length === 1 ? F`<circle cx=${u(y[0])} cy=${h(y[0])} r="3" fill="var(--accent-ink)"/>` : p}`;
       }
-    )}${v ? D`<line class="cursor-line" x1=${u(v)} x2=${u(v)} y1="0" y2="160"/>${v.value !== null ? D`<circle class="cursor-dot" cx=${u(v)} cy=${c(v)} r="5"/>` : h}` : h}
+    )}${b ? F`<line class="cursor-line" x1=${u(b)} x2=${u(b)} y1="0" y2="160"/>${b.value !== null ? F`<circle class="cursor-dot" cx=${u(b)} cy=${h(b)} r="5"/>` : p}` : p}
                     </svg>
                   </div>
                   <div class="bounds">
@@ -4494,29 +6116,30 @@ class Se extends A {
                   </div>` : r`<div class="empty">
                   ${this.error ? "History is unavailable." : "No numeric history in this period."}
                 </div>`}
+        ${i.length ? r`<div class="day-night-key" aria-label="Time shading: daytime 6 AM to 6 PM, nighttime 6 PM to 6 AM"><span><i></i>Day · 6–18</span><span class="night"><i></i>Night · 18–6</span></div>` : p}
       </div>
       <div class="history-status" role="status">
         <span
           >${this.error ? `${this.error}${this.points.length ? " Showing previous data." : ""}` : this.loading ? "Updating history…" : ""}</span
         >
-        ${this.error ? r`<button class="retry" @click=${() => this.fetchHistory()}>Try again</button>` : h}
+        ${this.error ? r`<button class="retry" @click=${() => this.fetchHistory()}>Try again</button>` : p}
       </div>
       <div class="stats">
         <span
           >Low<strong
-            >${s.length ? this.format(n) : "—"} ${e}</strong
+            >${s.length ? this.format(a) : "—"} ${e}</strong
           ></span
         ><span
           >High<strong
-            >${s.length ? this.format(a) : "—"} ${e}</strong
+            >${s.length ? this.format(o) : "—"} ${e}</strong
           ></span
         ><span>Samples<strong>${i.length}</strong></span>
       </div>
     </article>`;
   }
 }
-customElements.define("signal-graph", Se);
-class Ee extends A {
+customElements.define("signal-graph", gi);
+class fi extends S {
   constructor() {
     super(...arguments), this.detailsOpen = !1, this.config = { type: "custom:signal-metric", entity: "" };
   }
@@ -4529,8 +6152,8 @@ class Ee extends A {
   }
   static {
     this.styles = [
-      ut,
-      S`
+      Ht,
+      _`
       .widget {
         cursor: pointer;
         transition: transform 0.2s;
@@ -4625,7 +6248,7 @@ class Ee extends A {
     this.detailsOpen = !0;
   }
   render() {
-    const t = this.hass?.states[this.config.entity], e = $(t), i = e ? y(t.state) : void 0, s = i === void 0 ? 0 : Math.max(
+    const t = this.hass?.states[this.config.entity], e = $(t), i = e ? w(t.state) : void 0, s = i === void 0 ? 0 : Math.max(
       0,
       Math.min(
         100,
@@ -4637,8 +6260,8 @@ class Ee extends A {
         role="button"
         tabindex="0"
         @click=${this.more}
-        @keydown=${(n) => {
-      ["Enter", " "].includes(n.key) && (n.preventDefault(), this.more());
+        @keydown=${(a) => {
+      ["Enter", " "].includes(a.key) && (a.preventDefault(), this.more());
     }}
       >
         <div class="top">
@@ -4646,11 +6269,11 @@ class Ee extends A {
             ${this.config.name || t?.attributes.friendly_name || this.config.entity}
           </h2>
           <span class="symbol"
-            >${g(t?.attributes.device_class === "humidity" ? "drop" : t?.attributes.device_class === "temperature" ? "climate" : "graph")}</span
+            >${f(t?.attributes.device_class === "humidity" ? "drop" : t?.attributes.device_class === "temperature" ? "climate" : "graph")}</span
           >
         </div>
         <div class="metric numeric">
-          ${e ? i === void 0 ? k(t.state) : new Intl.NumberFormat(this.hass?.locale?.language || void 0, { maximumFractionDigits: 1 }).format(i) : "—"}<small>
+          ${e ? i === void 0 ? D(t.state) : new Intl.NumberFormat(this.hass?.locale?.language || void 0, { maximumFractionDigits: 1 }).format(i) : "—"}<small>
             ${t?.attributes.unit_of_measurement || ""}</small
           >
         </div>
@@ -4666,13 +6289,15 @@ class Ee extends A {
       ></signal-details>`;
   }
 }
-customElements.define("signal-metric", Ee);
-const z = [
-  { id: "home", name: "Overview", icon: "home" },
-  { id: "climate", name: "Climate", icon: "climate" },
-  { id: "safety", name: "Safety", icon: "shield" },
-  { id: "lists", name: "Lists", icon: "list" }
-], Ot = {
+customElements.define("signal-metric", fi);
+const bi = [
+  { id: "home", name: "Home", icon: "home" },
+  { id: "rooms", name: "Lighting", icon: "bulb" },
+  { id: "cameras", name: "Cameras", icon: "camera" },
+  { id: "lists", name: "Lists", icon: "list" },
+  { id: "safety", name: "Security", icon: "shield" },
+  { id: "climate", name: "Climate", icon: "climate" }
+], vi = {
   off: "Off",
   heat: "Heat",
   cool: "Cool",
@@ -4681,17 +6306,17 @@ const z = [
   dry: "Dry",
   fan_only: "Fan"
 };
-class Ce extends A {
+class xi extends S {
   constructor() {
-    super(...arguments), this.config = { type: "custom:signal-home" }, this.tab = "home", this.pageTravel = 0, this.pendingTodo = "", this.messageTone = "neutral", this.dark = !1, this.appearance = "auto", this.completedTodos = [], this.completionTimes = {}, this.deleteError = "", this.todoMutating = !1, this.todoRefreshPending = !1, this.todoOrder = /* @__PURE__ */ new Map(), this.selectedTodo = "", this.loadedTodo = "", this.discoveredTodos = [], this.detailEntity = "", this.detailReady = !1, this.menuOpen = !1, this.contentScrolled = !1, this.onContentScroll = (t) => {
+    super(...arguments), this.config = { type: "custom:signal-home" }, this.tab = "home", this.pageTravel = 0, this.pendingTodo = "", this.messageTone = "neutral", this.dark = !1, this.appearance = "auto", this.completedTodos = [], this.completionTimes = {}, this.deleteError = "", this.todoMutating = !1, this.todoRefreshPending = !1, this.todoOrder = /* @__PURE__ */ new Map(), this.selectedTodo = "", this.loadedTodo = "", this.discoveredTodos = [], this.detailEntity = "", this.detailReady = !1, this.menuOpen = !1, this.moreOpen = !1, this.moreDestination = "", this.contentScrolled = !1, this.onContentScroll = (t) => {
       this.contentScrolled = t.currentTarget.scrollTop > 4;
-    }, this.chrome = new xe(), this.chromePath = "", this.syncChrome = () => {
+    }, this.chrome = new Fe(), this.chromePath = "", this.syncChrome = () => {
       this.isConnected && this.immersive && location.pathname === this.chromePath ? this.chrome.sync(this.dark, this.hass?.auth?.external) : this.chrome.release();
     }, this.phone = window.matchMedia("(max-width: 760px)"), this.narrow = this.phone.matches, this.resize = () => {
       this.narrow = this.phone.matches;
-    }, this.todos = [], this.rangeSide = "low", this.syncRoute = () => {
-      const t = location.hash.replace("#signal/", ""), e = z.some((i) => i.id === t) ? t : "home";
-      e !== this.tab && (this.pageTravel = z.findIndex((i) => i.id === e) > z.findIndex((i) => i.id === this.tab) ? 12 : -12, this.tab = e, this.resetScroll());
+    }, this.todos = [], this.rangeSide = "low", this.cameraRoute = "", this.syncRoute = () => {
+      const t = location.hash.replace("#signal/", ""), e = t === "lights" ? "rooms" : t, i = this.tabs.some((a) => a.id === e) ? e : "home", s = i === "cameras" ? location.search : "";
+      s !== this.cameraRoute && (this.cameraRoute = s, this.resetScroll()), i !== this.tab && (this.pageTravel = this.tabs.findIndex((a) => a.id === i) > this.tabs.findIndex((a) => a.id === this.tab) ? 12 : -12, this.tab = i, this.resetScroll());
     }, this.todoError = "", this.busy = !1, this.message = "", this.draft = "", this.todoSequence = 0, this.todoSignature = "", this.todoLoading = !1, this.todoLoaded = !1, this.media = window.matchMedia("(prefers-color-scheme: dark)"), this.applyAppearance = () => {
       let t = null;
       try {
@@ -4699,7 +6324,7 @@ class Ce extends A {
       } catch {
       }
       const e = t || this.config.appearance || "auto";
-      this.appearance = Mt.includes(e) ? e : "auto", this.dark = ve(
+      this.appearance = te.includes(e) ? e : "auto", this.dark = We(
         this.appearance,
         this.media.matches,
         /* @__PURE__ */ new Date(),
@@ -4722,6 +6347,7 @@ class Ce extends A {
       detailEntity: { state: !0 },
       detailReady: { state: !0 },
       menuOpen: { state: !0 },
+      moreOpen: { state: !0 },
       narrow: { state: !0 },
       contentScrolled: { state: !0 },
       appearance: { state: !0 },
@@ -4736,7 +6362,10 @@ class Ce extends A {
     };
   }
   static {
-    this.styles = [ge, fe, be, Q];
+    this.styles = [Pe, qe, je, bt, hi];
+  }
+  get tabs() {
+    return bi;
   }
   get todoLists() {
     return this.todoListStates === this.hass?.states ? this.discoveredTodos : (this.todoListStates = this.hass?.states, this.discoveredTodos = Object.entries(this.hass?.states || {}).filter(([t]) => t.startsWith("todo.")).map(([t, e]) => ({ ...e, entity_id: t })).sort(
@@ -4744,7 +6373,7 @@ class Ce extends A {
     ), this.discoveredTodos);
   }
   listName(t) {
-    return this.hass?.states[t]?.attributes.friendly_name || k(t.replace(/^todo\./, ""));
+    return this.hass?.states[t]?.attributes.friendly_name || D(t.replace(/^todo\./, ""));
   }
   get todoEntity() {
     const t = this.todoLists;
@@ -4774,34 +6403,45 @@ class Ce extends A {
     return `signal-home-appearance-v2:${this.config.title || "Home"}`;
   }
   connectedCallback() {
-    super.connectedCallback(), this.chromePath = location.pathname, window.addEventListener("location-changed", this.syncChrome), window.addEventListener("popstate", this.syncChrome), this.syncRoute(), window.addEventListener("popstate", this.syncRoute), window.addEventListener("hashchange", this.syncRoute), this.media.addEventListener("change", this.applyAppearance), document.addEventListener("visibilitychange", this.applyAppearance), this.phone.addEventListener("change", this.resize), this.resize(), this.applyAppearance(), this.clock = setInterval(() => {
+    super.connectedCallback(), this.chromePath = location.pathname, window.addEventListener("location-changed", this.syncChrome), window.addEventListener("popstate", this.syncChrome), this.syncRoute(), window.addEventListener("popstate", this.syncRoute), window.addEventListener("hashchange", this.syncRoute), window.addEventListener("location-changed", this.syncRoute), this.media.addEventListener("change", this.applyAppearance), document.addEventListener("visibilitychange", this.applyAppearance), this.phone.addEventListener("change", this.resize), this.resize(), this.applyAppearance(), this.clock = setInterval(() => {
       this.applyAppearance(), this.requestUpdate(), this.todoEntity && this.loadTodos();
     }, 6e4);
   }
   disconnectedCallback() {
-    super.disconnectedCallback(), window.removeEventListener("location-changed", this.syncChrome), window.removeEventListener("popstate", this.syncChrome), this.chrome.release(), window.removeEventListener("popstate", this.syncRoute), window.removeEventListener("hashchange", this.syncRoute), this.media.removeEventListener("change", this.applyAppearance), document.removeEventListener("visibilitychange", this.applyAppearance), this.phone.removeEventListener("change", this.resize), clearInterval(this.clock), clearTimeout(this.timer), this.todoSequence++;
+    super.disconnectedCallback(), window.removeEventListener("location-changed", this.syncChrome), window.removeEventListener("popstate", this.syncChrome), this.chrome.release(), window.removeEventListener("popstate", this.syncRoute), window.removeEventListener("hashchange", this.syncRoute), window.removeEventListener("location-changed", this.syncRoute), this.media.removeEventListener("change", this.applyAppearance), document.removeEventListener("visibilitychange", this.applyAppearance), this.phone.removeEventListener("change", this.resize), clearInterval(this.clock), clearTimeout(this.timer), this.todoSequence++;
   }
   setConfig(t) {
     if (!t || typeof t != "object")
       throw new Error("Signal Home needs a configuration.");
-    for (const e of ["climate", "weather", "todo", "humidity"])
-      if (t[e] && typeof t[e] != "string")
-        throw new Error(`${e} must be an entity ID.`);
+    for (const i of ["climate", "weather", "todo", "humidity"])
+      if (t[i] && typeof t[i] != "string")
+        throw new Error(`${i} must be an entity ID.`);
     if (t.sensors && (!Array.isArray(t.sensors) || t.sensors.some(
-      (e) => !e || typeof Rt(e).entity != "string"
+      (i) => !i || typeof Et(i).entity != "string"
     )))
       throw new Error(
         "Sensors must be entity IDs or objects containing entity."
       );
-    if (t.favorites && (!Array.isArray(t.favorites) || t.favorites.some((e) => typeof e != "string")))
+    if (t.favorites && (!Array.isArray(t.favorites) || t.favorites.some((i) => typeof i != "string")))
       throw new Error("Favorites must be entity IDs.");
     if (t.graphs && (!Array.isArray(t.graphs) || t.graphs.some(
-      (e) => !e || typeof e != "string" && (typeof e.entity != "string" || e.hours !== void 0 && (!Number.isFinite(e.hours) || e.hours < 1 || e.hours > 168))
+      (i) => !i || typeof i != "string" && (typeof i.entity != "string" || i.hours !== void 0 && (!Number.isFinite(i.hours) || i.hours < 1 || i.hours > 168))
     )))
       throw new Error(
         "Graphs need an entity ID and optional hours between 1 and 168."
       );
-    this.config = { ...t }, this.selectedTodo = "", this.resetTodoState(), this.applyAppearance();
+    if (t.cameras !== void 0 && (!Array.isArray(t.cameras) || t.cameras.some((i) => typeof i != "string" || !/^camera\.[a-z0-9_]+$/.test(i))))
+      throw new Error("Cameras must be Home Assistant camera entity IDs.");
+    if (t.home_mode && !/^input_select\.[a-z0-9_]+$/.test(t.home_mode))
+      throw new Error("Home mode must be an input_select helper.");
+    const e = (i) => i && typeof i.name == "string" && /^(script|scene)\.[a-z0-9_]+$/.test(i.entity);
+    if (t.quick_actions && (!Array.isArray(t.quick_actions) || !t.quick_actions.every(e)))
+      throw new Error("Quick actions need a name and script or scene entity.");
+    if (t.light_rooms && (!Array.isArray(t.light_rooms) || !t.light_rooms.every((i) => i && typeof i.id == "string" && typeof i.name == "string" && Array.isArray(i.entities) && i.entities.length > 0 && i.entities.every((s) => /^(light|switch)\.[a-z0-9_]+$/.test(s)) && /^script\.[a-z0-9_]+$/.test(i.on_script) && /^script\.[a-z0-9_]+$/.test(i.off_script) && (!i.scenes || Array.isArray(i.scenes) && i.scenes.every(e)))))
+      throw new Error("Light rooms need lamp entities and on/off scripts.");
+    if (t.all_lights_off && !/^script\.[a-z0-9_]+$/.test(t.all_lights_off)) throw new Error("All lights off must be a script.");
+    if (t.doorbell && (!/^camera\.[a-z0-9_]+$/.test(t.doorbell.entity) || !/^[a-z0-9_]+$/.test(t.doorbell.camera) || t.doorbell.instance && !/^[a-z0-9_]+$/.test(t.doorbell.instance))) throw new Error("Doorbell needs valid camera and instance IDs.");
+    this.config = { ...t }, this.tabs.some((i) => i.id === this.tab) || (this.tab = "home"), this.selectedTodo = "", this.resetTodoState(), this.applyAppearance();
   }
   static getConfigElement() {
     return document.createElement("signal-home-editor");
@@ -4834,7 +6474,7 @@ class Ce extends A {
     return t ? this.hass?.states[t] : void 0;
   }
   format(t, e = 0) {
-    const i = y(t);
+    const i = w(t);
     return i === void 0 ? "—" : new Intl.NumberFormat(this.hass?.locale?.language || void 0, {
       maximumFractionDigits: e
     }).format(i);
@@ -4882,14 +6522,14 @@ class Ce extends A {
       if (e === this.todoSequence && t === this.todoEntity) {
         const s = i.response?.[t]?.items;
         if (!Array.isArray(s)) throw new Error("Missing list response");
-        this.todoOrder = new Map(s.map((a, d) => [a.uid, d])), this.todos = s.filter((a) => a.status === "needs_action"), this.completedTodos = s.filter(
-          (a) => a.status === "completed"
+        this.todoOrder = new Map(s.map((o, c) => [o.uid, c])), this.todos = s.filter((o) => o.status === "needs_action"), this.completedTodos = s.filter(
+          (o) => o.status === "completed"
         );
-        const n = new Set(this.completedTodos.map((a) => a.uid));
-        for (const a of Object.keys(this.completionTimes))
-          n.has(a) || delete this.completionTimes[a];
-        for (const a of s)
-          a.status !== "completed" ? delete this.completionTimes[a.uid] : Number.isFinite(this.completionTimes[a.uid]) || (this.completionTimes[a.uid] = Date.now());
+        const a = new Set(this.completedTodos.map((o) => o.uid));
+        for (const o of Object.keys(this.completionTimes))
+          a.has(o) || delete this.completionTimes[o];
+        for (const o of s)
+          o.status !== "completed" ? delete this.completionTimes[o.uid] : Number.isFinite(this.completionTimes[o.uid]) || (this.completionTimes[o.uid] = Date.now());
         this.saveCompletionTimes(), this.todoError = "", this.todoLoaded = !0;
       }
     } catch {
@@ -4921,8 +6561,8 @@ class Ce extends A {
   }
   /** Commit only after HA accepts the change; keep refreshes out of the transition. */
   async moveTodo(t, e, i, s = !1) {
-    const n = matchMedia("(prefers-reduced-motion: reduce)").matches, a = this.motionRows(), d = a.find((c) => c.dataset.todoUid === t);
-    if (d && !n && await d.animate(
+    const a = matchMedia("(prefers-reduced-motion: reduce)").matches, o = this.motionRows(), c = o.find((h) => h.dataset.todoUid === t);
+    if (c && !a && await c.animate(
       [
         { opacity: 1, transform: "none" },
         { opacity: 0, transform: "translateX(10px) scale(.98)" }
@@ -4931,22 +6571,22 @@ class Ce extends A {
     ).finished.catch(() => {
     }), i !== this.todoEntity || !this.isConnected) return;
     const l = new Map(
-      a.map((c) => [
-        c.dataset.todoMotion,
-        c.getBoundingClientRect().top
+      o.map((h) => [
+        h.dataset.todoMotion,
+        h.getBoundingClientRect().top
       ])
     );
     e(), await this.updateComplete;
-    const p = this.motionRows(), u = [];
-    if (!n)
-      for (const c of p) {
-        const m = l.get(c.dataset.todoMotion), f = c.dataset.todoUid === t, v = m === void 0 || f ? 12 : m - c.getBoundingClientRect().top;
-        !v && !f || u.push(
-          c.animate(
+    const d = this.motionRows(), u = [];
+    if (!a)
+      for (const h of d) {
+        const m = l.get(h.dataset.todoMotion), g = h.dataset.todoUid === t, b = m === void 0 || g ? 12 : m - h.getBoundingClientRect().top;
+        !b && !g || u.push(
+          h.animate(
             [
               {
-                transform: `translateY(${v}px)`,
-                opacity: m === void 0 || f ? 0 : 1
+                transform: `translateY(${b}px)`,
+                opacity: m === void 0 || g ? 0 : 1
               },
               { transform: "none", opacity: 1 }
             ],
@@ -4955,10 +6595,10 @@ class Ce extends A {
         );
       }
     if (await Promise.all(
-      u.map((c) => c.finished.catch(() => {
+      u.map((h) => h.finished.catch(() => {
       }))
     ), s && this.tab === "lists" && !this.deleteTarget && !this.menuOpen && !this.detailEntity) {
-      const m = p.find((f) => f.dataset.todoUid === t)?.querySelector(".check-button");
+      const m = d.find((g) => g.dataset.todoUid === t)?.querySelector(".check-button");
       requestAnimationFrame(() => {
         m?.isConnected && !m.disabled ? m.focus({ preventScroll: !0 }) : this.tab === "lists" && this.renderRoot.querySelector('[aria-label="Refresh list"]')?.focus({ preventScroll: !0 });
       });
@@ -4999,7 +6639,7 @@ class Ce extends A {
   }
   async complete(t, e = !1) {
     if (this.busy || !this.todoSupports(4)) return;
-    const i = this.todoEntity, s = this.shadowRoot?.activeElement, n = !!s?.matches(":focus-visible") && s.closest("[data-todo-uid]")?.dataset.todoUid === t.uid;
+    const i = this.todoEntity, s = this.shadowRoot?.activeElement, a = !!s?.matches(":focus-visible") && s.closest("[data-todo-uid]")?.dataset.todoUid === t.uid;
     this.busy = !0, this.pendingTodo = t.uid, this.todoMutating = !0, this.todoSequence++;
     try {
       if (await this.hass.callService("todo", "update_item", {
@@ -5011,23 +6651,23 @@ class Ce extends A {
         t.uid,
         () => {
           e ? (delete this.completionTimes[t.uid], this.completedTodos = this.completedTodos.filter(
-            (a) => a.uid !== t.uid
-          ), this.todos.some((a) => a.uid === t.uid) || (this.todos = [
+            (o) => o.uid !== t.uid
+          ), this.todos.some((o) => o.uid === t.uid) || (this.todos = [
             ...this.todos,
             { ...t, status: "needs_action", completed: null }
           ].sort(
-            (a, d) => (this.todoOrder.get(a.uid) ?? 1 / 0) - (this.todoOrder.get(d.uid) ?? 1 / 0)
-          )), this.notify("Back on your list.", "success")) : (this.completionTimes[t.uid] = Date.now(), this.todos = this.todos.filter((a) => a.uid !== t.uid), this.completedTodos = [
+            (o, c) => (this.todoOrder.get(o.uid) ?? 1 / 0) - (this.todoOrder.get(c.uid) ?? 1 / 0)
+          )), this.notify("Back on your list.", "success")) : (this.completionTimes[t.uid] = Date.now(), this.todos = this.todos.filter((o) => o.uid !== t.uid), this.completedTodos = [
             {
               ...t,
               status: "completed",
               completed: (/* @__PURE__ */ new Date()).toISOString()
             },
-            ...this.completedTodos.filter((a) => a.uid !== t.uid)
+            ...this.completedTodos.filter((o) => o.uid !== t.uid)
           ], this.notify("Checked off.", "success"), this.undoItem = t), this.saveCompletionTimes();
         },
         i,
-        n
+        a
       );
     } catch {
       this.notify("Couldn’t update the list. Try again.", "error");
@@ -5056,7 +6696,7 @@ class Ce extends A {
     }
   }
   chooseAppearance(t) {
-    if (Mt.includes(t)) {
+    if (te.includes(t)) {
       try {
         localStorage.setItem(this.appearanceKey, t);
       } catch {
@@ -5065,7 +6705,14 @@ class Ce extends A {
     }
   }
   navigate(t) {
-    t !== this.tab && (this.pageTravel = z.findIndex((e) => e.id === t) > z.findIndex((e) => e.id === this.tab) ? 12 : -12, t !== this.tab && history.pushState(history.state, "", `#signal/${t}`), this.tab = t, this.resetScroll());
+    if (t !== this.tab) {
+      if (this.pageTravel = this.tabs.findIndex((e) => e.id === t) > this.tabs.findIndex((e) => e.id === this.tab) ? 12 : -12, t !== this.tab) {
+        const e = new URL(location.href);
+        for (const i of ["signal_review", "signal_event", "signal_camera", "signal_instance"]) e.searchParams.delete(i);
+        e.hash = `signal/${t}`, history.pushState(history.state, "", e);
+      }
+      this.tab = t, this.resetScroll();
+    }
   }
   resetScroll() {
     this.updateComplete.then(
@@ -5073,74 +6720,87 @@ class Ce extends A {
     );
   }
   nav(t = !1) {
-    return r`<nav
-      class=${t ? "bottom-nav" : ""}
-      style=${`--active: ${z.findIndex((e) => e.id === this.tab)}`}
-      aria-label=${t ? "Mobile navigation" : "Dashboard navigation"}
-    >
-      ${t ? r`<span class="nav-indicator" aria-hidden="true"></span>` : h}
-      ${z.map((e) => r`<button aria-current=${this.tab === e.id ? "page" : h} @click=${() => this.navigate(e.id)}>${g(e.icon)}<span>${e.name}</span></button>`)}
+    const e = t ? [...this.tabs.filter((s) => ["home", "rooms", "cameras", "lists"].includes(s.id)), { id: "more", name: "More", icon: "more" }] : this.tabs, i = t && ["safety", "climate"].includes(this.tab) ? "more" : this.tab;
+    return r`<nav class=${t ? "bottom-nav" : ""}
+      style=${`--active: ${e.findIndex((s) => s.id === i)}; --tab-count: ${e.length}`}
+      aria-label=${t ? "Mobile navigation" : "Dashboard navigation"}>
+      ${t ? r`<span class="nav-indicator" aria-hidden="true"></span>` : p}
+      ${e.map((s) => r`<button aria-current=${i === s.id ? "page" : p} aria-expanded=${s.id === "more" ? this.moreOpen : p} aria-haspopup=${s.id === "more" ? "dialog" : p} @click=${() => {
+      s.id === "more" ? this.moreOpen = !0 : this.navigate(s.id);
+    }}>${f(s.icon)}<span>${s.name}</span></button>`)}
     </nav>`;
   }
+  chooseMore(t) {
+    this.moreDestination = t, this.renderRoot.querySelector("#more-sheet")?.requestClose();
+  }
+  digestNavigation(t) {
+    if (this.navigate(t.detail.route), t.detail.review && this.config.doorbell) {
+      const e = new URL(location.href);
+      e.searchParams.set("signal_review", t.detail.review), e.searchParams.set("signal_camera", this.config.doorbell.camera), e.searchParams.set("signal_instance", this.config.doorbell.instance || "frigate"), history.replaceState(history.state, "", e), window.dispatchEvent(new Event("location-changed"));
+    }
+  }
   get sensors() {
-    return (this.config.sensors || []).map(Rt);
+    return (this.config.sensors || []).map(Et);
   }
   get safetySummary() {
+    if (this.hass?.connection?.connected === !1) return { alarm: 0, unknown: this.sensors.length || 1, unverified: 0, text: "Connection lost" };
     const t = this.sensors, e = t.filter(
-      (s) => this.state(s.entity)?.state === "on"
-    ).length, i = t.filter((s) => !$(this.state(s.entity))).length;
+      (a) => a.entity.startsWith("lock.") ? $(this.state(a.entity)) && this.state(a.entity)?.state !== "locked" : this.state(a.entity)?.state === "on"
+    ).length, i = t.filter((a) => !$(this.state(a.entity))).length, s = t.filter((a) => a.unverified && $(this.state(a.entity)) && this.state(a.entity)?.state !== "on").length;
     return {
       alarm: e,
       unknown: i,
-      text: e ? `${e} sensor${e > 1 ? "s" : ""} need attention` : i ? `${i} sensor${i > 1 ? "s" : ""} unavailable` : t.length ? "Sensors clear" : "Make yourself at home"
+      unverified: s,
+      text: e ? `${e} sensor${e > 1 ? "s" : ""} need attention` : i ? `${i} sensor${i > 1 ? "s" : ""} unavailable` : s ? `${s} sensor${s > 1 ? "s" : ""} need verification` : t.length ? "Sensors clear" : "Make yourself at home"
     };
   }
   climate(t = !1) {
     const e = this.state(this.config.climate);
     if (!this.config.climate)
       return r`<section class="panel mint climate">
-        <div class="panel-label">${g("climate")} Climate</div>
+        <div class="panel-label">${f("climate")} Climate</div>
         <h2 style="margin-top:40px">Comfort starts here.</h2>
         <p>
           Choose a climate entity in the card editor to bring your home’s
           temperature into focus.
         </p>
       </section>`;
-    const i = $(e), s = e?.attributes || {}, n = y(s.current_temperature), a = y(s.target_temp_low), d = y(s.target_temp_high), l = i && e.state === "heat_cool" && a !== void 0 && d !== void 0 && ((y(s.supported_features) ?? 0) & 2) !== 0, p = l ? this.rangeSide === "low" ? a : d : y(s.temperature), u = l && this.rangeSide === "high" ? a : y(s.min_temp) ?? 7, c = l && this.rangeSide === "low" ? d : y(s.max_temp) ?? 35, m = y(s.target_temp_step) || (this.hass?.config?.unit_system?.temperature === "°F" ? 1 : 0.5), f = this.hass?.config?.unit_system?.temperature || "°", v = p ?? n, b = v === void 0 ? 0 : Math.max(
+    const i = $(e), s = e?.attributes || {}, a = w(s.current_temperature), o = w(s.target_temp_low), c = w(s.target_temp_high), l = i && e.state === "heat_cool" && o !== void 0 && c !== void 0 && ((w(s.supported_features) ?? 0) & 2) !== 0, d = l ? this.rangeSide === "low" ? o : c : w(s.temperature), u = l && this.rangeSide === "high" ? o : w(s.min_temp) ?? 7, h = l && this.rangeSide === "low" ? c : w(s.max_temp) ?? 35, m = w(s.target_temp_step) || (this.hass?.config?.unit_system?.temperature === "°F" ? 1 : 0.5), g = this.hass?.config?.unit_system?.temperature || "°", b = a, x = b === void 0 ? 0 : Math.max(
       0,
       Math.min(
         1,
-        (v - (y(s.min_temp) ?? 7)) / Math.max(
+        (b - (w(s.min_temp) ?? 7)) / Math.max(
           1,
-          (y(s.max_temp) ?? 35) - (y(s.min_temp) ?? 7)
+          (w(s.max_temp) ?? 35) - (w(s.min_temp) ?? 7)
         )
       )
-    ), x = i && p !== void 0 && (l || ((y(s.supported_features) ?? 0) & 1) !== 0) && e.state !== "off", w = (E) => {
-      if (!x || p === void 0) return;
-      const tt = Number(
-        Math.max(u, Math.min(c, p + E)).toFixed(2)
-      ), jt = l ? {
-        target_temp_low: this.rangeSide === "low" ? tt : a,
-        target_temp_high: this.rangeSide === "high" ? tt : d
-      } : { temperature: tt };
+    ), C = i && d !== void 0 && (l || ((w(s.supported_features) ?? 0) & 1) !== 0) && e.state !== "off", y = (T) => {
+      if (!C || d === void 0) return;
+      const H = Number(
+        Math.max(u, Math.min(h, d + T)).toFixed(2)
+      ), X = l ? {
+        target_temp_low: this.rangeSide === "low" ? H : o,
+        target_temp_high: this.rangeSide === "high" ? H : c
+      } : { temperature: H };
       this.service("climate", "set_temperature", {
         entity_id: this.config.climate,
-        ...jt
+        ...X
       });
-    }, P = Array.isArray(s.hvac_modes) ? s.hvac_modes : [];
+    }, E = Array.isArray(s.hvac_modes) ? s.hvac_modes : [];
     return r`<section
       class="panel mint climate"
+      data-activity=${i ? s.hvac_action || "idle" : "unavailable"}
       aria-label="Climate control"
     >
       <div class="panel-top">
-        <span class="panel-label">${g("climate")} Home climate</span
+        <span class="panel-label">${f("climate")} Home climate</span
         ><button
           class="icon-button"
           aria-label="Climate details"
           ?hidden=${t}
           @click=${() => this.moreInfo(this.config.climate)}
         >
-          ${g("arrow")}
+          ${f("arrow")}
         </button>
       </div>
       <div class="dial">
@@ -5161,76 +6821,76 @@ class Ce extends A {
             r="101"
             fill="none"
             stroke-width="5"
-            stroke-dasharray=${`${b * 476} 635`}
+            stroke-dasharray=${`${x * 476} 635`}
             stroke-linecap="round"
             class="dial-fill"
           />
         </svg>
         <div class="dial-center">
           <div class="dial-mode">
-            ${i ? k(s.hvac_action || e.state) : "Unavailable"}
+            ${i ? D(s.hvac_action || e.state) : "Unavailable"}
           </div>
           <div class="dial-value" aria-live="polite">
-            ${Et(v, r`<span class="value-in">${i ? this.format(v, 1) : "—"}</span>`)}<sup
-              >${f}</sup
+            ${Xt(b, r`<span class="value-in">${i ? this.format(b, 1) : "—"}</span>`)}<sup
+              >${g}</sup
             >
           </div>
           <div class="dial-caption">
-            ${i ? l ? this.rangeSide === "low" ? "Heat below" : "Cool above" : p !== void 0 ? "Target temperature" : "Current temperature" : "Waiting for your thermostat"}
+            ${i ? "Current temperature" : "Waiting for your thermostat"}
           </div>
         </div>
       </div>
       <div class="stepper">
         <button
           aria-label="Decrease target temperature"
-          ?disabled=${!x || this.busy || p <= u}
-          @click=${() => w(-m)}
+          ?disabled=${!C || this.busy || d <= u}
+          @click=${() => y(-m)}
         >
-          ${g("minus")}</button
+          ${f("minus")}</button
         ><span
-          >${i ? `${this.format(n, 1)}${f} inside` : "No reading"}</span
+          >${i ? `${l ? this.rangeSide === "low" ? "Heat below" : "Cool above" : "Target"} ${this.format(d, 1)}${g}` : "No reading"}</span
         ><button
           aria-label="Increase target temperature"
-          ?disabled=${!x || this.busy || p >= c}
-          @click=${() => w(m)}
+          ?disabled=${!C || this.busy || d >= h}
+          @click=${() => y(m)}
         >
-          ${g("plus")}
+          ${f("plus")}
         </button>
       </div>
-      ${l ? r`<div class="range-tabs" aria-label="Temperature range"><button aria-pressed=${this.rangeSide === "low"} @click=${() => this.rangeSide = "low"}>Heat ${this.format(a, 1)}°</button><button aria-pressed=${this.rangeSide === "high"} @click=${() => this.rangeSide = "high"}>Cool ${this.format(d, 1)}°</button></div>` : h}
+      ${l ? r`<div class="range-tabs" aria-label="Temperature range"><button aria-pressed=${this.rangeSide === "low"} @click=${() => this.rangeSide = "low"}>Heat ${this.format(o, 1)}°</button><button aria-pressed=${this.rangeSide === "high"} @click=${() => this.rangeSide = "high"}>Cool ${this.format(c, 1)}°</button></div>` : p}
       <div class="climate-foot">
         <span
-          >${g("drop")}
+          >${f("drop")}
           ${this.format(this.state(this.config.humidity)?.state ?? s.current_humidity)}%
           humidity</span
-        >${P.length ? r`<select
+        >${E.length ? r`<select
                 aria-label="HVAC mode"
-                .value=${U(e?.state || "")}
+                .value=${K(e?.state || "")}
                 ?disabled=${!i || this.busy}
-                @change=${(E) => this.service("climate", "set_hvac_mode", { entity_id: this.config.climate, hvac_mode: E.target.value })}
+                @change=${(T) => this.service("climate", "set_hvac_mode", { entity_id: this.config.climate, hvac_mode: T.target.value })}
               >
-                ${P.map((E) => r`<option value=${E} .selected=${U(E === e?.state)}>${Ot[E] || k(E)}</option>`)}
-              </select>` : h}
+                ${E.map((T) => r`<option value=${T} .selected=${K(T === e?.state)}>${vi[T] || D(T)}</option>`)}
+              </select>` : p}
       </div>
     </section>`;
   }
   weather(t = !1) {
-    const e = this.state(this.config.weather), i = $(e), s = e?.attributes || {}, n = s.temperature_unit || this.hass?.config?.unit_system?.temperature || "°";
+    const e = this.state(this.config.weather), i = $(e), s = e?.attributes || {}, a = s.temperature_unit || this.hass?.config?.unit_system?.temperature || "°";
     return r`<section class="panel lilac weather">
       <div class="panel-top">
-        <span class="panel-label">${g("sun")} Outside</span
-        >${this.config.weather && !t ? r`<button class="icon-button" aria-label="Weather details" @click=${() => this.moreInfo(this.config.weather)}>${g("arrow")}</button>` : h}
+        <span class="panel-label">${f("sun")} Outside</span
+        >${this.config.weather && !t ? r`<button class="icon-button" aria-label="Weather details" @click=${() => this.moreInfo(this.config.weather)}>${f("arrow")}</button>` : p}
       </div>
       <div class="weather-content">
         <div>
           <div class="weather-temp">
             ${i ? this.format(s.temperature) : "—"}<span
               style="font-size:27px;vertical-align:top;position:relative;top:9px;letter-spacing:-1px"
-              >${n}</span
+              >${a}</span
             >
           </div>
           <div class="weather-condition">
-            ${i ? k(e.state) : "Weather unavailable"}
+            ${i ? D(e.state) : "Weather unavailable"}
           </div>
         </div>
         <div
@@ -5238,7 +6898,7 @@ class Ce extends A {
           aria-hidden="true"
         >
           <div class="sun-disc"></div>
-          ${["sunny", "clear-night"].includes(e?.state || "") ? h : r`<div class="cloud"></div>`}
+          ${["sunny", "clear-night"].includes(e?.state || "") ? p : r`<div class="cloud"></div>`}
         </div>
       </div>
       <div class="weather-details">
@@ -5270,7 +6930,7 @@ class Ce extends A {
         aria-label=${`${e ? "Restore" : "Complete"} ${t.summary}`}
         @click=${() => this.complete(t, e)}
       >
-        <span class="check-box">${e ? g("check") : h}</span>
+        <span class="check-box">${e ? f("check") : p}</span>
       </button>
       <span class="todo-label">${t.summary}</span>
       <button
@@ -5280,12 +6940,12 @@ class Ce extends A {
         title="Delete permanently"
         @click=${() => this.askDelete(t)}
       >
-        ${g("trash")}
+        ${f("trash")}
       </button>
     </div>`;
   }
   todoListPicker() {
-    return this.todoLists.length < 2 ? h : r`<div
+    return this.todoLists.length < 2 ? p : r`<div
       class="list-switcher"
       role="group"
       aria-label="Your to-do lists"
@@ -5297,7 +6957,7 @@ class Ce extends A {
             ?disabled=${this.busy}
             @click=${() => this.chooseTodo(t.entity_id)}
           >
-            ${g("list")}<span>${this.listName(t.entity_id)}</span>
+            ${f("list")}<span>${this.listName(t.entity_id)}</span>
             <small>${$(t) ? t.state : "Offline"}</small>
           </button>`
     )}
@@ -5309,13 +6969,13 @@ class Ce extends A {
       aria-busy=${this.todoLoading}
     >
       <div class="panel-top">
-        <span class="panel-label">${g("list")} ${this.todoName}</span
-        >${t ? r`<button class="icon-button" aria-label="Refresh list" @click=${() => this.loadTodos()}>${g("list")}</button>` : r`<button class="icon-button" aria-label="Open to-do lists" @click=${() => this.navigate("lists")}>${g("arrow")}</button>`}
+        <span class="panel-label">${f("list")} ${this.todoName}</span
+        >${t ? r`<button class="icon-button" aria-label="Refresh list" @click=${() => this.loadTodos()}>${f("list")}</button>` : r`<button class="icon-button" aria-label="Open to-do lists" @click=${() => this.navigate("lists")}>${f("arrow")}</button>`}
       </div>
       ${this.todoEntity ? this.todoError && !this.todoLoaded ? r`<button class="text-button" @click=${() => this.loadTodos()}>
                 ${this.todoError}
               </button>` : r`<div class="list-preview">
-                ${this.todos.length ? Tt(
+                ${this.todos.length ? pt(
       t ? this.todos : this.todos.slice(0, 2),
       (e) => e.uid,
       (e) => this.todoRow(e)
@@ -5334,19 +6994,19 @@ class Ce extends A {
               No to-do lists are available. Add a list in Home Assistant and it
               will appear here.
             </p>`}
-      ${t && this.todoEntity ? r`<form class="todo-form" data-todo-motion="form" @submit=${this.addTodo}><input aria-label="New task" placeholder="Add something good…" maxlength="255" ?disabled=${!this.todoSupports(1)} .value=${this.draft} @input=${(e) => this.draft = e.target.value} /><button aria-label="Add task" ?disabled=${this.busy || !this.draft.trim() || !this.todoSupports(1)}>${g("plus")}</button></form>` : r`<button class="text-button" @click=${() => this.navigate("lists")}>${this.todos.length ? `${this.todos.length} things on your list` : "Open your list"} ${g("arrow")}</button>`}
-      ${this.todoError && this.todoLoaded ? r`<button class="text-button" @click=${() => this.loadTodos()}>Couldn’t refresh. Showing the last loaded list. Retry</button>` : h}
-      ${t && (!this.todoError || this.todoLoaded) ? this.completedList() : h}
+      ${t && this.todoEntity ? r`<form class="todo-form" data-todo-motion="form" @submit=${this.addTodo}><input aria-label="New task" placeholder="Add something good…" maxlength="255" ?disabled=${!this.todoSupports(1)} .value=${this.draft} @input=${(e) => this.draft = e.target.value} /><button aria-label="Add task" ?disabled=${this.busy || !this.draft.trim() || !this.todoSupports(1)}>${f("plus")}</button></form>` : r`<button class="text-button" @click=${() => this.navigate("lists")}>${this.todos.length ? `${this.todos.length} things on your list` : "Open your list"} ${f("arrow")}</button>`}
+      ${this.todoError && this.todoLoaded ? r`<button class="text-button" @click=${() => this.loadTodos()}>Couldn’t refresh. Showing the last loaded list. Retry</button>` : p}
+      ${t && (!this.todoError || this.todoLoaded) ? this.completedList() : p}
     </section>`;
   }
   completedList() {
-    if (!this.completedTodos.length) return h;
+    if (!this.completedTodos.length) return p;
     const t = Date.now() - 864e5, e = [...this.completedTodos].sort(
-      (a, d) => this.completedAt(d) - this.completedAt(a)
-    ), i = e.filter((a) => this.completedAt(a) > t), s = e.filter((a) => this.completedAt(a) <= t), n = (a) => Tt(
-      a,
-      (d) => d.uid,
-      (d) => this.todoRow(d, !0)
+      (o, c) => this.completedAt(c) - this.completedAt(o)
+    ), i = e.filter((o) => this.completedAt(o) > t), s = e.filter((o) => this.completedAt(o) <= t), a = (o) => pt(
+      o,
+      (c) => c.uid,
+      (c) => this.todoRow(c, !0)
     );
     return r`<div class="completed-list">
       <h3 data-todo-motion="completed-heading">
@@ -5356,45 +7016,66 @@ class Ce extends A {
         Tap a check to put it back. After 24 hours, items move to Older
         completed.
       </p>
-      ${this.config.completed_retention_days && this.todoEntity === this.config.todo ? r`<p data-todo-motion="retention">HA automatically deletes timestamped completed items after ${this.config.completed_retention_days} days. Restore anything you still need before then.</p>` : h}
-      ${n(i)}
+      ${this.config.completed_retention_days && this.todoEntity === this.config.todo ? r`<p data-todo-motion="retention">HA automatically deletes timestamped completed items after ${this.config.completed_retention_days} days. Restore anything you still need before then.</p>` : p}
+      ${a(i)}
       ${s.length ? r`<details>
               <summary data-todo-motion="older-heading">
                 Older completed · ${s.length}
               </summary>
-              ${n(s)}
-            </details>` : h}
-      ${e.some((a) => !a.completed || !Number.isFinite(Date.parse(a.completed))) ? r`<small>For items without a completion time, the 24 hours starts when this device first sees them completed.</small>` : h}
+              ${a(s)}
+            </details>` : p}
+      ${e.some((o) => !o.completed || !Number.isFinite(Date.parse(o.completed))) ? r`<small>For items without a completion time, the 24 hours starts when this device first sees them completed.</small>` : p}
     </div>`;
   }
+  securityMode() {
+    const t = this.state(this.config.home_mode), e = [
+      { name: "Home", icon: "home", title: "At home", detail: "Saved household preference" },
+      { name: "Sleeping", icon: "moon", title: "Sleeping", detail: "Saved nighttime preference" },
+      { name: "Away", icon: "arrow", title: "Away", detail: "Saved out-of-home preference" }
+    ];
+    return r`<section class="security-mode" aria-label="Household mode">
+      <div class="security-mode-head"><div><span class="eyebrow">Household mode</span><h2>${$(t) ? t.state : "Unavailable"}</h2></div><span class="mode-context">Saved preference · alarm not connected</span></div>
+      <div class="security-mode-options">${e.map((i) => r`<button class=${`security-mode-option mode-${i.name.toLowerCase()}`} aria-pressed=${t?.state === i.name} ?disabled=${!$(t) || this.busy || this.hass.connection?.connected === !1} @click=${() => this.service("input_select", "select_option", { entity_id: this.config.home_mode, option: i.name }, `${i.name} preference saved`)}>
+        <span class="mode-icon">${f(i.icon)}</span><strong>${i.title}</strong><small>${i.detail}</small><span class="mode-check" aria-hidden="true">${t?.state === i.name ? f("check") : p}</span>
+      </button>`)}</div>
+    </section>`;
+  }
   safety() {
-    return this.sensors.length ? r`<div class="sensors">
-      ${this.sensors.map((t) => {
-      const e = this.state(t.entity), i = $(e), s = e?.state === "on", n = e?.attributes.device_class, a = i ? s ? n === "moisture" ? "Water detected" : n === "opening" || n === "door" || n === "window" ? "Open" : "Detected" : n === "moisture" ? "Dry" : n === "opening" || n === "door" || n === "window" ? "Closed" : "Clear" : "Unavailable", d = this.state(t.battery), l = $(d) ? y(d.state) : void 0;
-      return r`<button
-          class="sensor"
-          @click=${() => this.moreInfo(t.entity)}
-        >
-          <div class="sensor-head">
-            <span
-              class=${`sensor-symbol ${i ? s ? "bad" : "" : "unknown"}`}
-              >${g(i ? s ? "warn" : n === "moisture" ? "drop" : "shield" : "warn")}</span
-            ><span class="sensor-state">${a}</span>
-          </div>
-          <div>
-            <div class="sensor-name">
-              ${t.name || e?.attributes.friendly_name || t.entity}
-            </div>
-            <div class="sensor-sub">
-              ${t.battery ? l !== void 0 ? `${l}% battery${l < 20 ? " · Low battery" : ""}` : "Battery unavailable" : "Tap for details"}
-            </div>
-          </div>
-        </button>`;
-    })}
-    </div>` : r`<div class="notice">
+    if (!this.sensors.length)
+      return r`<div class="notice">
         Add your water, smoke, or opening sensors in the card editor. Their
         actual state will appear here.
       </div>`;
+    const t = (c) => this.state(c.entity)?.attributes.device_class, e = this.sensors.filter((c) => c.entity.startsWith("lock.") || ["door", "window", "opening", "garage_door"].includes(t(c))), i = this.sensors.filter((c) => t(c) === "moisture"), s = this.sensors.filter((c) => !e.includes(c) && !i.includes(c)), a = (c) => {
+      const l = c?.last_reported || c?.last_updated;
+      return l && Number.isFinite(Date.parse(l)) ? new Date(l).toLocaleString(this.hass.locale?.language || void 0, { month: "short", day: "numeric", hour: "numeric", minute: "2-digit", timeZone: this.hass.config?.time_zone }) : "time unknown";
+    }, o = (c) => r`<div class="sensors">${c.map((l) => {
+      const d = this.state(l.entity), u = $(d), h = l.entity.startsWith("lock.") ? u && d.state !== "locked" : d?.state === "on", m = d?.attributes.device_class, g = u ? l.entity.startsWith("lock.") ? D(d?.state) : h ? m === "moisture" ? "Water detected" : m === "opening" || m === "door" || m === "window" ? "Open" : "Detected" : l.unverified ? "Needs verification" : m === "moisture" ? "Dry" : m === "opening" || m === "door" || m === "window" ? "Closed" : "Clear" : "Unavailable", b = this.state(l.battery), x = $(b) ? w(b.state) : void 0;
+      return r`<button
+          class="sensor"
+          @click=${() => this.moreInfo(l.entity)}
+        >
+          <div class="sensor-head">
+            <span
+              class=${`sensor-symbol ${!u || l.unverified && !h ? "unknown" : h ? "bad" : ""}`}
+              >${f(["door", "window", "opening", "garage_door"].includes(m) ? "door" : m === "moisture" ? "drop" : !u || h ? "warn" : "shield")}</span
+            ><span class="sensor-state">${g}</span>
+          </div>
+          <div>
+            <div class="sensor-name">
+              ${l.name || d?.attributes.friendly_name || l.entity}
+            </div>
+            <div class="sensor-sub">
+              ${l.unverified ? `Last reported ${u ? l.entity.startsWith("lock.") ? d.state : d.state === "off" ? "closed" : d.state === "on" ? "open" : d.state : "unavailable"} · ${a(d)}` : l.battery ? x !== void 0 ? `${x}% battery${x < 20 ? " · Low battery" : ""}` : "Battery unavailable" : "Tap for details"}
+            </div>
+          </div>
+        </button>`;
+    })}</div>`;
+    return r`<div class="sensor-sections">
+      ${e.length ? r`<section class="sensor-section" aria-label="Doors"><h2>Doors</h2>${o(e)}</section>` : p}
+      ${i.length ? r`<section class="sensor-section" aria-label="Water"><h2>Water</h2>${o(i)}</section>` : p}
+      ${s.length ? r`<section class="sensor-section" aria-label="Other sensors"><h2>Other sensors</h2>${o(s)}</section>` : p}
+    </div>`;
   }
   favorites() {
     return this.config.favorites?.length ? r`<div class="section-top">
@@ -5406,7 +7087,7 @@ class Ce extends A {
             .hass=${this.hass}
             .configuration=${{ type: "custom:signal-control", entity: t, appearance: this.dark ? "dark" : "light" }}
           ></signal-control>`)}
-      </div>` : h;
+      </div>` : p;
   }
   graphs(t = !1) {
     return this.config.graphs?.length ? r`<div class="section-top">
@@ -5422,15 +7103,15 @@ class Ce extends A {
             .configuration=${{ ...s, type: "custom:signal-graph", accent: i % 2 ? "mint" : "lilac", appearance: this.dark ? "dark" : "light" }}
           ></signal-graph>`;
     })}
-      </div>` : h;
+      </div>` : p;
   }
   content() {
-    return this.tab === "climate" ? r`<div class="grid detail-grid">
+    return this.tab === "rooms" ? r`<signal-lights .hass=${this.hass} .rooms=${this.config.light_rooms || []} .dark=${this.dark}></signal-lights>` : this.tab === "cameras" ? r`<signal-cameras .hass=${this.hass} .cameras=${this.config.cameras || []} @signal-camera-navigation=${() => this.resetScroll()}></signal-cameras>` : this.tab === "climate" ? r`<div class="grid detail-grid">
           ${this.climate()}
           <div class="stack">
             ${this.weather()}
             <section class="panel lime">
-              <div class="panel-label">${g("drop")} Inside humidity</div>
+              <div class="panel-label">${f("drop")} Inside humidity</div>
               <div class="metric">
                 ${this.format(this.state(this.config.humidity)?.state ?? this.state(this.config.climate)?.attributes.current_humidity)}<small
                   >%</small
@@ -5442,123 +7123,18 @@ class Ce extends A {
             </section>
           </div>
         </div>
-        ${this.graphs()}` : this.tab === "safety" ? r`${this.safety()}
+        ${this.graphs()}` : this.tab === "safety" ? r`${this.securityMode()}${this.safety()}
         <div class="notice" style="margin-top:20px">
-          ${this.safetySummary.alarm ? "A sensor is reporting an active state. Open it for details." : this.safetySummary.unknown ? "An unavailable sensor cannot confirm the condition of its space." : "Tap any sensor for its history and details."}
+          ${this.safetySummary.alarm ? "A sensor is reporting an active state. Open it for details." : this.safetySummary.unknown ? "An unavailable sensor cannot confirm the condition of its space." : this.safetySummary.unverified ? "These sensors have not passed a recent physical test. Their last reported states are not confirmed current conditions." : "Tap any sensor for its history and details."}
         </div>` : this.tab === "lists" ? r`<div style="max-width:740px">
         ${this.todoListPicker()}${this.grocery(!0)}
-      </div>` : this.narrow ? this.pocketOverview() : r`<div class="grid">
-        ${this.climate()}
-        <div class="stack">${this.weather()}${this.grocery()}</div>
-      </div>
-      ${this.favorites()}
-      <div class="section-top">
-        <h2>Around the house</h2>
-        <button class="text-button" @click=${() => this.navigate("safety")}>
-          All sensors ${g("arrow")}
-        </button>
-      </div>
-      ${this.safety()}`;
+      </div>` : this.householdOverview();
   }
-  pocketOverview() {
-    const t = this.state(this.config.climate), e = t?.attributes || {}, i = $(t), s = this.state(this.config.weather), n = s?.attributes || {}, a = $(s), d = this.hass.config?.unit_system?.temperature || "°", l = y(
-      this.state(this.config.humidity)?.state ?? e.current_humidity
-    ), p = this.safetySummary, u = i ? t.state === "off" ? "Climate is off" : t.state === "heat_cool" ? `Heat ${this.format(e.target_temp_low)}° · Cool ${this.format(e.target_temp_high)}°` : `${Ot[t.state] || k(t.state)} · Target ${this.format(e.temperature)}°` : this.config.climate ? "Controls unavailable" : "Choose a climate entity in the editor", c = this.state(this.todoEntity), m = $(c) ? y(c.state) : void 0;
-    return r`<div class="pocket-overview">
-      <button
-        class="pocket-tile comfort-tile mint"
-        aria-label="Climate details"
-        ?disabled=${!this.config.climate}
-        @click=${() => this.moreInfo(this.config.climate)}
-      >
-        <span class="tile-top"
-          ><span class="tile-label">${g("climate")} Inside</span
-          ><span class="live-chip"
-            >${i ? k(e.hvac_action || t.state) : "Unavailable"}</span
-          ></span
-        >
-        <span class="comfort-reading"
-          ><span class="pocket-temperature"
-            >${i ? this.format(e.current_temperature) : "—"}<small
-              >${d}</small
-            ></span
-          ><span class="comfort-orbit" aria-hidden="true"
-            ><i></i><i></i><span>${g("home")}</span></span
-          ></span
-        >
-        <span class="tile-bottom"
-          ><span
-            ><strong>${u}</strong
-            ><small
-              >${l !== void 0 ? `${this.format(l)}% humidity` : "Humidity unavailable"}</small
-            ></span
-          ><span class="tile-arrow">${g("arrow")}</span></span
-        >
-      </button>
-      <div class="pocket-pair">
-        <button
-          class="pocket-tile outside-tile lilac"
-          aria-label="Weather details"
-          ?disabled=${!this.config.weather}
-          @click=${() => this.moreInfo(this.config.weather)}
-        >
-          <span class="tile-top"
-            ><span class="tile-label">Outside</span
-            >${g(s?.state === "clear-night" ? "moon" : s?.state === "sunny" ? "sun" : s?.state?.includes("rain") ? "drop" : s?.state?.includes("wind") ? "wind" : "cloud")}</span
-          >
-          <span class="pocket-reading"
-            >${a ? this.format(n.temperature) : "—"}<small
-              >${n.temperature_unit || d}</small
-            ></span
-          ><span class="tile-bottom"
-            ><span class="tile-caption"
-              >${a ? k(s.state) : this.config.weather ? "Unavailable" : "Choose weather in editor"}</span
-            >${g("arrow")}</span
-          >
-        </button>
-        <button
-          class="pocket-tile list-tile apricot"
-          aria-label="Open to-do lists"
-          @click=${() => this.navigate("lists")}
-        >
-          <span class="tile-top"
-            ><span class="tile-label">${this.todoName}</span
-            >${g("list")}</span
-          ><span class="pocket-reading"
-            >${m === void 0 ? "—" : m}<small
-              >${m === 1 ? "item" : "items"}</small
-            ></span
-          ><span class="tile-bottom"
-            ><span class="tile-caption"
-              >${this.todoError ? "Tap to retry" : m === void 0 ? "Open your list" : m === 0 ? "All caught up" : this.todos[0]?.summary || "Ready when you are"}</span
-            >${g("arrow")}</span
-          >
-        </button>
-      </div>
-      <button
-        class=${`home-signal ${p.alarm ? "attention" : p.unknown ? "uncertain" : ""}`}
-        @click=${() => this.navigate("safety")}
-        aria-label=${`Home status: ${p.text}`}
-      >
-        <span class="signal-symbol"
-          >${g(p.alarm || p.unknown ? "warn" : "shield")}</span
-        ><span
-          ><strong>${p.text}</strong
-          ><small
-            >${p.alarm ? "Take a closer look" : p.unknown ? "Some spaces cannot be checked" : this.sensors.length ? "Your sensors, together" : "Choose sensors in the editor"}</small
-          ></span
-        >${g("arrow")}
-      </button>
-      ${this.favorites()}
-      <div class="section-top">
-        <h2>Around the house</h2>
-        <small>${this.sensors.length} sensors</small>
-      </div>
-      ${this.safety()}
-    </div>`;
+  householdOverview() {
+    return r`<signal-digest .hass=${this.hass} .config=${this.config} @signal-digest-navigation=${this.digestNavigation}></signal-digest>`;
   }
   appHeader(t) {
-    const e = qt(t, this.hass.config?.time_zone), i = `Good ${e < 12 ? "morning" : e < 18 ? "afternoon" : "evening"}.`;
+    const e = ut(t, this.hass.config?.time_zone), i = `Good ${e < 12 ? "morning" : e < 18 ? "afternoon" : "evening"}.`;
     return r`<header
       class=${`app-header ${this.contentScrolled ? "scrolled" : ""}`}
     >
@@ -5577,7 +7153,7 @@ class Ce extends A {
           aria-label="Open Signal menu"
           @click=${() => this.menuOpen = !0}
         >
-          ${g("settings")}
+          ${f("settings")}
         </button>
       </div>
     </header>`;
@@ -5585,9 +7161,9 @@ class Ce extends A {
   render() {
     if (!this.hass)
       return r`<div class="notice" role="status">Connecting to home…</div>`;
-    const t = /* @__PURE__ */ new Date(), e = this.config.greeting || "Home, at a glance.", i = this.tab === "home" ? e : this.tab === "climate" ? "Just your temperature." : this.tab === "safety" ? "Peace of mind." : "Good things, listed.", s = this.tab === "home" ? "Your home, at a glance." : this.tab === "climate" ? "Find your comfortable." : this.tab === "safety" ? "A clear view of the things that matter." : "A little space for everyday essentials.", n = this.safetySummary, a = new URL(location.href);
-    a.searchParams.set("disable_km", ""), a.hash = "";
-    const d = this.sensors.find((l) => l.entity === this.detailEntity);
+    const t = /* @__PURE__ */ new Date(), e = this.config.greeting || "Home, at a glance.", i = this.tab === "home" ? e : this.tab === "rooms" ? "Lighting." : this.tab === "climate" ? "Just your temperature." : this.tab === "safety" ? "Peace of mind." : this.tab === "cameras" ? "Cameras." : "Good things, listed.", s = this.tab === "home" ? "Your home, at a glance." : this.tab === "climate" ? "Current temperature and comfort controls." : this.tab === "safety" ? "A clear view of the things that matter." : this.tab === "rooms" ? "Lighting, room by room." : this.tab === "cameras" ? "Live video and recorded activity." : "A little space for everyday essentials.", a = this.safetySummary, o = new URL(location.href);
+    o.searchParams.set("disable_km", ""), o.hash = "";
+    const c = this.sensors.find((l) => l.entity === this.detailEntity);
     return r`<div
       class=${`app ${this.dark ? "dark" : ""} ${this.immersive ? "immersive" : ""} ${this.tab === "home" ? "overview-page" : ""}`}
     >
@@ -5605,26 +7181,34 @@ class Ce extends A {
           </div>
         </div>
       </aside>
-      ${this.narrow ? this.appHeader(t) : h}
+      ${this.narrow ? this.appHeader(t) : p}
       <main @scroll=${this.onContentScroll}>
-        ${this.narrow ? h : this.appHeader(t)}
-        <div class="page-heading">
+        ${this.narrow ? p : this.appHeader(t)}
+        ${this.tab !== "home" ? r`<div class="page-heading">
           <div>
             <h1>${i}</h1>
             <p class="intro">${s}</p>
           </div>
-          <div class=${`status-pill ${n.alarm ? "alert" : ""}`}>
-            <span class="dot"></span>${n.text}
-          </div>
-        </div>
-        ${Et(this.tab, r`<div class="page" style=${`--page-travel:${this.pageTravel}px`}>${this.content()}</div>`)}
+          <button class=${`status-pill ${a.alarm ? "alert" : a.unverified ? "review" : ""}`} @click=${() => this.navigate("safety")}>
+            <span class="dot"></span>${a.text}
+          </button>
+        </div>` : p}
+        ${Xt(this.tab, r`<div class="page" style=${`--page-travel:${this.pageTravel}px`}>${this.content()}</div>`)}
         <footer class="footer">
           <span
             >Signal Home <span style="opacity:.5">/</span> made for living</span
           >
         </footer>
       </main>
-      ${this.nav(!0)}${this.message ? r`<div class=${`toast ${this.messageTone}`} role="status">${this.messageTone !== "neutral" ? r`<span class="toast-mark" aria-hidden="true">${g(this.messageTone === "success" ? "check" : "warn")}</span>` : h}<span class="toast-copy">${this.message}</span>${this.undoItem ? r`<button ?disabled=${this.busy} @click=${() => this.undoItem && this.complete(this.undoItem, !0)}>Undo</button>` : h}</div>` : h}
+      ${this.nav(!0)}${this.message ? r`<div class=${`toast ${this.messageTone}`} role="status">${this.messageTone !== "neutral" ? r`<span class="toast-mark" aria-hidden="true">${f(this.messageTone === "success" ? "check" : "warn")}</span>` : p}<span class="toast-copy">${this.message}</span>${this.undoItem ? r`<button ?disabled=${this.busy} @click=${() => this.undoItem && this.complete(this.undoItem, !0)}>Undo</button>` : p}</div>` : p}
+      <signal-sheet id="more-sheet" .open=${this.moreOpen} .dark=${this.dark} heading="More" .compact=${!0}
+        @signal-close=${() => {
+      this.moreOpen = !1;
+      const l = this.moreDestination;
+      this.moreDestination = "", l && this.navigate(l);
+    }}>
+        <div class="more-links">${this.tabs.filter((l) => ["safety", "climate"].includes(l.id)).map((l) => r`<button @click=${() => this.chooseMore(l.id)}>${f(l.icon)}<span>${l.name}</span>${f("arrow")}</button>`)}</div>
+      </signal-sheet>
       <signal-sheet
         .open=${this.menuOpen}
         heading="Your place. Your way."
@@ -5655,23 +7239,23 @@ class Ce extends A {
             >
           </label>
           <a href="/profile"
-            >${g("home")}<span
+            >${f("home")}<span
               >Account & sign out<small>Your profile and session</small></span
-            >${g("arrow")}</a
+            >${f("arrow")}</a
           >
           ${this.hass.user?.is_admin ? r`<a href="/config/dashboard"
-                  >${g("settings")}<span
+                  >${f("settings")}<span
                     >Home Assistant settings<small
                       >Devices, integrations, and administration</small
                     ></span
-                  >${g("arrow")}</a
-                >` : h}
+                  >${f("arrow")}</a
+                >` : p}
           <a
-            href=${a.pathname + a.search}
+            href=${o.pathname + o.search}
             @click=${(l) => {
-      l.preventDefault(), l.stopPropagation(), window.location.assign(a.pathname + a.search);
+      l.preventDefault(), l.stopPropagation(), window.location.assign(o.pathname + o.search);
     }}
-            >${g("arrow")}<span
+            >${f("arrow")}<span
               >Open standard Home Assistant<small
                 >Restore the header, sidebar, and dashboard editor</small
               ></span
@@ -5692,13 +7276,13 @@ class Ce extends A {
         .dark=${this.dark}
         @signal-close=${() => {
       const l = this.deleteTarget && ![...this.todos, ...this.completedTodos].some(
-        (p) => p.uid === this.deleteTarget.item.uid
+        (d) => d.uid === this.deleteTarget.item.uid
       );
       this.deleteTarget = void 0, this.deleteError = "", l && this.tab === "lists" && this.renderRoot.querySelector('[aria-label="Refresh list"]')?.focus({ preventScroll: !0 });
     }}
       >
         <div class="delete-confirmation">
-          <div class="delete-symbol" aria-hidden="true">${g("trash")}</div>
+          <div class="delete-symbol" aria-hidden="true">${f("trash")}</div>
           <p class="delete-item">${this.deleteTarget?.item.summary}</p>
           <p class="delete-list-name">
             ${this.deleteTarget ? this.listName(this.deleteTarget.entity) : ""}
@@ -5707,7 +7291,7 @@ class Ce extends A {
             This removes the item from the shared list for everyone. It can’t be
             undone.
           </p>
-          ${this.deleteError ? r`<p class="delete-error" role="alert">${this.deleteError}</p>` : h}
+          ${this.deleteError ? r`<p class="delete-error" role="alert">${this.deleteError}</p>` : p}
           <div class="delete-actions">
             <button ?disabled=${this.busy} @click=${this.closeDelete}>
               Keep item
@@ -5726,8 +7310,8 @@ class Ce extends A {
         .hass=${this.hass}
         .entity=${this.detailEntity}
         .dark=${this.dark}
-        .name=${this.detailEntity === this.config.climate ? "Climate" : this.detailEntity === this.config.weather ? "Weather" : d?.name || ""}
-        .battery=${d?.battery || ""}
+        .name=${this.detailEntity === this.config.climate ? "Climate" : this.detailEntity === this.config.weather ? "Weather" : c?.name || ""}
+        .battery=${c?.battery || ""}
         .custom=${!!this.detailEntity && [this.config.climate, this.config.weather].includes(this.detailEntity)}
         @signal-opened=${() => this.detailReady = !0}
         @signal-close=${() => {
@@ -5735,28 +7319,28 @@ class Ce extends A {
     }}
       >
         ${this.detailEntity === this.config.climate ? r`<div class="sheet-custom">
-                ${this.climate(!0)}${this.message ? r`<p role="status">${this.message}</p>` : h}${this.graphs(!this.detailReady)}
+                ${this.climate(!0)}${this.message ? r`<p role="status">${this.message}</p>` : p}${this.graphs(!this.detailReady)}
               </div>` : this.detailEntity === this.config.weather ? r`<div class="sheet-custom">
                   ${this.weather(!0)}
                   <p class="intro">
                     Current conditions from your weather provider.
                   </p>
-                </div>` : h}
+                </div>` : p}
       </signal-details>
     </div>`;
   }
 }
-customElements.get("signal-home") || customElements.define("signal-home", Ce);
-const G = window;
-G.customCards = G.customCards || [];
-G.customCards.push({
+customElements.get("signal-home") || customElements.define("signal-home", xi);
+const mt = window;
+mt.customCards = mt.customCards || [];
+mt.customCards.push({
   type: "signal-home",
   name: "Signal Home",
   description: "A colorful, fluid home dashboard with climate, weather, groceries and safety.",
   preview: !0,
   documentationURL: "https://github.com/gkgkgkgk/signal-home"
 });
-G.customCards.push(
+mt.customCards.push(
   {
     type: "signal-control",
     name: "Signal Control",
@@ -5780,5 +7364,5 @@ G.customCards.push(
   }
 );
 export {
-  Ce as SignalHome
+  xi as SignalHome
 };

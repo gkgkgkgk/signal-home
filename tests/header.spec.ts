@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { navigate } from "./navigation";
 import { setAppearance } from "../scripts/appearance.mjs";
 
 for (const dark of [false, true]) {
@@ -15,6 +16,8 @@ for (const dark of [false, true]) {
     const top = (await header.boundingBox())!.y;
     const dockTop = (await dock.boundingBox())!.y;
     await expect(header).not.toHaveClass(/scrolled/);
+    // Supply enough content to exercise scrolling even when the digest is short.
+    await page.locator("signal-digest").evaluate((el) => (el as HTMLElement).style.paddingBottom = "500px");
     await main.evaluate((el) => (el.scrollTop = el.scrollHeight));
     await expect(header).toHaveClass(/scrolled/);
     expect((await header.boundingBox())!.y).toBeCloseTo(top, 1);
@@ -24,7 +27,7 @@ for (const dark of [false, true]) {
     ).toBe(dark ? "rgb(26, 35, 32)" : "rgb(244, 243, 238)");
     // The heading scrolls under the stationary header, not over it.
     const greeting = await page
-      .getByRole("heading", { name: "Home feels good." })
+      .locator("signal-digest h1")
       .boundingBox();
     expect(greeting!.y + greeting!.height).toBeLessThan(top);
     const position = await main.evaluate((el) => el.scrollTop);
@@ -35,7 +38,7 @@ for (const dark of [false, true]) {
       page.getByRole("button", { name: "Open Signal menu" }),
     ).toBeFocused();
     expect(await main.evaluate((el) => el.scrollTop)).toBe(position);
-    await dock.getByRole("button", { name: "Safety", exact: true }).click();
+    await navigate(page, "Security");
     await expect(header).not.toContainText("Safety");
     await expect(header).not.toHaveClass(/scrolled/);
     expect(await main.evaluate((el) => el.scrollTop)).toBe(0);

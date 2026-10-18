@@ -1,10 +1,13 @@
 export interface Entity {
   entity_id: string;
+  last_updated?: string;
+  last_changed?: string;
+  last_reported?: string;
   state: string;
   attributes: Record<string, any>;
 }
 export interface Hass {
-  connection?: object;
+  connection?: { connected?: boolean };
   auth?: {
     external?: { fireMessage(message: { type: "theme-update" }): void };
   };
@@ -23,6 +26,15 @@ export interface SensorConfig {
   entity: string;
   name?: string;
   battery?: string;
+  /** A real-world open/close test has not confirmed this sensor's reported state. */
+  unverified?: boolean;
+}
+export interface QuickAction { name: string; entity: string }
+export interface LightRoom {
+  id: string; name: string; entities: string[];
+  on_script: string; off_script: string;
+  scenes?: QuickAction[];
+  automation_note_entity?: string;
 }
 export interface Config {
   type: string;
@@ -36,9 +48,16 @@ export interface Config {
   humidity?: string;
   sensors?: (string | SensorConfig)[];
   favorites?: string[];
+  cameras?: string[];
+  light_rooms?: LightRoom[];
+  quick_actions?: QuickAction[];
+  home_mode?: string;
+  all_lights_off?: string;
+  doorbell?: { entity: string; camera: string; instance?: string; activity_entity?: string };
   graphs?: (string | { entity: string; name?: string; hours?: number })[];
   appearance?: "light" | "dark" | "auto" | "system";
   immersive?: boolean;
+  upcoming?: { waste_entity?: string; hebcal_zip?: string };
 }
 export interface Todo {
   uid: string;

@@ -528,7 +528,7 @@ export const pocketStyles = css`
     .app {
       display: grid;
       grid-template-columns: minmax(0, 1fr);
-      grid-template-rows: auto minmax(0, 1fr) auto;
+      grid-template-rows: auto minmax(0, 1fr);
       height: calc(100dvh - var(--signal-header-height, 56px));
       min-height: 0;
       overflow: hidden;
@@ -542,7 +542,7 @@ export const pocketStyles = css`
       overflow-y: auto;
       overscroll-behavior-y: contain;
       scrollbar-width: none;
-      padding: 19px 18px 24px;
+      padding: 19px 18px calc(112px + env(safe-area-inset-bottom, 0px));
       scroll-padding-top: 12px;
     }
     .app main::-webkit-scrollbar {
@@ -629,33 +629,33 @@ export const pocketStyles = css`
       font-size: 12px;
     }
     .bottom-nav {
-      position: relative;
+      position: fixed;
       inset: auto;
-      left: auto;
-      bottom: auto;
-      transform: none;
-      width: 100%;
+      left: 50%;
+      bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+      transform: translateX(-50%);
+      width: min(calc(100% - 24px), 470px);
       max-width: none;
       margin: 0;
-      border-radius: 0;
-      background: var(--paper);
+      border-radius: 28px;
+      background: var(--surface);
       color: var(--muted);
-      border-top: 1px solid var(--line);
-      box-shadow: 0 -5px 18px #00000005;
-      padding: 8px 18px max(8px, env(safe-area-inset-bottom));
+      border: 1px solid var(--line);
+      box-shadow: 0 8px 28px #00000020, 0 2px 6px #0000000a;
+      padding: 7px;
       gap: 4px;
-      min-height: 70px;
+      min-height: 68px;
+      z-index: 30;
+      overscroll-behavior: none;
     }
     .nav-indicator {
-      top: 8px;
-      bottom: max(8px, env(safe-area-inset-bottom));
-      left: 18px;
-      width: calc((100% - 48px) / 4);
-      border-radius: 18px;
-      background: var(--surface);
-      box-shadow:
-        inset 0 1px 0 #ffffff26,
-        0 2px 6px #0000000c;
+      top: 7px;
+      bottom: 7px;
+      left: 7px;
+      width: calc((100% - 14px - (var(--tab-count, 4) - 1) * 4px) / var(--tab-count, 4));
+      border-radius: 21px;
+      background: var(--mint);
+      box-shadow: none;
       transform: translateX(calc(var(--active) * (100% + 4px)));
     }
     .bottom-nav button {
@@ -665,7 +665,7 @@ export const pocketStyles = css`
       min-height: 52px;
     }
     .bottom-nav button[aria-current="page"] {
-      color: var(--ink);
+      color: #172d27;
     }
     .bottom-nav button[aria-current="page"] svg {
       stroke-width: 2;

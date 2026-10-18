@@ -945,7 +945,7 @@ export const styles = css`
       top: 7px;
       bottom: 7px;
       left: 7px;
-      width: calc((100% - 20px) / 4);
+      width: calc((100% - 14px - (var(--tab-count, 4) - 1) * 2px) / var(--tab-count, 4));
       background: var(--mint);
       border-radius: 20px;
       transform: translateX(calc(var(--active) * (100% + 2px)));

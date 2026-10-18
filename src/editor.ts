@@ -71,6 +71,7 @@ export class SignalEditor extends LitElement {
       })),
       { name: "humidity", selector: { entity: { domain: "sensor" } } },
       { name: "favorites", selector: { entity: { multiple: true } } },
+      { name: "cameras", selector: { entity: { domain: "camera", multiple: true } } },
     ];
     return html`<p>
         <strong>Welcome to Signal.</strong> Select your entities below. For the
@@ -83,7 +84,7 @@ export class SignalEditor extends LitElement {
         .hass=${this.hass}
         .data=${this.config}
         .schema=${schema}
-        .computeLabel=${(s: { name: string }) => ({ todo: "Default to-do list (all lists are available)", greeting: "Custom greeting (optional)", favorites: "Shortcut entities", humidity: "Humidity sensor (optional)" })[s.name] || s.name[0].toUpperCase() + s.name.slice(1)}
+        .computeLabel=${(s: { name: string }) => ({ todo: "Default to-do list (all lists are available)", greeting: "Custom greeting (optional)", favorites: "Shortcut entities", cameras: "Frigate cameras (live, events, and playback)", humidity: "Humidity sensor (optional)" })[s.name] || s.name[0].toUpperCase() + s.name.slice(1)}
         @value-changed=${(event: CustomEvent) => this.change({ ...this.config, ...event.detail.value })}
       ></ha-form>
       <details>

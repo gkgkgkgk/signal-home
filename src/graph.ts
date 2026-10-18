@@ -8,6 +8,7 @@ import {
 import { widgetStyles } from "./widget-styles";
 import { motionStyles } from "./motion";
 import { icon } from "./icons";
+import { dayNightBands } from "./graph-day-night";
 interface GraphConfig {
   type: string;
   entity: string;
@@ -136,6 +137,14 @@ export class SignalGraph extends LitElement {
         stroke-width: 1;
         vector-effect: non-scaling-stroke;
       }
+      .time-band.day { fill: #efc77f; opacity: .15; }
+      .time-band.night { fill: #657ba9; opacity: .18; }
+      .widget.dark .time-band.day { opacity: .1; }
+      .widget.dark .time-band.night { opacity: .22; }
+      .day-night-key { display:flex; justify-content:flex-end; align-items:center; gap:12px; color:var(--subtle); font-size:10px; margin-top:7px; }
+      .day-night-key span { display:inline-flex; align-items:center; gap:5px; }
+      .day-night-key i { display:inline-block; width:10px; height:10px; border-radius:3px; background:#efc77f; }
+      .day-night-key .night i { background:#657ba9; }
       .cursor-line {
         stroke: var(--subtle);
         stroke-width: 1;
@@ -470,6 +479,7 @@ export class SignalGraph extends LitElement {
     if (segment.length) segments.push(segment);
     const selected =
       this.cursor !== undefined ? this.points[this.cursor] : undefined;
+    const bands = dayNightBands(this.start, this.end, this.hass?.config?.time_zone);
     const display = selected
       ? selected.value
       : available(entity)
@@ -533,6 +543,7 @@ export class SignalGraph extends LitElement {
                       preserveAspectRatio="none"
                       aria-hidden="true"
                     >
+                      ${bands.map((band) => svg`<rect class=${`time-band ${band.day ? "day" : "night"}`} x=${Math.max(0, (band.start-this.start)/(this.end-this.start)*600)} y="0" width=${Math.max(0, (band.end-band.start)/(this.end-this.start)*600)} height="160"/>`)}
                       ${[25, 75, 125].map((y) => svg`<line class="grid-line" x1="0" y1=${y} x2="600" y2=${y}/>`)}${segments.map(
                         (s) => {
                           const d = s
@@ -554,6 +565,7 @@ export class SignalGraph extends LitElement {
                     >
                   </div>`
         }
+        ${numeric.length ? html`<div class="day-night-key" aria-label="Time shading: daytime 6 AM to 6 PM, nighttime 6 PM to 6 AM"><span><i></i>Day · 6–18</span><span class="night"><i></i>Night · 18–6</span></div>` : nothing}
       </div>
       <div class="history-status" role="status">
         <span

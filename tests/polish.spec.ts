@@ -1,4 +1,15 @@
+import {navigate} from "./navigation";
 import { test, expect } from "@playwright/test";
+import { dayNightBands } from "../src/graph-day-night";
+
+test("day and night shading follows the home's time zone", () => {
+  const start = Date.parse("2026-10-02T09:00:00Z"); // 5 AM in New York
+  const end = Date.parse("2026-10-02T23:00:00Z"); // 7 PM in New York
+  const bands = dayNightBands(start, end, "America/New_York");
+  expect(bands.map((band) => band.day)).toEqual([false, true, false]);
+  expect(Math.abs(bands[1].start - Date.parse("2026-10-02T10:00:00Z"))).toBeLessThan(60000);
+  expect(Math.abs(bands[1].end - Date.parse("2026-10-02T22:00:00Z"))).toBeLessThan(60000);
+});
 
 test("navigation is directional, immediate, and does not reset the current tab", async ({
   page,
@@ -6,7 +17,7 @@ test("navigation is directional, immediate, and does not reset the current tab",
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/");
   const nav = page.getByRole("navigation", { name: "Mobile navigation" });
-  await nav.getByRole("button", { name: "Lists", exact: true }).click();
+  await navigate(page, "Lists");
   expect(
     await page
       .locator("signal-home .page")
@@ -25,9 +36,9 @@ test("navigation is directional, immediate, and does not reset the current tab",
   const main = page.locator("signal-home main");
   await main.evaluate((el) => (el.scrollTop = 100));
   const scroll = await main.evaluate((el) => el.scrollTop);
-  await nav.getByRole("button", { name: "Overview", exact: true }).click();
+  await nav.getByRole("button", { name: "Home", exact: true }).click();
   expect(await main.evaluate((el) => el.scrollTop)).toBe(scroll);
-  await expect(page.locator("signal-home .sensor").first()).toHaveCSS(
+  await expect(page.locator("signal-digest .row").first()).toHaveCSS(
     "animation-name",
     "none",
   );
@@ -38,17 +49,14 @@ test("touch press feedback and new motion both respect reduced motion", async ({
 }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/");
-  const tile = page.locator(".comfort-tile");
+  const tile = page.getByRole("navigation",{name:"Mobile navigation"}).getByRole("button",{name:"Lighting",exact:true});
   await tile.hover();
   await page.mouse.down();
   await expect(tile).not.toHaveCSS("transform", "none");
   await page.mouse.move(1, 1);
   await page.mouse.up();
   await page.emulateMedia({ reducedMotion: "reduce" });
-  await page
-    .getByRole("navigation", { name: "Mobile navigation" })
-    .getByRole("button", { name: "Lists", exact: true })
-    .click();
+  await navigate(page, "Lists");
   await expect(page.locator("signal-home .page")).toHaveCSS(
     "animation-name",
     "none",
@@ -141,6 +149,9 @@ test("graphs keep their geometry and old data during pending and failed refreshe
   await page.goto("/components.html");
   const graph = page.locator("signal-graph").first();
   await graph.getByRole("slider", { name: "History cursor" }).waitFor();
+  await expect(graph.locator(".time-band.day")).not.toHaveCount(0);
+  await expect(graph.locator(".time-band.night")).not.toHaveCount(0);
+  await expect(graph.locator(".day-night-key")).toContainText("Night");
   const paths = () =>
     graph
       .locator("path.line")

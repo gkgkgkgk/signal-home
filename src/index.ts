@@ -25,16 +25,22 @@ import {
   type Todo,
 } from "./types";
 import "./editor";
+import "./cameras";
+import "./lights";
+import "./digest";
+import { householdStyles } from "./household-styles";
 import "./control";
 import "./graph";
 import "./metric";
 import "./details";
 
 const tabs = [
-  { id: "home", name: "Overview", icon: "home" },
-  { id: "climate", name: "Climate", icon: "climate" },
-  { id: "safety", name: "Safety", icon: "shield" },
+  { id: "home", name: "Home", icon: "home" },
+  { id: "rooms", name: "Lighting", icon: "bulb" },
+  { id: "cameras", name: "Cameras", icon: "camera" },
   { id: "lists", name: "Lists", icon: "list" },
+  { id: "safety", name: "Security", icon: "shield" },
+  { id: "climate", name: "Climate", icon: "climate" },
 ];
 const modeLabels: Record<string, string> = {
   off: "Off",
@@ -61,6 +67,7 @@ export class SignalHome extends LitElement {
     detailEntity: { state: true },
     detailReady: { state: true },
     menuOpen: { state: true },
+    moreOpen: { state: true },
     narrow: { state: true },
     contentScrolled: { state: true },
     appearance: { state: true },
@@ -73,10 +80,11 @@ export class SignalHome extends LitElement {
     pendingTodo: { state: true },
     messageTone: { state: true },
   };
-  static styles = [styles, pocketStyles, polishStyles, motionStyles];
+  static styles = [styles, pocketStyles, polishStyles, motionStyles, householdStyles];
   declare hass: Hass;
   private config: Config = { type: "custom:signal-home" };
   private tab = "home";
+  private get tabs() { return tabs; }
   private pageTravel = 0;
   private pendingTodo = "";
   private messageTone: "neutral" | "success" | "error" = "neutral";
@@ -158,6 +166,8 @@ export class SignalHome extends LitElement {
   private detailEntity = "";
   private detailReady = false;
   private menuOpen = false;
+  private moreOpen = false;
+  private moreDestination = "";
   private contentScrolled = false;
   private onContentScroll = (event: Event) => {
     this.contentScrolled = (event.currentTarget as HTMLElement).scrollTop > 4;
@@ -186,13 +196,17 @@ export class SignalHome extends LitElement {
   };
   private todos: Todo[] = [];
   private rangeSide: "low" | "high" = "low";
+  private cameraRoute = "";
   private syncRoute = () => {
-    const route = location.hash.replace("#signal/", "");
-    const next = tabs.some((t) => t.id === route) ? route : "home";
+    const rawRoute = location.hash.replace("#signal/", "");
+    const route = rawRoute === "lights" ? "rooms" : rawRoute;
+    const next = this.tabs.some((t) => t.id === route) ? route : "home";
+    const cameraRoute = next === "cameras" ? location.search : "";
+    if (cameraRoute !== this.cameraRoute) { this.cameraRoute = cameraRoute; this.resetScroll(); }
     if (next !== this.tab) {
       this.pageTravel =
-        tabs.findIndex((t) => t.id === next) >
-        tabs.findIndex((t) => t.id === this.tab)
+        this.tabs.findIndex((t) => t.id === next) >
+        this.tabs.findIndex((t) => t.id === this.tab)
           ? 12
           : -12;
       this.tab = next;
@@ -239,6 +253,7 @@ export class SignalHome extends LitElement {
     this.syncRoute();
     window.addEventListener("popstate", this.syncRoute);
     window.addEventListener("hashchange", this.syncRoute);
+    window.addEventListener("location-changed", this.syncRoute);
     this.media.addEventListener("change", this.applyAppearance);
     document.addEventListener("visibilitychange", this.applyAppearance);
     this.phone.addEventListener("change", this.resize);
@@ -257,6 +272,7 @@ export class SignalHome extends LitElement {
     this.chrome.release();
     window.removeEventListener("popstate", this.syncRoute);
     window.removeEventListener("hashchange", this.syncRoute);
+    window.removeEventListener("location-changed", this.syncRoute);
     this.media.removeEventListener("change", this.applyAppearance);
     document.removeEventListener("visibilitychange", this.applyAppearance);
     this.phone.removeEventListener("change", this.resize);
@@ -303,7 +319,23 @@ export class SignalHome extends LitElement {
       throw new Error(
         "Graphs need an entity ID and optional hours between 1 and 168.",
       );
+    if (config.cameras !== undefined && (!Array.isArray(config.cameras) || config.cameras.some((entity) => typeof entity !== "string" || !/^camera\.[a-z0-9_]+$/.test(entity))))
+      throw new Error("Cameras must be Home Assistant camera entity IDs.");
+    if (config.home_mode && !/^input_select\.[a-z0-9_]+$/.test(config.home_mode))
+      throw new Error("Home mode must be an input_select helper.");
+    const validAction = (action: any) => action && typeof action.name === "string" && /^(script|scene)\.[a-z0-9_]+$/.test(action.entity);
+    if (config.quick_actions && (!Array.isArray(config.quick_actions) || !config.quick_actions.every(validAction)))
+      throw new Error("Quick actions need a name and script or scene entity.");
+    if (config.light_rooms && (!Array.isArray(config.light_rooms) || !config.light_rooms.every(room =>
+      room && typeof room.id === "string" && typeof room.name === "string" &&
+      Array.isArray(room.entities) && room.entities.length > 0 && room.entities.every(id => /^(light|switch)\.[a-z0-9_]+$/.test(id)) &&
+      /^script\.[a-z0-9_]+$/.test(room.on_script) && /^script\.[a-z0-9_]+$/.test(room.off_script) &&
+      (!room.scenes || (Array.isArray(room.scenes) && room.scenes.every(validAction))))))
+      throw new Error("Light rooms need lamp entities and on/off scripts.");
+    if (config.all_lights_off && !/^script\.[a-z0-9_]+$/.test(config.all_lights_off)) throw new Error("All lights off must be a script.");
+    if (config.doorbell && (!/^camera\.[a-z0-9_]+$/.test(config.doorbell.entity) || !/^[a-z0-9_]+$/.test(config.doorbell.camera) || (config.doorbell.instance && !/^[a-z0-9_]+$/.test(config.doorbell.instance)))) throw new Error("Doorbell needs valid camera and instance IDs.");
     this.config = { ...config };
+    if (!this.tabs.some((item) => item.id === this.tab)) this.tab = "home";
     this.selectedTodo = "";
     this.resetTodoState();
     this.applyAppearance();
@@ -707,11 +739,16 @@ export class SignalHome extends LitElement {
   private navigate(id: string) {
     if (id === this.tab) return;
     this.pageTravel =
-      tabs.findIndex((t) => t.id === id) >
-      tabs.findIndex((t) => t.id === this.tab)
+      this.tabs.findIndex((t) => t.id === id) >
+      this.tabs.findIndex((t) => t.id === this.tab)
         ? 12
         : -12;
-    if (id !== this.tab) history.pushState(history.state, "", `#signal/${id}`);
+    if (id !== this.tab) {
+      const url = new URL(location.href);
+      for (const key of ["signal_review", "signal_event", "signal_camera", "signal_instance"]) url.searchParams.delete(key);
+      url.hash = `signal/${id}`;
+      history.pushState(history.state, "", url);
+    }
     this.tab = id;
     this.resetScroll();
   }
@@ -721,31 +758,51 @@ export class SignalHome extends LitElement {
     );
   }
   private nav(bottom = false) {
-    return html`<nav
-      class=${bottom ? "bottom-nav" : ""}
-      style=${`--active: ${tabs.findIndex((t) => t.id === this.tab)}`}
-      aria-label=${bottom ? "Mobile navigation" : "Dashboard navigation"}
-    >
+    const destinations = bottom ? [...this.tabs.filter(t => ["home", "rooms", "cameras", "lists"].includes(t.id)), {id:"more",name:"More",icon:"more"}] : this.tabs;
+    const active = bottom && ["safety","climate"].includes(this.tab) ? "more" : this.tab;
+    return html`<nav class=${bottom ? "bottom-nav" : ""}
+      style=${`--active: ${destinations.findIndex(t=>t.id===active)}; --tab-count: ${destinations.length}`}
+      aria-label=${bottom ? "Mobile navigation" : "Dashboard navigation"}>
       ${bottom ? html`<span class="nav-indicator" aria-hidden="true"></span>` : nothing}
-      ${tabs.map((t) => html`<button aria-current=${this.tab === t.id ? "page" : nothing} @click=${() => this.navigate(t.id)}>${icon(t.icon)}<span>${t.name}</span></button>`)}
+      ${destinations.map(t=>html`<button aria-current=${active===t.id?"page":nothing} aria-expanded=${t.id==='more'?this.moreOpen:nothing} aria-haspopup=${t.id==='more'?'dialog':nothing} @click=${()=>{if(t.id==='more')this.moreOpen=true;else this.navigate(t.id);}}>${icon(t.icon)}<span>${t.name}</span></button>`)}
     </nav>`;
+  }
+  private chooseMore(id:string) {
+    this.moreDestination=id;
+    this.renderRoot.querySelector<SignalSheet>('#more-sheet')?.requestClose();
+  }
+  private digestNavigation(event:CustomEvent<{route:string;review?:string}>) {
+    this.navigate(event.detail.route);
+    if(event.detail.review && this.config.doorbell) {
+      const url=new URL(location.href);
+      url.searchParams.set('signal_review',event.detail.review);
+      url.searchParams.set('signal_camera',this.config.doorbell.camera);
+      url.searchParams.set('signal_instance',this.config.doorbell.instance || 'frigate');
+      history.replaceState(history.state,'',url);
+      window.dispatchEvent(new Event('location-changed'));
+    }
   }
   private get sensors() {
     return (this.config.sensors || []).map(sensorConfig);
   }
   private get safetySummary() {
+    if(this.hass?.connection?.connected===false) return {alarm:0,unknown:this.sensors.length || 1,unverified:0,text:"Connection lost"};
     const all = this.sensors;
     const alarm = all.filter(
-      (s) => this.state(s.entity)?.state === "on",
+      (s) => s.entity.startsWith("lock.") ? available(this.state(s.entity)) && this.state(s.entity)?.state!=="locked" : this.state(s.entity)?.state === "on",
     ).length;
     const unknown = all.filter((s) => !available(this.state(s.entity))).length;
+    const unverified = all.filter((s) => s.unverified && available(this.state(s.entity)) && this.state(s.entity)?.state !== "on").length;
     return {
       alarm,
       unknown,
+      unverified,
       text: alarm
         ? `${alarm} sensor${alarm > 1 ? "s" : ""} need attention`
         : unknown
           ? `${unknown} sensor${unknown > 1 ? "s" : ""} unavailable`
+          : unverified
+            ? `${unverified} sensor${unverified > 1 ? "s" : ""} need verification`
           : all.length
             ? "Sensors clear"
             : "Make yourself at home",
@@ -786,7 +843,7 @@ export class SignalHome extends LitElement {
       number(a.target_temp_step) ||
       (this.hass?.config?.unit_system?.temperature === "°F" ? 1 : 0.5);
     const unit = this.hass?.config?.unit_system?.temperature || "°";
-    const value = target ?? current;
+    const value = current;
     const ratio =
       value === undefined
         ? 0
@@ -825,6 +882,7 @@ export class SignalHome extends LitElement {
     const modes = Array.isArray(a.hvac_modes) ? (a.hvac_modes as string[]) : [];
     return html`<section
       class="panel mint climate"
+      data-activity=${ready ? a.hvac_action || "idle" : "unavailable"}
       aria-label="Climate control"
     >
       <div class="panel-top">
@@ -871,7 +929,7 @@ export class SignalHome extends LitElement {
             >
           </div>
           <div class="dial-caption">
-            ${!ready ? "Waiting for your thermostat" : range ? (this.rangeSide === "low" ? "Heat below" : "Cool above") : target !== undefined ? "Target temperature" : "Current temperature"}
+            ${!ready ? "Waiting for your thermostat" : "Current temperature"}
           </div>
         </div>
       </div>
@@ -883,7 +941,7 @@ export class SignalHome extends LitElement {
         >
           ${icon("minus")}</button
         ><span
-          >${ready ? `${this.format(current, 1)}${unit} inside` : "No reading"}</span
+          >${ready ? `${range ? (this.rangeSide === "low" ? "Heat below" : "Cool above") : "Target"} ${this.format(target, 1)}${unit}` : "No reading"}</span
         ><button
           aria-label="Increase target temperature"
           ?disabled=${!adjustable || this.busy || target! >= max}
@@ -1096,26 +1154,51 @@ export class SignalHome extends LitElement {
       ${sorted.some((item) => !item.completed || !Number.isFinite(Date.parse(item.completed))) ? html`<small>For items without a completion time, the 24 hours starts when this device first sees them completed.</small>` : nothing}
     </div>`;
   }
+  private securityMode() {
+    const mode=this.state(this.config.home_mode);
+    const items=[
+      {name:"Home",icon:"home",title:"At home",detail:"Saved household preference"},
+      {name:"Sleeping",icon:"moon",title:"Sleeping",detail:"Saved nighttime preference"},
+      {name:"Away",icon:"arrow",title:"Away",detail:"Saved out-of-home preference"},
+    ];
+    return html`<section class="security-mode" aria-label="Household mode">
+      <div class="security-mode-head"><div><span class="eyebrow">Household mode</span><h2>${available(mode)?mode.state:"Unavailable"}</h2></div><span class="mode-context">Saved preference · alarm not connected</span></div>
+      <div class="security-mode-options">${items.map(item=>html`<button class=${`security-mode-option mode-${item.name.toLowerCase()}`} aria-pressed=${mode?.state===item.name} ?disabled=${!available(mode)||this.busy||this.hass.connection?.connected===false} @click=${()=>this.service("input_select","select_option",{entity_id:this.config.home_mode,option:item.name},`${item.name} preference saved`)}>
+        <span class="mode-icon">${icon(item.icon)}</span><strong>${item.title}</strong><small>${item.detail}</small><span class="mode-check" aria-hidden="true">${mode?.state===item.name?icon("check"):nothing}</span>
+      </button>`)}</div>
+    </section>`;
+  }
   private safety() {
     if (!this.sensors.length)
       return html`<div class="notice">
         Add your water, smoke, or opening sensors in the card editor. Their
         actual state will appear here.
       </div>`;
-    return html`<div class="sensors">
-      ${this.sensors.map((s) => {
+    const kindOf=(s: (typeof this.sensors)[number])=>this.state(s.entity)?.attributes.device_class;
+    const doors=this.sensors.filter(s=>s.entity.startsWith("lock.") || ["door","window","opening","garage_door"].includes(kindOf(s)));
+    const water=this.sensors.filter(s=>kindOf(s)==="moisture");
+    const other=this.sensors.filter(s=>!doors.includes(s)&&!water.includes(s));
+    const report=(e: Entity | undefined)=>{
+      const when=e?.last_reported || e?.last_updated;
+      return when && Number.isFinite(Date.parse(when))
+        ? new Date(when).toLocaleString(this.hass.locale?.language || undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit",timeZone:this.hass.config?.time_zone})
+        : "time unknown";
+    };
+    const cards=(items: typeof this.sensors)=>html`<div class="sensors">${items.map((s) => {
         const e = this.state(s.entity);
         const ready = available(e);
-        const alarm = e?.state === "on";
+        const alarm = s.entity.startsWith("lock.") ? ready && e.state!=="locked" : e?.state === "on";
         const kind = e?.attributes.device_class;
         const label = !ready
           ? "Unavailable"
-          : alarm
+          : s.entity.startsWith("lock.") ? words(e?.state) : alarm
             ? kind === "moisture"
               ? "Water detected"
               : kind === "opening" || kind === "door" || kind === "window"
                 ? "Open"
                 : "Detected"
+            : s.unverified
+              ? "Needs verification"
             : kind === "moisture"
               ? "Dry"
               : kind === "opening" || kind === "door" || kind === "window"
@@ -1129,8 +1212,8 @@ export class SignalHome extends LitElement {
         >
           <div class="sensor-head">
             <span
-              class=${`sensor-symbol ${!ready ? "unknown" : alarm ? "bad" : ""}`}
-              >${icon(!ready ? "warn" : alarm ? "warn" : kind === "moisture" ? "drop" : "shield")}</span
+              class=${`sensor-symbol ${!ready || (s.unverified && !alarm) ? "unknown" : alarm ? "bad" : ""}`}
+              >${icon(["door","window","opening","garage_door"].includes(kind) ? "door" : kind === "moisture" ? "drop" : !ready || alarm ? "warn" : "shield")}</span
             ><span class="sensor-state">${label}</span>
           </div>
           <div>
@@ -1138,11 +1221,15 @@ export class SignalHome extends LitElement {
               ${s.name || e?.attributes.friendly_name || s.entity}
             </div>
             <div class="sensor-sub">
-              ${s.battery ? (charge !== undefined ? `${charge}% battery${charge < 20 ? " · Low battery" : ""}` : "Battery unavailable") : "Tap for details"}
+              ${s.unverified ? `Last reported ${ready ? s.entity.startsWith("lock.") ? e.state : e.state === "off" ? "closed" : e.state === "on" ? "open" : e.state : "unavailable"} · ${report(e)}` : s.battery ? (charge !== undefined ? `${charge}% battery${charge < 20 ? " · Low battery" : ""}` : "Battery unavailable") : "Tap for details"}
             </div>
           </div>
         </button>`;
-      })}
+      })}</div>`;
+    return html`<div class="sensor-sections">
+      ${doors.length?html`<section class="sensor-section" aria-label="Doors"><h2>Doors</h2>${cards(doors)}</section>`:nothing}
+      ${water.length?html`<section class="sensor-section" aria-label="Water"><h2>Water</h2>${cards(water)}</section>`:nothing}
+      ${other.length?html`<section class="sensor-section" aria-label="Other sensors"><h2>Other sensors</h2>${cards(other)}</section>`:nothing}
     </div>`;
   }
   private favorites() {
@@ -1178,6 +1265,10 @@ export class SignalHome extends LitElement {
       </div>`;
   }
   private content() {
+    if (this.tab === "rooms")
+      return html`<signal-lights .hass=${this.hass} .rooms=${this.config.light_rooms || []} .dark=${this.dark}></signal-lights>`;
+    if (this.tab === "cameras")
+      return html`<signal-cameras .hass=${this.hass} .cameras=${this.config.cameras || []} @signal-camera-navigation=${()=>this.resetScroll()}></signal-cameras>`;
     if (this.tab === "climate")
       return html`<div class="grid detail-grid">
           ${this.climate()}
@@ -1198,143 +1289,18 @@ export class SignalHome extends LitElement {
         </div>
         ${this.graphs()}`;
     if (this.tab === "safety")
-      return html`${this.safety()}
+      return html`${this.securityMode()}${this.safety()}
         <div class="notice" style="margin-top:20px">
-          ${this.safetySummary.alarm ? "A sensor is reporting an active state. Open it for details." : this.safetySummary.unknown ? "An unavailable sensor cannot confirm the condition of its space." : "Tap any sensor for its history and details."}
+          ${this.safetySummary.alarm ? "A sensor is reporting an active state. Open it for details." : this.safetySummary.unknown ? "An unavailable sensor cannot confirm the condition of its space." : this.safetySummary.unverified ? "These sensors have not passed a recent physical test. Their last reported states are not confirmed current conditions." : "Tap any sensor for its history and details."}
         </div>`;
     if (this.tab === "lists")
       return html`<div style="max-width:740px">
         ${this.todoListPicker()}${this.grocery(true)}
       </div>`;
-    if (this.narrow) return this.pocketOverview();
-    return html`<div class="grid">
-        ${this.climate()}
-        <div class="stack">${this.weather()}${this.grocery()}</div>
-      </div>
-      ${this.favorites()}
-      <div class="section-top">
-        <h2>Around the house</h2>
-        <button class="text-button" @click=${() => this.navigate("safety")}>
-          All sensors ${icon("arrow")}
-        </button>
-      </div>
-      ${this.safety()}`;
+    return this.householdOverview();
   }
-  private pocketOverview() {
-    const climate = this.state(this.config.climate);
-    const c = climate?.attributes || {};
-    const climateReady = available(climate);
-    const weather = this.state(this.config.weather);
-    const w = weather?.attributes || {};
-    const weatherReady = available(weather);
-    const tempUnit = this.hass.config?.unit_system?.temperature || "°";
-    const humidity = number(
-      this.state(this.config.humidity)?.state ?? c.current_humidity,
-    );
-    const summary = this.safetySummary;
-    const target = !climateReady
-      ? this.config.climate
-        ? "Controls unavailable"
-        : "Choose a climate entity in the editor"
-      : climate.state === "off"
-        ? "Climate is off"
-        : climate.state === "heat_cool"
-          ? `Heat ${this.format(c.target_temp_low)}° · Cool ${this.format(c.target_temp_high)}°`
-          : `${modeLabels[climate.state] || words(climate.state)} · Target ${this.format(c.temperature)}°`;
-    const todo = this.state(this.todoEntity);
-    const count = available(todo) ? number(todo.state) : undefined;
-    return html`<div class="pocket-overview">
-      <button
-        class="pocket-tile comfort-tile mint"
-        aria-label="Climate details"
-        ?disabled=${!this.config.climate}
-        @click=${() => this.moreInfo(this.config.climate)}
-      >
-        <span class="tile-top"
-          ><span class="tile-label">${icon("climate")} Inside</span
-          ><span class="live-chip"
-            >${climateReady ? words(c.hvac_action || climate.state) : "Unavailable"}</span
-          ></span
-        >
-        <span class="comfort-reading"
-          ><span class="pocket-temperature"
-            >${climateReady ? this.format(c.current_temperature) : "—"}<small
-              >${tempUnit}</small
-            ></span
-          ><span class="comfort-orbit" aria-hidden="true"
-            ><i></i><i></i><span>${icon("home")}</span></span
-          ></span
-        >
-        <span class="tile-bottom"
-          ><span
-            ><strong>${target}</strong
-            ><small
-              >${humidity !== undefined ? `${this.format(humidity)}% humidity` : "Humidity unavailable"}</small
-            ></span
-          ><span class="tile-arrow">${icon("arrow")}</span></span
-        >
-      </button>
-      <div class="pocket-pair">
-        <button
-          class="pocket-tile outside-tile lilac"
-          aria-label="Weather details"
-          ?disabled=${!this.config.weather}
-          @click=${() => this.moreInfo(this.config.weather)}
-        >
-          <span class="tile-top"
-            ><span class="tile-label">Outside</span
-            >${icon(weather?.state === "clear-night" ? "moon" : weather?.state === "sunny" ? "sun" : weather?.state?.includes("rain") ? "drop" : weather?.state?.includes("wind") ? "wind" : "cloud")}</span
-          >
-          <span class="pocket-reading"
-            >${weatherReady ? this.format(w.temperature) : "—"}<small
-              >${w.temperature_unit || tempUnit}</small
-            ></span
-          ><span class="tile-bottom"
-            ><span class="tile-caption"
-              >${weatherReady ? words(weather.state) : this.config.weather ? "Unavailable" : "Choose weather in editor"}</span
-            >${icon("arrow")}</span
-          >
-        </button>
-        <button
-          class="pocket-tile list-tile apricot"
-          aria-label="Open to-do lists"
-          @click=${() => this.navigate("lists")}
-        >
-          <span class="tile-top"
-            ><span class="tile-label">${this.todoName}</span
-            >${icon("list")}</span
-          ><span class="pocket-reading"
-            >${count === undefined ? "—" : count}<small
-              >${count === 1 ? "item" : "items"}</small
-            ></span
-          ><span class="tile-bottom"
-            ><span class="tile-caption"
-              >${this.todoError ? "Tap to retry" : count === undefined ? "Open your list" : count === 0 ? "All caught up" : this.todos[0]?.summary || "Ready when you are"}</span
-            >${icon("arrow")}</span
-          >
-        </button>
-      </div>
-      <button
-        class=${`home-signal ${summary.alarm ? "attention" : summary.unknown ? "uncertain" : ""}`}
-        @click=${() => this.navigate("safety")}
-        aria-label=${`Home status: ${summary.text}`}
-      >
-        <span class="signal-symbol"
-          >${icon(summary.alarm || summary.unknown ? "warn" : "shield")}</span
-        ><span
-          ><strong>${summary.text}</strong
-          ><small
-            >${summary.alarm ? "Take a closer look" : summary.unknown ? "Some spaces cannot be checked" : this.sensors.length ? "Your sensors, together" : "Choose sensors in the editor"}</small
-          ></span
-        >${icon("arrow")}
-      </button>
-      ${this.favorites()}
-      <div class="section-top">
-        <h2>Around the house</h2>
-        <small>${this.sensors.length} sensors</small>
-      </div>
-      ${this.safety()}
-    </div>`;
+  private householdOverview() {
+    return html`<signal-digest .hass=${this.hass} .config=${this.config} @signal-digest-navigation=${this.digestNavigation}></signal-digest>`;
   }
   private appHeader(time: Date) {
     const hour = homeHour(time, this.hass.config?.time_zone);
@@ -1370,19 +1336,19 @@ export class SignalHome extends LitElement {
     const title =
       this.tab === "home"
         ? welcome
-        : this.tab === "climate"
+        : this.tab === "rooms" ? "Lighting." : this.tab === "climate"
           ? "Just your temperature."
           : this.tab === "safety"
             ? "Peace of mind."
-            : "Good things, listed.";
+            : this.tab === "cameras" ? "Cameras." : "Good things, listed.";
     const subtitle =
       this.tab === "home"
         ? "Your home, at a glance."
         : this.tab === "climate"
-          ? "Find your comfortable."
+          ? "Current temperature and comfort controls."
           : this.tab === "safety"
             ? "A clear view of the things that matter."
-            : "A little space for everyday essentials.";
+            : this.tab === "rooms" ? "Lighting, room by room." : this.tab === "cameras" ? "Live video and recorded activity." : "A little space for everyday essentials.";
     const summary = this.safetySummary;
     const recovery = new URL(location.href);
     recovery.searchParams.set("disable_km", "");
@@ -1408,15 +1374,15 @@ export class SignalHome extends LitElement {
       ${this.narrow ? this.appHeader(time) : nothing}
       <main @scroll=${this.onContentScroll}>
         ${!this.narrow ? this.appHeader(time) : nothing}
-        <div class="page-heading">
+        ${this.tab !== "home" ? html`<div class="page-heading">
           <div>
             <h1>${title}</h1>
             <p class="intro">${subtitle}</p>
           </div>
-          <div class=${`status-pill ${summary.alarm ? "alert" : ""}`}>
+          <button class=${`status-pill ${summary.alarm ? "alert" : summary.unverified ? "review" : ""}`} @click=${()=>this.navigate("safety")}>
             <span class="dot"></span>${summary.text}
-          </div>
-        </div>
+          </button>
+        </div>` : nothing}
         ${keyed(this.tab, html`<div class="page" style=${`--page-travel:${this.pageTravel}px`}>${this.content()}</div>`)}
         <footer class="footer">
           <span
@@ -1425,6 +1391,10 @@ export class SignalHome extends LitElement {
         </footer>
       </main>
       ${this.nav(true)}${this.message ? html`<div class=${`toast ${this.messageTone}`} role="status">${this.messageTone !== "neutral" ? html`<span class="toast-mark" aria-hidden="true">${icon(this.messageTone === "success" ? "check" : "warn")}</span>` : nothing}<span class="toast-copy">${this.message}</span>${this.undoItem ? html`<button ?disabled=${this.busy} @click=${() => this.undoItem && this.complete(this.undoItem, true)}>Undo</button>` : nothing}</div>` : nothing}
+      <signal-sheet id="more-sheet" .open=${this.moreOpen} .dark=${this.dark} heading="More" .compact=${true}
+        @signal-close=${()=>{this.moreOpen=false;const id=this.moreDestination;this.moreDestination="";if(id)this.navigate(id);}}>
+        <div class="more-links">${this.tabs.filter(t=>['safety','climate'].includes(t.id)).map(t=>html`<button @click=${()=>this.chooseMore(t.id)}>${icon(t.icon)}<span>${t.name}</span>${icon('arrow')}</button>`)}</div>
+      </signal-sheet>
       <signal-sheet
         .open=${this.menuOpen}
         heading="Your place. Your way."
