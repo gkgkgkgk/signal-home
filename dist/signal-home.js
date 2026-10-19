@@ -35,7 +35,7 @@ const fe = (n) => new oe(typeof n == "string" ? n : n + "", void 0, Rt), E = (n,
   for (const i of t.cssRules) e += i.cssText;
   return fe(e);
 })(n) : n;
-const { is: ve, defineProperty: xe, getOwnPropertyDescriptor: ye, getOwnPropertyNames: we, getOwnPropertySymbols: $e, getPrototypeOf: ke } = Object, bt = globalThis, Ft = bt.trustedTypes, _e = Ft ? Ft.emptyScript : "", Ae = bt.reactiveElementPolyfillSupport, ot = (n, t) => n, Ct = { toAttribute(n, t) {
+const { is: ve, defineProperty: xe, getOwnPropertyDescriptor: ye, getOwnPropertyNames: we, getOwnPropertySymbols: $e, getPrototypeOf: ke } = Object, bt = globalThis, Wt = bt.trustedTypes, _e = Wt ? Wt.emptyScript : "", Ae = bt.reactiveElementPolyfillSupport, ot = (n, t) => n, Ct = { toAttribute(n, t) {
   switch (t) {
     case Boolean:
       n = n ? _e : null;
@@ -63,7 +63,7 @@ const { is: ve, defineProperty: xe, getOwnPropertyDescriptor: ye, getOwnProperty
       }
   }
   return e;
-} }, re = (n, t) => !ve(n, t), Bt = { attribute: !0, type: String, converter: Ct, reflect: !1, useDefault: !1, hasChanged: re };
+} }, re = (n, t) => !ve(n, t), Ft = { attribute: !0, type: String, converter: Ct, reflect: !1, useDefault: !1, hasChanged: re };
 Symbol.metadata ??= /* @__PURE__ */ Symbol("metadata"), bt.litPropertyMetadata ??= /* @__PURE__ */ new WeakMap();
 let X = class extends HTMLElement {
   static addInitializer(t) {
@@ -72,7 +72,7 @@ let X = class extends HTMLElement {
   static get observedAttributes() {
     return this.finalize(), this._$Eh && [...this._$Eh.keys()];
   }
-  static createProperty(t, e = Bt) {
+  static createProperty(t, e = Ft) {
     if (e.state && (e.attribute = !1), this._$Ei(), this.prototype.hasOwnProperty(t) && ((e = Object.create(e)).wrapped = !0), this.elementProperties.set(t, e), !e.noAccessor) {
       const i = /* @__PURE__ */ Symbol(), s = this.getPropertyDescriptor(t, i, e);
       s !== void 0 && xe(this.prototype, t, s);
@@ -90,7 +90,7 @@ let X = class extends HTMLElement {
     }, configurable: !0, enumerable: !0 };
   }
   static getPropertyOptions(t) {
-    return this.elementProperties.get(t) ?? Bt;
+    return this.elementProperties.get(t) ?? Ft;
   }
   static _$Ei() {
     if (this.hasOwnProperty(ot("elementProperties"))) return;
@@ -247,21 +247,21 @@ let X = class extends HTMLElement {
   }
 };
 X.elementStyles = [], X.shadowRootOptions = { mode: "open" }, X[ot("elementProperties")] = /* @__PURE__ */ new Map(), X[ot("finalized")] = /* @__PURE__ */ new Map(), Ae?.({ ReactiveElement: X }), (bt.reactiveElementVersions ??= []).push("2.1.2");
-const Lt = globalThis, Wt = (n) => n, ut = Lt.trustedTypes, Vt = ut ? ut.createPolicy("lit-html", { createHTML: (n) => n }) : void 0, le = "$lit$", q = `lit$${Math.random().toFixed(9).slice(2)}$`, de = "?" + q, Se = `<${de}>`, K = document, rt = () => K.createComment(""), lt = (n) => n === null || typeof n != "object" && typeof n != "function", Ot = Array.isArray, Te = (n) => Ot(n) || typeof n?.[Symbol.iterator] == "function", St = `[ 	
-\f\r]`, it = /<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g, Zt = /-->/g, Yt = />/g, B = RegExp(`>|${St}(?:([^\\s"'>=/]+)(${St}*=${St}*(?:[^ 	
-\f\r"'\`<>=]|("|')|))|$)`, "g"), Kt = /'/g, Jt = /"/g, ce = /^(?:script|style|textarea|title)$/i, he = (n) => (t, ...e) => ({ _$litType$: n, strings: t, values: e }), r = he(1), V = he(2), R = /* @__PURE__ */ Symbol.for("lit-noChange"), p = /* @__PURE__ */ Symbol.for("lit-nothing"), Gt = /* @__PURE__ */ new WeakMap(), Y = K.createTreeWalker(K, 129);
+const Lt = globalThis, Bt = (n) => n, ut = Lt.trustedTypes, Vt = ut ? ut.createPolicy("lit-html", { createHTML: (n) => n }) : void 0, le = "$lit$", q = `lit$${Math.random().toFixed(9).slice(2)}$`, de = "?" + q, Se = `<${de}>`, K = document, rt = () => K.createComment(""), lt = (n) => n === null || typeof n != "object" && typeof n != "function", Ot = Array.isArray, Ee = (n) => Ot(n) || typeof n?.[Symbol.iterator] == "function", St = `[ 	
+\f\r]`, it = /<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g, Zt = /-->/g, Yt = />/g, F = RegExp(`>|${St}(?:([^\\s"'>=/]+)(${St}*=${St}*(?:[^ 	
+\f\r"'\`<>=]|("|')|))|$)`, "g"), Kt = /'/g, Gt = /"/g, ce = /^(?:script|style|textarea|title)$/i, he = (n) => (t, ...e) => ({ _$litType$: n, strings: t, values: e }), r = he(1), V = he(2), R = /* @__PURE__ */ Symbol.for("lit-noChange"), p = /* @__PURE__ */ Symbol.for("lit-nothing"), Jt = /* @__PURE__ */ new WeakMap(), Y = K.createTreeWalker(K, 129);
 function pe(n, t) {
   if (!Ot(n) || !n.hasOwnProperty("raw")) throw Error("invalid template strings array");
   return Vt !== void 0 ? Vt.createHTML(t) : t;
 }
-const Ee = (n, t) => {
+const Te = (n, t) => {
   const e = n.length - 1, i = [];
   let s, a = t === 2 ? "<svg>" : t === 3 ? "<math>" : "", o = it;
   for (let d = 0; d < e; d++) {
     const l = n[d];
     let c, u, h = -1, g = 0;
-    for (; g < l.length && (o.lastIndex = g, u = o.exec(l), u !== null); ) g = o.lastIndex, o === it ? u[1] === "!--" ? o = Zt : u[1] !== void 0 ? o = Yt : u[2] !== void 0 ? (ce.test(u[2]) && (s = RegExp("</" + u[2], "g")), o = B) : u[3] !== void 0 && (o = B) : o === B ? u[0] === ">" ? (o = s ?? it, h = -1) : u[1] === void 0 ? h = -2 : (h = o.lastIndex - u[2].length, c = u[1], o = u[3] === void 0 ? B : u[3] === '"' ? Jt : Kt) : o === Jt || o === Kt ? o = B : o === Zt || o === Yt ? o = it : (o = B, s = void 0);
-    const f = o === B && n[d + 1].startsWith("/>") ? " " : "";
+    for (; g < l.length && (o.lastIndex = g, u = o.exec(l), u !== null); ) g = o.lastIndex, o === it ? u[1] === "!--" ? o = Zt : u[1] !== void 0 ? o = Yt : u[2] !== void 0 ? (ce.test(u[2]) && (s = RegExp("</" + u[2], "g")), o = F) : u[3] !== void 0 && (o = F) : o === F ? u[0] === ">" ? (o = s ?? it, h = -1) : u[1] === void 0 ? h = -2 : (h = o.lastIndex - u[2].length, c = u[1], o = u[3] === void 0 ? F : u[3] === '"' ? Gt : Kt) : o === Gt || o === Kt ? o = F : o === Zt || o === Yt ? o = it : (o = F, s = void 0);
+    const f = o === F && n[d + 1].startsWith("/>") ? " " : "";
     a += o === it ? l + Se : h >= 0 ? (i.push(c), l.slice(0, h) + le + l.slice(h) + q + f) : l + q + (h === -2 ? d : f);
   }
   return [pe(n, a + (n[e] || "<?>") + (t === 2 ? "</svg>" : t === 3 ? "</math>" : "")), i];
@@ -271,7 +271,7 @@ class dt {
     let s;
     this.parts = [];
     let a = 0, o = 0;
-    const d = t.length - 1, l = this.parts, [c, u] = Ee(t, e);
+    const d = t.length - 1, l = this.parts, [c, u] = Te(t, e);
     if (this.el = dt.createElement(c, i), Y.currentNode = this.el.content, e === 2 || e === 3) {
       const h = this.el.content.firstChild;
       h.replaceWith(...h.childNodes);
@@ -356,7 +356,7 @@ class et {
     return this._$AB;
   }
   _$AI(t, e = this) {
-    t = tt(this, t, e), lt(t) ? t === p || t == null || t === "" ? (this._$AH !== p && this._$AR(), this._$AH = p) : t !== this._$AH && t !== R && this._(t) : t._$litType$ !== void 0 ? this.$(t) : t.nodeType !== void 0 ? this.T(t) : Te(t) ? this.k(t) : this._(t);
+    t = tt(this, t, e), lt(t) ? t === p || t == null || t === "" ? (this._$AH !== p && this._$AR(), this._$AH = p) : t !== this._$AH && t !== R && this._(t) : t._$litType$ !== void 0 ? this.$(t) : t.nodeType !== void 0 ? this.T(t) : Ee(t) ? this.k(t) : this._(t);
   }
   O(t) {
     return this._$AA.parentNode.insertBefore(t, this._$AB);
@@ -376,8 +376,8 @@ class et {
     }
   }
   _$AC(t) {
-    let e = Gt.get(t.strings);
-    return e === void 0 && Gt.set(t.strings, e = new dt(t)), e;
+    let e = Jt.get(t.strings);
+    return e === void 0 && Jt.set(t.strings, e = new dt(t)), e;
   }
   k(t) {
     Ot(this._$AH) || (this._$AH = [], this._$AR());
@@ -388,8 +388,8 @@ class et {
   }
   _$AR(t = this._$AA.nextSibling, e) {
     for (this._$AP?.(!1, !0, e); t !== this._$AB; ) {
-      const i = Wt(t).nextSibling;
-      Wt(t).remove(), t = i;
+      const i = Bt(t).nextSibling;
+      Bt(t).remove(), t = i;
     }
   }
   setConnected(t) {
@@ -473,7 +473,7 @@ const Ne = (n, t, e) => {
   return s._$AI(n), s;
 };
 const Nt = globalThis;
-let z = class extends X {
+let C = class extends X {
   constructor() {
     super(...arguments), this.renderOptions = { host: this }, this._$Do = void 0;
   }
@@ -495,9 +495,9 @@ let z = class extends X {
     return R;
   }
 };
-z._$litElement$ = !0, z.finalized = !0, Nt.litElementHydrateSupport?.({ LitElement: z });
+C._$litElement$ = !0, C.finalized = !0, Nt.litElementHydrateSupport?.({ LitElement: C });
 const Ie = Nt.litElementPolyfillSupport;
-Ie?.({ LitElement: z });
+Ie?.({ LitElement: C });
 (Nt.litElementVersions ??= []).push("4.2.2");
 const Z = { ATTRIBUTE: 1, CHILD: 2, PROPERTY: 3, BOOLEAN_ATTRIBUTE: 4 }, It = (n) => (...t) => ({ _$litDirective$: n, values: t });
 let Ht = class {
@@ -536,7 +536,7 @@ const { I: He } = Le, Xt = (n) => n, Ue = (n) => n.strings === void 0, Qt = () =
     }
   }
   return e;
-}, W = (n, t, e = n) => (n._$AI(t, e), n), Pe = {}, Ut = (n, t = Pe) => n._$AH = t, qe = (n) => n._$AH, Tt = (n) => {
+}, B = (n, t, e = n) => (n._$AI(t, e), n), Pe = {}, Ut = (n, t = Pe) => n._$AH = t, qe = (n) => n._$AH, Et = (n) => {
   n._$AR(), n._$AA.remove();
 };
 const te = It(class extends Ht {
@@ -595,26 +595,26 @@ const ee = (n, t, e) => {
     let c, u, h = 0, g = s.length - 1, f = 0, v = a.length - 1;
     for (; h <= g && f <= v; ) if (s[h] === null) h++;
     else if (s[g] === null) g--;
-    else if (d[h] === o[f]) l[f] = W(s[h], a[f]), h++, f++;
-    else if (d[g] === o[v]) l[v] = W(s[g], a[v]), g--, v--;
-    else if (d[h] === o[v]) l[v] = W(s[h], a[v]), st(n, l[v + 1], s[h]), h++, v--;
-    else if (d[g] === o[f]) l[f] = W(s[g], a[f]), st(n, s[h], s[g]), g--, f++;
+    else if (d[h] === o[f]) l[f] = B(s[h], a[f]), h++, f++;
+    else if (d[g] === o[v]) l[v] = B(s[g], a[v]), g--, v--;
+    else if (d[h] === o[v]) l[v] = B(s[h], a[v]), st(n, l[v + 1], s[h]), h++, v--;
+    else if (d[g] === o[f]) l[f] = B(s[g], a[f]), st(n, s[h], s[g]), g--, f++;
     else if (c === void 0 && (c = ee(o, f, v), u = ee(d, h, g)), c.has(d[h])) if (c.has(d[g])) {
       const m = u.get(o[f]), S = m !== void 0 ? s[m] : null;
       if (S === null) {
         const x = st(n, s[h]);
-        W(x, a[f]), l[f] = x;
-      } else l[f] = W(S, a[f]), st(n, s[h], S), s[m] = null;
+        B(x, a[f]), l[f] = x;
+      } else l[f] = B(S, a[f]), st(n, s[h], S), s[m] = null;
       f++;
-    } else Tt(s[g]), g--;
-    else Tt(s[h]), h++;
+    } else Et(s[g]), g--;
+    else Et(s[h]), h++;
     for (; f <= v; ) {
       const m = st(n, l[v + 1]);
-      W(m, a[f]), l[f++] = m;
+      B(m, a[f]), l[f++] = m;
     }
     for (; h <= g; ) {
       const m = s[h++];
-      m !== null && Tt(m);
+      m !== null && Et(m);
     }
     return this.ut = o, Ut(n, l), R;
   }
@@ -1732,7 +1732,7 @@ const ee = (n, t, e) => {
       transform: none !important;
     }
   }
-`, Fe = E`
+`, We = E`
   .list-tile .tile-label {
     min-width: 0;
     overflow: hidden;
@@ -2520,7 +2520,7 @@ const ee = (n, t, e) => {
       scale: none !important;
     }
   }
-`, Be = E`
+`, Fe = E`
   .page {
     animation: signal-page-in 240ms var(--signal-ease) both;
   }
@@ -2642,7 +2642,7 @@ const ee = (n, t, e) => {
   }
 `;
 let at;
-class We {
+class Be {
   constructor() {
     this.metas = /* @__PURE__ */ new Map(), this.color = "", this.frame = 0;
   }
@@ -2757,9 +2757,10 @@ const se = {
   bulb: "M9 18h6M9 21h6M8 15a7 7 0 1 1 8 0l-1 3H9Z",
   settings: "M4 7h16M4 17h16M8 4v6M16 14v6",
   wind: "M3 8h13a3 3 0 1 0-3-3M3 12h16a3 3 0 1 1-3 3M3 16h6a3 3 0 1 1-3 3",
-  warn: "m12 3 10 18H2ZM12 9v5M12 17v.5"
+  warn: "m12 3 10 18H2ZM12 9v5M12 17v.5",
+  clock: "M12 3a9 9 0 1 1 0 18 9 9 0 0 1 0-18ZM12 7v5l3 2"
 }, b = (n) => V`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d=${se[n] || se.home}></path></svg>`, $ = (n) => !!n && !["unknown", "unavailable"].includes(n.state), w = (n) => n != null && n !== "" && Number.isFinite(Number(n)) ? Number(n) : void 0, N = (n) => n === "partlycloudy" ? "Partly cloudy" : (n || "Unavailable").replaceAll("_", " ").replaceAll("-", " "), zt = (n) => typeof n == "string" ? { entity: n } : n;
-class Ze extends z {
+class Ze extends C {
   constructor() {
     super(...arguments), this.config = { type: "custom:signal-home" };
   }
@@ -2889,7 +2890,7 @@ class Ze extends z {
   }
 }
 customElements.get("signal-home-editor") || customElements.define("signal-home-editor", Ze);
-class Ye extends z {
+class Ye extends C {
   constructor() {
     super(...arguments), this.eventId = "", this.kind = "event", this.camera = "", this.instance = "frigate", this.url = "", this.error = "", this.loading = !0, this.signature = "", this.generation = 0, this.load = async () => {
       const t = ++this.generation;
@@ -2978,7 +2979,7 @@ class Ye extends z {
   }
 }
 customElements.get("signal-camera-event") || customElements.define("signal-camera-event", Ye);
-class Ke extends z {
+class Ke extends C {
   constructor() {
     super(...arguments), this.camera = "", this.events = [], this.loading = !1, this.error = "", this.more = !1, this.limit = 24, this.signature = "", this.generation = 0, this.load = async () => {
       const t = ++this.generation;
@@ -3072,8 +3073,8 @@ class Ke extends z {
   }
 }
 customElements.get("signal-camera-grid") || customElements.define("signal-camera-grid", Ke);
-const Je = 2e3, Ge = ["armed_night", "armed_away", "armed_home", "armed_vacation", "armed_custom_bypass", "pending", "triggered"];
-class Xe extends z {
+const Ge = 2e3, Je = ["armed_night", "armed_away", "armed_home", "armed_vacation", "armed_custom_bypass", "pending", "triggered"];
+class Xe extends C {
   constructor() {
     super(...arguments), this.cameras = [], this.alarmCameras = [], this.alarmEntity = "", this.eventId = "", this.eventCamera = "", this.eventInstance = "frigate", this.eventKind = "event", this.selected = "", this.error = "", this.ready = !1, this.voiceActive = !1, this.talking = !1, this.liveSignature = "", this.generation = 0, this.toggleVoice = () => {
       if (this.voiceActive) {
@@ -3093,7 +3094,7 @@ class Xe extends z {
     }, this.stopTalking = (t) => {
       this.talking && (t.preventDefault(), this.cardAction("microphone_mute"), this.talking = !1, this.echoTimer = setTimeout(() => {
         this.voiceActive && !this.talking && this.cardAction("unmute");
-      }, Je));
+      }, Ge));
     }, this.syncEventRoute = () => {
       const t = new URLSearchParams(location.search), e = t.get("signal_review") || t.get("signal_event") || "", i = t.has("signal_review") ? "review" : "event", s = t.get("signal_camera") || "front_door", a = t.get("signal_instance") || "frigate";
       (i !== this.eventKind || e !== this.eventId || s !== this.eventCamera || a !== this.eventInstance) && (this.releaseViewers(), this.eventId = e, this.eventCamera = s, this.eventInstance = a, this.eventKind = i, e && this.cameras.includes(`camera.${s}`) && (this.selected = `camera.${s}`));
@@ -3221,7 +3222,7 @@ class Xe extends z {
   }
   /** An alarm-only camera is off (turned away, privacy mode, not recording) unless the alarm is armed. */
   resting(t) {
-    return this.alarmCameras.includes(t) && !Ge.includes(this.hass?.states[this.alarmEntity]?.state || "");
+    return this.alarmCameras.includes(t) && !Je.includes(this.hass?.states[this.alarmEntity]?.state || "");
   }
   willUpdate(t) {
     if (this.cameras.includes(this.selected) || (this.selected = this.cameras[0] || ""), (this.connection !== this.hass?.connection || this.user !== this.hass?.user?.id) && (this.releaseViewers(), this.connection = this.hass?.connection, this.user = this.hass?.user?.id), this.eventId || this.resting(this.selected)) {
@@ -3438,7 +3439,7 @@ const Pt = E`
     }
   }
 `;
-class Qe extends z {
+class Qe extends C {
   constructor() {
     super(...arguments), this.open = !1, this.heading = "Details", this.dark = !1, this.compact = !1, this.sheetId = `signal-sheet-${Date.now()}-${Math.random().toString(36).slice(2)}`, this.closing = !1, this.closeRequested = !1, this.startY = 0, this.entryTransform = "translateY(12px)", this.mobileSheet = !1, this.motionSequence = 0, this.pop = () => {
       this.open && history.state?.signalSheet !== this.sheetId && this.finish();
@@ -3704,7 +3705,7 @@ class Qe extends z {
   }
 }
 customElements.define("signal-sheet", Qe);
-class ti extends z {
+class ti extends C {
   constructor() {
     super(...arguments), this.entity = "", this.dark = !1, this.name = "", this.custom = !1, this.battery = "", this.advanced = !1, this.records = [], this.loading = !1, this.loadError = "", this.sequence = 0;
   }
@@ -3972,7 +3973,7 @@ class ti extends z {
   }
 }
 customElements.define("signal-details", ti);
-class ei extends z {
+class ei extends C {
   constructor() {
     super(...arguments), this.config = { type: "custom:signal-control", entity: "" }, this.pending = !1, this.acknowledged = !1, this.detailsOpen = !1, this.error = "", this.confirmUnlock = !1, this.preview = {};
   }
@@ -4497,7 +4498,7 @@ function ue(n, t = Date.now()) {
   const i = n.state.trim();
   return i && i !== "none" ? i : void 0;
 }
-class ii extends z {
+class ii extends C {
   constructor() {
     super(...arguments), this.rooms = [], this.dark = !1, this.selected = "", this.pending = !1, this.error = "";
   }
@@ -4791,20 +4792,20 @@ function ai(n, t, e, i = /* @__PURE__ */ new Date()) {
     (y) => y.e?.attributes.device_class === "moisture"
   ), l = a.filter(
     (y) => !o.includes(y) && !d.includes(y)
-  ), c = [], u = (y, C, D, U, I, kt) => {
-    const P = D.filter((A) => !$(A.e)), F = D.filter(
+  ), c = [], u = (y, z, D, U, I, kt) => {
+    const P = D.filter((A) => !$(A.e)), W = D.filter(
       (A) => A.id.startsWith("lock.") ? $(A.e) && A.e.state !== "locked" : A.e?.state === "on"
-    ), _t = F.map(
+    ), _t = W.map(
       (A) => `${A.name} ${y === "water" ? "reports water" : A.id.startsWith("lock.") ? A.e.state : y === "doors" ? "open" : "active"}`
-    ).join("; "), At = P.map((A) => `${A.name} offline`).join("; "), O = D.filter((A) => A.unverified && $(A.e) && !F.includes(A)), ge = O.length ? `${O.map((A) => A.name).join(" and ")} ${O.length === 1 ? "needs" : "need"} verification (last reported ${O.every((A) => A.e?.state === "off") ? "closed" : "state only"})` : "";
+    ).join("; "), At = P.map((A) => `${A.name} offline`).join("; "), O = D.filter((A) => A.unverified && $(A.e) && !W.includes(A)), ge = O.length ? `${O.map((A) => A.name).join(" and ")} ${O.length === 1 ? "needs" : "need"} verification (last reported ${O.every((A) => A.e?.state === "off") ? "closed" : "state only"})` : "";
     c.push({
       id: y,
-      label: C,
+      label: z,
       text: [_t, At, ge].filter(Boolean).join(" · ") || (D.length ? U : I),
       route: "safety",
       icon: kt,
-      priority: F.length ? y === "water" ? 100 : 90 : P.length ? 80 : O.length ? 65 : D.length ? 15 : 1,
-      tone: F.length ? "alert" : P.length || O.length ? "notice" : void 0,
+      priority: W.length ? y === "water" ? 100 : 90 : P.length ? 80 : O.length ? 65 : D.length ? 15 : 1,
+      tone: W.length ? "alert" : P.length || O.length ? "notice" : void 0,
       stamp: nt(D.map((A) => A.e)),
       timeLabel: O.length ? "Last report" : void 0
     });
@@ -4850,13 +4851,13 @@ function ai(n, t, e, i = /* @__PURE__ */ new Date()) {
   });
   const x = [
     ...new Set((t.light_rooms || []).flatMap((y) => y.entities))
-  ], _ = x.map((y) => s[y]), T = _.filter((y) => y?.state === "on").length, M = _.filter((y) => !$(y)).length, G = (t.light_rooms || []).filter(
-    (y) => y.entities.some((C) => s[C]?.state === "on")
+  ], _ = x.map((y) => s[y]), T = _.filter((y) => y?.state === "on").length, M = _.filter((y) => !$(y)).length, J = (t.light_rooms || []).filter(
+    (y) => y.entities.some((z) => s[z]?.state === "on")
   ), yt = gt(i, n.config?.time_zone) >= 22 || gt(i, n.config?.time_zone) < 6, H = T > 0 && ((t.alarm_entity ? ["armed_night", "armed_away", "arming", "pending"].includes(m?.state || "") : ["Sleeping", "Away"].includes(m?.state || "")) || yt);
   c.push({
     id: "lights",
     label: "Lighting",
-    text: x.length ? `${T ? `${T} ${T === 1 ? "light" : "lights"} on${G.length === 1 ? " in " + G[0].name : ""}` : M ? "Available lights off" : "All lights off"}${M ? ` · ${M} unavailable` : ""}` : "No lights connected",
+    text: x.length ? `${T ? `${T} ${T === 1 ? "light" : "lights"} on${J.length === 1 ? " in " + J[0].name : ""}` : M ? "Available lights off" : "All lights off"}${M ? ` · ${M} unavailable` : ""}` : "No lights connected",
     route: "rooms",
     icon: "bulb",
     priority: M ? 70 : H ? 50 : 12,
@@ -4879,7 +4880,7 @@ function ai(n, t, e, i = /* @__PURE__ */ new Date()) {
   const ct = Object.values(s).filter(
     (y) => y.entity_id.startsWith("todo.")
   ), ht = ct.filter((y) => !$(y)), wt = ct.reduce(
-    (y, C) => y + ($(C) && w(C.state) || 0),
+    (y, z) => y + ($(z) && w(z.state) || 0),
     0
   );
   c.push({
@@ -4895,10 +4896,10 @@ function ai(n, t, e, i = /* @__PURE__ */ new Date()) {
   if ($t) {
     const y = Date.parse(
       s[$t.activity_entity || ""]?.attributes.last_triggered || ""
-    ), C = e.review, D = C ? C.start_time * 1e3 : NaN, U = Math.max(
+    ), z = e.review, D = z ? z.start_time * 1e3 : NaN, U = Math.max(
       Number.isFinite(y) ? y : 0,
       Number.isFinite(D) ? D : 0
-    ), I = U > 0 && U <= i.getTime() && i.getTime() - U < 2 * 36e5, kt = s[$t.entity], P = !$(kt), F = Math.max(0, Math.floor((i.getTime() - U) / 6e4)), _t = F < 1 ? "just now" : `${F} min ago`, At = y >= D || !Number.isFinite(D) && Number.isFinite(y) || C?.doorbell, O = !!C && (D >= y || y >= D && y <= (C.end_time ? C.end_time * 1e3 : i.getTime()) + 1e4);
+    ), I = U > 0 && U <= i.getTime() && i.getTime() - U < 2 * 36e5, kt = s[$t.entity], P = !$(kt), W = Math.max(0, Math.floor((i.getTime() - U) / 6e4)), _t = W < 1 ? "just now" : `${W} min ago`, At = y >= D || !Number.isFinite(D) && Number.isFinite(y) || z?.doorbell, O = !!z && (D >= y || y >= D && y <= (z.end_time ? z.end_time * 1e3 : i.getTime()) + 1e4);
     c.push({
       id: "doorbell",
       label: "Front door",
@@ -4909,11 +4910,11 @@ function ai(n, t, e, i = /* @__PURE__ */ new Date()) {
       tone: I || P || e.error ? "notice" : void 0,
       stamp: I ? new Date(U).toISOString() : e.checked,
       timeLabel: I ? "At" : "Checked",
-      image: I && O ? C?.image : void 0,
-      review: I && O ? C?.id : void 0
+      image: I && O ? z?.image : void 0,
+      review: I && O ? z?.id : void 0
     });
   }
-  return c.sort((y, C) => C.priority - y.priority);
+  return c.sort((y, z) => z.priority - y.priority);
 }
 function ni(n, t = !0) {
   if (!t) return "Connection lost. Showing last received states.";
@@ -4927,16 +4928,16 @@ function ni(n, t = !0) {
   const o = n.find((u) => u.id === "climate"), d = n.find((u) => u.id === "lights"), l = d?.text.match(/^\d+ lights? on/)?.[0] || (d?.text === "All lights off" ? "lights off" : ""), c = o?.text.replace(", ", " and ") || "";
   return `Quiet.${[l, c].filter(Boolean).length ? " " + [l, c].filter(Boolean).join(", ") + "." : ""}`;
 }
-const J = (n) => new Intl.DateTimeFormat("en-CA", {
+const G = (n) => new Intl.DateTimeFormat("en-CA", {
   timeZone: "America/New_York",
   year: "numeric",
   month: "2-digit",
   day: "2-digit"
-}).format(n), ae = J, Mt = (n, t) => {
-  const e = /* @__PURE__ */ new Date(`${J(n)}T12:00:00Z`);
-  return e.setUTCDate(e.getUTCDate() + t), J(e);
+}).format(n), ae = G, Mt = (n, t) => {
+  const e = /* @__PURE__ */ new Date(`${G(n)}T12:00:00Z`);
+  return e.setUTCDate(e.getUTCDate() + t), G(e);
 }, oi = (n, t = "15217") => {
-  const e = J(n), i = Mt(n, 30);
+  const e = G(n), i = Mt(n, 30);
   return `https://www.hebcal.com/hebcal?${new URLSearchParams({
     v: "1",
     cfg: "json",
@@ -4958,7 +4959,7 @@ const J = (n) => new Intl.DateTimeFormat("en-CA", {
 function ri(n, t) {
   if (!$(n)) return [];
   if (Array.isArray(n.attributes.events)) {
-    const s = J(t);
+    const s = G(t);
     return n.attributes.events.flatMap((a) => !a || typeof a.date != "string" || !/^\d{4}-\d{2}-\d{2}$/.test(a.date) || a.date < s || !["trash", "recycling", "yard"].includes(a.kind) ? [] : [{
       id: `pghst-${a.kind}-${a.date}`,
       date: a.date,
@@ -4972,7 +4973,7 @@ function ri(n, t) {
     ["next_pickup_date", "Trash pickup", "trash"],
     ["next_recycling_date", "Recycling pickup", "recycling"],
     ["next_yard_date", "Yard pickup", "yard"]
-  ], i = J(t);
+  ], i = G(t);
   return e.flatMap(([s, a, o]) => {
     const d = s === "next_pickup_date" ? n.state : n.attributes[s];
     if (typeof d != "string" || !/^\d{1,2}-\d{1,2}-\d{4}$/.test(d)) return [];
@@ -4982,7 +4983,7 @@ function ri(n, t) {
 }
 function li(n, t) {
   if (!n || typeof n != "object" || !Array.isArray(n.items)) return [];
-  const e = J(t);
+  const e = G(t);
   return n.items.flatMap((i) => {
     if (!i || typeof i.title != "string" || typeof i.date != "string") return [];
     const s = i.date.slice(0, 10);
@@ -5014,7 +5015,7 @@ const ne = /* @__PURE__ */ new Map(), ci = {
   shabbat: "shabbat",
   holiday: "holiday"
 }, hi = (n) => n === "trash" || n === "recycling" || n === "yard" ? "trash" : n === "candles" ? "sun" : n === "havdalah" ? "moon" : "sparkle";
-class pi extends z {
+class pi extends C {
   constructor() {
     super(...arguments), this.config = { type: "custom:signal-home" }, this.events = [], this.status = "loading", this.now = /* @__PURE__ */ new Date(), this.expanded = !1, this.requestKey = "", this.requestedAt = 0, this.onVisibility = () => {
       document.visibilityState === "visible" && (this.now = /* @__PURE__ */ new Date(), this.refresh());
@@ -5137,7 +5138,7 @@ class pi extends z {
   }
 }
 customElements.define("signal-upcoming", pi);
-class ui extends z {
+class ui extends C {
   constructor() {
     super(...arguments), this.config = { type: "custom:signal-home" }, this.front = {}, this.pending = "", this.error = "", this.now = /* @__PURE__ */ new Date(), this.signature = "", this.generation = 0, this.resume = () => {
       document.visibilityState === "visible" && (this.now = /* @__PURE__ */ new Date(), this.loadFront());
@@ -5773,8 +5774,8 @@ function bi(n, t, e) {
   }
   return a.push({ start: o, end: t, day: d }), a;
 }
-const Et = /* @__PURE__ */ new WeakMap();
-class vi extends z {
+const Tt = /* @__PURE__ */ new WeakMap();
+class vi extends C {
   constructor() {
     super(...arguments), this.suspended = !1, this.config = { type: "custom:signal-graph", entity: "" }, this.points = [], this.loading = !1, this.error = "", this.hours = 24, this.displayedHours = 24, this.sequence = 0, this.queried = "", this.cacheUser = "", this.restored = "", this.end = Date.now(), this.start = this.end - 864e5;
   }
@@ -6046,7 +6047,7 @@ class vi extends z {
       const s = `${this.config.entity}:${this.hours}`;
       if (this.restored !== s) {
         this.restored = s;
-        const a = Et.get(e)?.get(`${i}:${s}`);
+        const a = Tt.get(e)?.get(`${i}:${s}`);
         a && Date.now() - a.end < 6e4 && (this.points = a.points, this.start = a.start, this.end = a.end, this.displayedHours = a.hours, this.queried = s);
       }
     }
@@ -6071,8 +6072,8 @@ class vi extends z {
       if (t === this.sequence) {
         this.points = gi(a[this.config.entity] || []), this.start = s, this.end = e, this.displayedHours = i;
         const o = this.hass.connection || this.hass.callWS;
-        let d = Et.get(o);
-        d || Et.set(o, d = /* @__PURE__ */ new Map());
+        let d = Tt.get(o);
+        d || Tt.set(o, d = /* @__PURE__ */ new Map());
         const l = `${this.cacheUser}:${this.queried}`;
         d.delete(l), d.set(l, { points: this.points, start: s, end: e, hours: i }), d.size > 16 && d.delete(d.keys().next().value);
       }
@@ -6214,7 +6215,7 @@ class vi extends z {
   }
 }
 customElements.define("signal-graph", vi);
-class xi extends z {
+class xi extends C {
   constructor() {
     super(...arguments), this.detailsOpen = !1, this.config = { type: "custom:signal-metric", entity: "" };
   }
@@ -6365,14 +6366,226 @@ class xi extends z {
   }
 }
 customElements.define("signal-metric", xi);
-const yi = [
+function yi(n, t, e, i) {
+  const s = new Map(t.map((d) => [d.category_id, d.name])), a = /* @__PURE__ */ new Map(), o = [];
+  for (const d of n) {
+    if (d.platform !== "automation" || d.disabled_by || !d.labels?.includes(e)) continue;
+    const l = d.categories?.automation;
+    l && s.has(l) ? a.set(l, [...a.get(l) || [], d.entity_id]) : o.push({ id: d.entity_id, name: i(d.entity_id), entities: [d.entity_id] });
+  }
+  for (const [d, l] of a)
+    o.push(
+      l.length > 1 ? { id: `category:${d}`, name: s.get(d), entities: l.sort((c, u) => i(c).localeCompare(i(u))) } : { id: l[0], name: i(l[0]), entities: l }
+    );
+  return o.sort((d, l) => d.name.localeCompare(l.name));
+}
+class wi extends C {
+  constructor() {
+    super(...arguments), this.label = "show_in_signal", this.groups = [], this.loading = !1, this.loaded = !1, this.loadError = "", this.pending = "", this.error = "";
+  }
+  static {
+    this.properties = {
+      hass: { attribute: !1 },
+      label: {},
+      groups: { state: !0 },
+      loading: { state: !0 },
+      loadError: { state: !0 },
+      pending: { state: !0 },
+      error: { state: !0 }
+    };
+  }
+  static {
+    this.styles = E`
+    :host {
+      display: block;
+      color: var(--ink);
+      max-width: 740px;
+    }
+    * {
+      box-sizing: border-box;
+    }
+    svg {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+    }
+    button {
+      font: inherit;
+      color: inherit;
+      cursor: pointer;
+    }
+    button:disabled {
+      cursor: default;
+      opacity: 0.5;
+    }
+    button:focus-visible {
+      outline: 3px solid var(--ink);
+      outline-offset: 4px;
+    }
+    .list {
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      background: var(--surface);
+      padding: 6px 24px;
+    }
+    .automation {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 18px 0;
+    }
+    .automation + .automation {
+      border-top: 1px solid var(--line);
+    }
+    .mark {
+      display: grid;
+      place-items: center;
+      width: 44px;
+      height: 44px;
+      border-radius: 16px;
+      background: var(--line);
+      color: var(--muted);
+      transition: background 0.3s, color 0.3s;
+    }
+    .on .mark {
+      background: var(--mint);
+      /* Mint stays light in both themes, so the mark keeps dark ink. */
+      color: #24402f;
+    }
+    .copy {
+      flex: 1;
+      min-width: 0;
+    }
+    h2 {
+      font-size: 17px;
+      margin: 0 0 4px;
+      overflow-wrap: anywhere;
+    }
+    p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.45;
+    }
+    .switch {
+      flex: none;
+      width: 64px;
+      height: 38px;
+      border: 0;
+      background: var(--line);
+      border-radius: 30px;
+      padding: 4px;
+    }
+    .switch span {
+      display: block;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: var(--surface);
+      box-shadow: 0 2px 5px #0002;
+      transition: transform 0.25s;
+    }
+    .switch[aria-checked="true"] {
+      background: var(--accent);
+    }
+    .switch[aria-checked="true"] span {
+      transform: translateX(26px);
+    }
+    .switch[aria-checked="mixed"] span {
+      transform: translateX(13px);
+    }
+    .note {
+      margin-top: 16px;
+    }
+    .retry {
+      min-height: 44px;
+      margin-top: 12px;
+      border: 1px solid var(--line);
+      border-radius: 15px;
+      padding: 10px 16px;
+      background: var(--surface);
+    }
+    .error {
+      color: var(--danger, #b33b36);
+      margin-top: 16px;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        transition: none !important;
+      }
+    }
+  `;
+  }
+  updated(t) {
+    (t.has("hass") || t.has("label")) && this.hass && !this.loaded && !this.loading && this.load();
+  }
+  name(t) {
+    return this.hass.states[t]?.attributes.friendly_name || t.replace(/^automation\./, "").replaceAll("_", " ");
+  }
+  async load() {
+    this.loading = !0, this.loadError = "";
+    try {
+      const [t, e] = await Promise.all([
+        this.hass.callWS({ type: "config/entity_registry/list" }),
+        this.hass.callWS({ type: "config/category_registry/list", scope: "automation" })
+      ]);
+      this.groups = yi(t, e, this.label, (i) => this.name(i)), this.loaded = !0;
+    } catch {
+      this.loadError = "Couldn’t load automations from Home Assistant.";
+    } finally {
+      this.loading = !1;
+    }
+  }
+  async toggle(t, e) {
+    if (!this.pending) {
+      this.pending = t.id, this.error = "";
+      try {
+        await this.hass.callService("automation", e ? "turn_on" : "turn_off", { entity_id: t.entities });
+      } catch {
+        this.error = `${t.name} didn’t switch ${e ? "on" : "off"}. Try again.`;
+      } finally {
+        this.pending = "";
+      }
+    }
+  }
+  row(t) {
+    const e = t.entities.map((l) => this.hass.states[l]), i = e.filter($), s = i.filter((l) => l.state === "on").length, a = s > 0 && s === e.length, o = i.length ? a ? "On" : s ? `${s} of ${e.length} on` : i.length < e.length ? "Off · some unavailable" : "Off" : "Unavailable", d = t.entities.length > 1 ? t.entities.map((l) => this.name(l)).join(" · ") : "";
+    return r`<div class=${`automation ${s ? "on" : ""}`} aria-busy=${this.pending === t.id}>
+      <span class="mark" aria-hidden="true">${b("clock")}</span>
+      <div class="copy">
+        <h2>${t.name}</h2>
+        ${d ? r`<p>${d}</p>` : p}
+        <p role="status">${o}${this.pending === t.id ? " · Sending…" : ""}</p>
+      </div>
+      <button
+        class="switch"
+        role="switch"
+        aria-label=${t.name}
+        aria-checked=${a ? "true" : s ? "mixed" : "false"}
+        ?disabled=${!!this.pending || !i.length || this.hass.connection?.connected === !1}
+        @click=${() => this.toggle(t, !a)}
+      ><span></span></button>
+    </div>`;
+  }
+  render() {
+    return this.hass ? this.loadError ? r`<p class="error" role="alert">${this.loadError}</p>
+        <button class="retry" ?disabled=${this.loading} @click=${() => this.load()}>Try again</button>` : this.loaded ? this.groups.length ? r`<div class="list">${this.groups.map((t) => this.row(t))}</div>
+      <p class="note">Automations in the same Home Assistant category switch on and off together.</p>
+      ${this.error ? r`<p class="error" role="alert">${this.error}</p>` : p}` : r`<p>No automations are shared with Signal yet. In Home Assistant, add the label “${this.label === "show_in_signal" ? "Show in Signal" : this.label}” to an automation to show it here.</p>` : r`<p role="status">Loading automations…</p>` : p;
+  }
+}
+customElements.define("signal-automations", wi);
+const $i = [
   { id: "home", name: "Home", icon: "home" },
   { id: "rooms", name: "Lighting", icon: "bulb" },
   { id: "cameras", name: "Cameras", icon: "camera" },
   { id: "lists", name: "Lists", icon: "list" },
   { id: "safety", name: "Security", icon: "shield" },
-  { id: "climate", name: "Climate", icon: "climate" }
-], wi = {
+  { id: "climate", name: "Climate", icon: "climate" },
+  { id: "automations", name: "Automations", icon: "clock" }
+], ki = {
   off: "Off",
   heat: "Heat",
   cool: "Cool",
@@ -6381,11 +6594,11 @@ const yi = [
   dry: "Dry",
   fan_only: "Fan"
 };
-class $i extends z {
+class _i extends C {
   constructor() {
     super(...arguments), this.config = { type: "custom:signal-home" }, this.tab = "home", this.pageTravel = 0, this.pendingTodo = "", this.editingTodo = "", this.editDraft = "", this.savingEdit = !1, this.messageTone = "neutral", this.dark = !1, this.appearance = "auto", this.completedTodos = [], this.completionTimes = {}, this.deleteError = "", this.todoMutating = !1, this.todoRefreshPending = !1, this.todoOrder = /* @__PURE__ */ new Map(), this.selectedTodo = "", this.loadedTodo = "", this.discoveredTodos = [], this.detailEntity = "", this.detailReady = !1, this.menuOpen = !1, this.moreOpen = !1, this.moreDestination = "", this.contentScrolled = !1, this.onContentScroll = (t) => {
       this.contentScrolled = t.currentTarget.scrollTop > 4;
-    }, this.chrome = new We(), this.chromePath = "", this.syncChrome = () => {
+    }, this.chrome = new Be(), this.chromePath = "", this.syncChrome = () => {
       this.isConnected && this.immersive && location.pathname === this.chromePath ? this.chrome.sync(this.dark, this.hass?.auth?.external) : this.chrome.release();
     }, this.phone = window.matchMedia("(max-width: 760px)"), this.narrow = this.phone.matches, this.resize = () => {
       this.narrow = this.phone.matches;
@@ -6439,10 +6652,10 @@ class $i extends z {
     };
   }
   static {
-    this.styles = [je, Fe, Be, xt, mi];
+    this.styles = [je, We, Fe, xt, mi];
   }
   get tabs() {
-    return yi;
+    return $i;
   }
   get todoLists() {
     return this.todoListStates === this.hass?.states ? this.discoveredTodos : (this.todoListStates = this.hass?.states, this.discoveredTodos = Object.entries(this.hass?.states || {}).filter(([t]) => t.startsWith("todo.")).map(([t, e]) => ({ ...e, entity_id: t })).sort(
@@ -6522,6 +6735,7 @@ class $i extends z {
       throw new Error("Quick actions need a name and script or scene entity.");
     if (t.light_rooms && (!Array.isArray(t.light_rooms) || !t.light_rooms.every((i) => i && typeof i.id == "string" && typeof i.name == "string" && Array.isArray(i.entities) && i.entities.length > 0 && i.entities.every((s) => /^(light|switch)\.[a-z0-9_]+$/.test(s)) && /^script\.[a-z0-9_]+$/.test(i.on_script) && /^script\.[a-z0-9_]+$/.test(i.off_script) && (!i.scenes || Array.isArray(i.scenes) && i.scenes.every(e)))))
       throw new Error("Light rooms need lamp entities and on/off scripts.");
+    if (t.automation_label !== void 0 && (typeof t.automation_label != "string" || !/^[a-z0-9_]+$/.test(t.automation_label))) throw new Error("Automation label must be a Home Assistant label ID.");
     if (t.all_lights_off && !/^script\.[a-z0-9_]+$/.test(t.all_lights_off)) throw new Error("All lights off must be a script.");
     if (t.doorbell && (!/^camera\.[a-z0-9_]+$/.test(t.doorbell.entity) || !/^[a-z0-9_]+$/.test(t.doorbell.camera) || t.doorbell.instance && !/^[a-z0-9_]+$/.test(t.doorbell.instance))) throw new Error("Doorbell needs valid camera and instance IDs.");
     this.config = { ...t }, this.tabs.some((i) => i.id === this.tab) || (this.tab = "home"), this.selectedTodo = "", this.resetTodoState(), this.applyAppearance();
@@ -6846,7 +7060,7 @@ class $i extends z {
     );
   }
   nav(t = !1) {
-    const e = t ? [...this.tabs.filter((s) => ["home", "rooms", "cameras", "lists"].includes(s.id)), { id: "more", name: "More", icon: "more" }] : this.tabs, i = t && ["safety", "climate"].includes(this.tab) ? "more" : this.tab;
+    const e = t ? [...this.tabs.filter((s) => ["home", "rooms", "cameras", "lists"].includes(s.id)), { id: "more", name: "More", icon: "more" }] : this.tabs, i = t && ["safety", "climate", "automations"].includes(this.tab) ? "more" : this.tab;
     return r`<nav class=${t ? "bottom-nav" : ""}
       style=${`--active: ${e.findIndex((s) => s.id === i)}; --tab-count: ${e.length}`}
       aria-label=${t ? "Mobile navigation" : "Dashboard navigation"}>
@@ -6904,13 +7118,13 @@ class $i extends z {
       if (!S || c === void 0) return;
       const M = Number(
         Math.max(u, Math.min(h, c + T)).toFixed(2)
-      ), G = l ? {
+      ), J = l ? {
         target_temp_low: this.rangeSide === "low" ? M : o,
         target_temp_high: this.rangeSide === "high" ? M : d
       } : { temperature: M };
       this.service("climate", "set_temperature", {
         entity_id: this.config.climate,
-        ...G
+        ...J
       });
     }, _ = Array.isArray(s.hvac_modes) ? s.hvac_modes : [];
     return r`<section
@@ -6995,7 +7209,7 @@ class $i extends z {
                 ?disabled=${!i || this.busy}
                 @change=${(T) => this.service("climate", "set_hvac_mode", { entity_id: this.config.climate, hvac_mode: T.target.value })}
               >
-                ${_.map((T) => r`<option value=${T} .selected=${Q(T === e?.state)}>${wi[T] || N(T)}</option>`)}
+                ${_.map((T) => r`<option value=${T} .selected=${Q(T === e?.state)}>${ki[T] || N(T)}</option>`)}
               </select>` : p}
       </div>
     </section>`;
@@ -7176,14 +7390,14 @@ class $i extends z {
   }
   securityMode() {
     if (this.config.alarm_entity) {
-      const i = this.state(this.config.alarm_entity), s = i?.state, a = i?.attributes.arm_mode, o = this.state(this.config.alarm_siren), d = a === "armed_night" ? "Sleeping" : "Away", l = ["arming", "pending", "triggered"].includes(s || "") ? a : s, c = Number(i?.attributes.delay), u = Date.parse(i?.last_changed || i?.last_updated || ""), h = (s === "arming" || s === "pending") && Number.isFinite(c) && c > 0, g = h ? Math.max(0, Math.ceil(c - (Number.isFinite(u) ? (Date.now() - u) / 1e3 : 0))) : 0, f = h ? Math.min(100, Math.max(0, (c - g) / c * 100)) : 0, v = (this.config.alarm_sensors || []).map((k) => this.state(k)), m = v.filter((k) => !$(k)), S = v.filter((k) => k?.state === "on"), x = (k) => k.map((j) => j?.attributes.friendly_name || j?.entity_id || "A door").join(", "), _ = m.length ? `${x(m)} unavailable` : S.length ? `${x(S)} open` : "", T = s === "disarmed" && i?.attributes.open_sensors && Object.keys(i.attributes.open_sensors).length > 0, M = $(i) ? s === "disarmed" ? "Home · alarm off" : s === "arming" ? `${d} · arming` : s === "pending" ? `${d} · door opened` : s === "triggered" ? `${d} · alarm sounding` : s === "armed_night" ? "Sleeping · armed" : s === "armed_away" ? "Away · armed" : "Alarm state unavailable" : "Alarm unavailable", G = s === "arming" ? `Alarm arms in ${g} seconds. Close the doors before then.` : s === "pending" ? `The siren sounds in ${g} seconds unless you disarm.` : s === "triggered" ? "The alarm has triggered. Disarm to stop the siren." : s === "disarmed" ? T && _ ? `Could not arm: ${_}.` : _ ? `Before arming: ${_}.` : "The alarm is off." : s === "armed_night" || s === "armed_away" ? "The alarm is armed. Opening a monitored door starts a 30-second countdown." : "Check Home Assistant for the current alarm state.", yt = [
+      const i = this.state(this.config.alarm_entity), s = i?.state, a = i?.attributes.arm_mode, o = this.state(this.config.alarm_siren), d = a === "armed_night" ? "Sleeping" : "Away", l = ["arming", "pending", "triggered"].includes(s || "") ? a : s, c = Number(i?.attributes.delay), u = Date.parse(i?.last_changed || i?.last_updated || ""), h = (s === "arming" || s === "pending") && Number.isFinite(c) && c > 0, g = h ? Math.max(0, Math.ceil(c - (Number.isFinite(u) ? (Date.now() - u) / 1e3 : 0))) : 0, f = h ? Math.min(100, Math.max(0, (c - g) / c * 100)) : 0, v = (this.config.alarm_sensors || []).map((k) => this.state(k)), m = v.filter((k) => !$(k)), S = v.filter((k) => k?.state === "on"), x = (k) => k.map((j) => j?.attributes.friendly_name || j?.entity_id || "A door").join(", "), _ = m.length ? `${x(m)} unavailable` : S.length ? `${x(S)} open` : "", T = s === "disarmed" && i?.attributes.open_sensors && Object.keys(i.attributes.open_sensors).length > 0, M = $(i) ? s === "disarmed" ? "Home · alarm off" : s === "arming" ? `${d} · arming` : s === "pending" ? `${d} · door opened` : s === "triggered" ? `${d} · alarm sounding` : s === "armed_night" ? "Sleeping · armed" : s === "armed_away" ? "Away · armed" : "Alarm state unavailable" : "Alarm unavailable", J = s === "arming" ? `Alarm arms in ${g} seconds. Close the doors before then.` : s === "pending" ? `The siren sounds in ${g} seconds unless you disarm.` : s === "triggered" ? "The alarm has triggered. Disarm to stop the siren." : s === "disarmed" ? T && _ ? `Could not arm: ${_}.` : _ ? `Before arming: ${_}.` : "The alarm is off." : s === "armed_night" || s === "armed_away" ? "The alarm is armed. Opening a monitored door starts a 30-second countdown." : "Check Home Assistant for the current alarm state.", yt = [
         { name: "Home", icon: "home", title: "Home", detail: "Alarm off", service: "alarm_disarm", state: "disarmed" },
         { name: "Sleeping", icon: "moon", title: "Sleeping", detail: "Arm for night", service: "alarm_arm_night", state: "armed_night" },
         { name: "Away", icon: "arrow", title: "Away", detail: "60-second exit", service: "alarm_arm_away", state: "armed_away" }
       ], H = !!s && s !== "disarmed" && $(i), L = s === "triggered" ? "Triggered" : s === "pending" ? "Entry countdown" : s === "arming" ? "Arming" : H ? "Armed" : "Disarmed";
       return r`<section class="security-mode" aria-label="Alarm mode" data-alarm-state=${s || "unavailable"}>
         <div class="security-mode-head"><div><span class="eyebrow">Current mode</span><h2>${M}</h2></div><span class=${`alarm-state-badge ${H ? "on" : "off"}`}>${L}</span></div>
-        <p class="alarm-mode-detail" role="status">${G}</p>
+        <p class="alarm-mode-detail" role="status">${J}</p>
         ${h ? r`<div class="alarm-countdown" role="timer" aria-label=${`${g} seconds remaining`}><span>${s === "arming" ? "Arming" : "Before siren"}</span><strong>${g}s</strong><div class="alarm-progress"><span style=${`width:${f}%`}></span></div></div>` : p}
         <div class="security-mode-options">${yt.map((k) => r`<button class=${`security-mode-option mode-${k.name.toLowerCase()} ${l === k.state ? "selected" : ""}`} aria-pressed=${l === k.state} ?disabled=${!$(i) || this.busy || this.hass.connection?.connected === !1 || k.state !== "disarmed" && (["arming", "pending", "triggered"].includes(s || "") || k.state === s || m.length > 0 || k.state === "armed_night" && S.length > 0)} @click=${() => this.service("alarm_control_panel", k.service, { entity_id: this.config.alarm_entity }, `${k.title} requested; waiting for alarm confirmation`)}>
           <span class="mode-icon">${b(k.icon)}</span><strong>${k.title}</strong><small>${k.detail}</small><span class="mode-check" aria-hidden="true">${l === k.state ? b("check") : p}</span>
@@ -7287,7 +7501,7 @@ class $i extends z {
         ${this.graphs()}` : this.tab === "safety" ? r`${this.securityMode()}${this.safety()}
         <div class="notice" style="margin-top:20px">
           ${this.safetySummary.alarm ? "A sensor is reporting an active state. Open it for details." : this.safetySummary.unknown ? "An unavailable sensor cannot confirm the condition of its space." : this.safetySummary.unverified ? "These sensors have not passed a recent physical test. Their last reported states are not confirmed current conditions." : "Tap any sensor for its history and details."}
-        </div>` : this.tab === "lists" ? r`<div style="max-width:740px">
+        </div>` : this.tab === "automations" ? r`<signal-automations .hass=${this.hass} .label=${this.config.automation_label || "show_in_signal"}></signal-automations>` : this.tab === "lists" ? r`<div style="max-width:740px">
         ${this.todoListPicker()}${this.grocery(!0)}
       </div>` : this.householdOverview();
   }
@@ -7322,7 +7536,7 @@ class $i extends z {
   render() {
     if (!this.hass)
       return r`<div class="notice" role="status">Connecting to home…</div>`;
-    const t = /* @__PURE__ */ new Date(), e = this.config.greeting || "Home, at a glance.", i = this.tab === "home" ? e : this.tab === "rooms" ? "Lighting." : this.tab === "climate" ? "Just your temperature." : this.tab === "safety" ? "Peace of mind." : this.tab === "cameras" ? "Cameras." : "Good things, listed.", s = this.tab === "home" ? "Your home, at a glance." : this.tab === "climate" ? "Current temperature and comfort controls." : this.tab === "safety" ? "A clear view of the things that matter." : this.tab === "rooms" ? "Lighting, room by room." : this.tab === "cameras" ? "Live video and recorded activity." : "A little space for everyday essentials.", a = this.safetySummary, o = new URL(location.href);
+    const t = /* @__PURE__ */ new Date(), e = this.config.greeting || "Home, at a glance.", i = this.tab === "home" ? e : this.tab === "rooms" ? "Lighting." : this.tab === "climate" ? "Just your temperature." : this.tab === "safety" ? "Peace of mind." : this.tab === "cameras" ? "Cameras." : this.tab === "automations" ? "Automations." : "Good things, listed.", s = this.tab === "home" ? "Your home, at a glance." : this.tab === "climate" ? "Current temperature and comfort controls." : this.tab === "safety" ? "A clear view of the things that matter." : this.tab === "rooms" ? "Lighting, room by room." : this.tab === "cameras" ? "Live video and recorded activity." : this.tab === "automations" ? "Routines that run on their own, on or off." : "A little space for everyday essentials.", a = this.safetySummary, o = new URL(location.href);
     o.searchParams.set("disable_km", ""), o.hash = "";
     const d = this.sensors.find((l) => l.entity === this.detailEntity);
     return r`<div
@@ -7368,7 +7582,7 @@ class $i extends z {
       const l = this.moreDestination;
       this.moreDestination = "", l && this.navigate(l);
     }}>
-        <div class="more-links">${this.tabs.filter((l) => ["safety", "climate"].includes(l.id)).map((l) => r`<button @click=${() => this.chooseMore(l.id)}>${b(l.icon)}<span>${l.name}</span>${b("arrow")}</button>`)}</div>
+        <div class="more-links">${this.tabs.filter((l) => ["safety", "climate", "automations"].includes(l.id)).map((l) => r`<button @click=${() => this.chooseMore(l.id)}>${b(l.icon)}<span>${l.name}</span>${b("arrow")}</button>`)}</div>
       </signal-sheet>
       <signal-sheet
         .open=${this.menuOpen}
@@ -7491,7 +7705,7 @@ class $i extends z {
     </div>`;
   }
 }
-customElements.get("signal-home") || customElements.define("signal-home", $i);
+customElements.get("signal-home") || customElements.define("signal-home", _i);
 const ft = window;
 ft.customCards = ft.customCards || [];
 ft.customCards.push({
@@ -7525,5 +7739,5 @@ ft.customCards.push(
   }
 );
 export {
-  $i as SignalHome
+  _i as SignalHome
 };
