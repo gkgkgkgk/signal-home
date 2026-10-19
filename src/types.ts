@@ -58,6 +58,8 @@ export interface Config {
   alarm_sensors?: string[];
   alarm_siren?: string;
   all_lights_off?: string;
+  /** Label ID marking the automations listed on the Automations page; default show_in_signal. */
+  automation_label?: string;
   doorbell?: { entity: string; camera: string; instance?: string; activity_entity?: string };
   graphs?: (string | { entity: string; name?: string; hours?: number })[];
   appearance?: "light" | "dark" | "auto" | "system";

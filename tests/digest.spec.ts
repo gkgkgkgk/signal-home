@@ -360,7 +360,7 @@ test("digest fits small dark phones and retains full desktop navigation", async 
     page
       .getByRole("navigation", { name: "Dashboard navigation" })
       .getByRole("button"),
-  ).toHaveText(["Home", "Lighting", "Cameras", "Lists", "Security", "Climate"]);
+  ).toHaveText(["Home", "Lighting", "Cameras", "Lists", "Security", "Climate", "Automations"]);
   await page.screenshot({ path: "docs/digest-desktop.png", fullPage: true });
 });
 

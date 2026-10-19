@@ -33,6 +33,7 @@ import "./control";
 import "./graph";
 import "./metric";
 import "./details";
+import "./automations";
 
 const tabs = [
   { id: "home", name: "Home", icon: "home" },
@@ -41,6 +42,7 @@ const tabs = [
   { id: "lists", name: "Lists", icon: "list" },
   { id: "safety", name: "Security", icon: "shield" },
   { id: "climate", name: "Climate", icon: "climate" },
+  { id: "automations", name: "Automations", icon: "clock" },
 ];
 const modeLabels: Record<string, string> = {
   off: "Off",
@@ -348,6 +350,7 @@ export class SignalHome extends LitElement {
       /^script\.[a-z0-9_]+$/.test(room.on_script) && /^script\.[a-z0-9_]+$/.test(room.off_script) &&
       (!room.scenes || (Array.isArray(room.scenes) && room.scenes.every(validAction))))))
       throw new Error("Light rooms need lamp entities and on/off scripts.");
+    if (config.automation_label !== undefined && (typeof config.automation_label !== "string" || !/^[a-z0-9_]+$/.test(config.automation_label))) throw new Error("Automation label must be a Home Assistant label ID.");
     if (config.all_lights_off && !/^script\.[a-z0-9_]+$/.test(config.all_lights_off)) throw new Error("All lights off must be a script.");
     if (config.doorbell && (!/^camera\.[a-z0-9_]+$/.test(config.doorbell.entity) || !/^[a-z0-9_]+$/.test(config.doorbell.camera) || (config.doorbell.instance && !/^[a-z0-9_]+$/.test(config.doorbell.instance)))) throw new Error("Doorbell needs valid camera and instance IDs.");
     this.config = { ...config };
@@ -840,7 +843,7 @@ export class SignalHome extends LitElement {
   }
   private nav(bottom = false) {
     const destinations = bottom ? [...this.tabs.filter(t => ["home", "rooms", "cameras", "lists"].includes(t.id)), {id:"more",name:"More",icon:"more"}] : this.tabs;
-    const active = bottom && ["safety","climate"].includes(this.tab) ? "more" : this.tab;
+    const active = bottom && ["safety","climate","automations"].includes(this.tab) ? "more" : this.tab;
     return html`<nav class=${bottom ? "bottom-nav" : ""}
       style=${`--active: ${destinations.findIndex(t=>t.id===active)}; --tab-count: ${destinations.length}`}
       aria-label=${bottom ? "Mobile navigation" : "Dashboard navigation"}>
@@ -1454,6 +1457,8 @@ export class SignalHome extends LitElement {
         <div class="notice" style="margin-top:20px">
           ${this.safetySummary.alarm ? "A sensor is reporting an active state. Open it for details." : this.safetySummary.unknown ? "An unavailable sensor cannot confirm the condition of its space." : this.safetySummary.unverified ? "These sensors have not passed a recent physical test. Their last reported states are not confirmed current conditions." : "Tap any sensor for its history and details."}
         </div>`;
+    if (this.tab === "automations")
+      return html`<signal-automations .hass=${this.hass} .label=${this.config.automation_label || "show_in_signal"}></signal-automations>`;
     if (this.tab === "lists")
       return html`<div style="max-width:740px">
         ${this.todoListPicker()}${this.grocery(true)}
@@ -1501,7 +1506,7 @@ export class SignalHome extends LitElement {
           ? "Just your temperature."
           : this.tab === "safety"
             ? "Peace of mind."
-            : this.tab === "cameras" ? "Cameras." : "Good things, listed.";
+            : this.tab === "cameras" ? "Cameras." : this.tab === "automations" ? "Automations." : "Good things, listed.";
     const subtitle =
       this.tab === "home"
         ? "Your home, at a glance."
@@ -1509,7 +1514,7 @@ export class SignalHome extends LitElement {
           ? "Current temperature and comfort controls."
           : this.tab === "safety"
             ? "A clear view of the things that matter."
-            : this.tab === "rooms" ? "Lighting, room by room." : this.tab === "cameras" ? "Live video and recorded activity." : "A little space for everyday essentials.";
+            : this.tab === "rooms" ? "Lighting, room by room." : this.tab === "cameras" ? "Live video and recorded activity." : this.tab === "automations" ? "Routines that run on their own, on or off." : "A little space for everyday essentials.";
     const summary = this.safetySummary;
     const recovery = new URL(location.href);
     recovery.searchParams.set("disable_km", "");
@@ -1554,7 +1559,7 @@ export class SignalHome extends LitElement {
       ${this.nav(true)}${this.message ? html`<div class=${`toast ${this.messageTone}`} role="status">${this.messageTone !== "neutral" ? html`<span class="toast-mark" aria-hidden="true">${icon(this.messageTone === "success" ? "check" : "warn")}</span>` : nothing}<span class="toast-copy">${this.message}</span>${this.undoItem ? html`<button ?disabled=${this.busy} @click=${() => this.undoItem && this.complete(this.undoItem, true)}>Undo</button>` : nothing}</div>` : nothing}
       <signal-sheet id="more-sheet" .open=${this.moreOpen} .dark=${this.dark} heading="More" .compact=${true}
         @signal-close=${()=>{this.moreOpen=false;const id=this.moreDestination;this.moreDestination="";if(id)this.navigate(id);}}>
-        <div class="more-links">${this.tabs.filter(t=>['safety','climate'].includes(t.id)).map(t=>html`<button @click=${()=>this.chooseMore(t.id)}>${icon(t.icon)}<span>${t.name}</span>${icon('arrow')}</button>`)}</div>
+        <div class="more-links">${this.tabs.filter(t=>['safety','climate','automations'].includes(t.id)).map(t=>html`<button @click=${()=>this.chooseMore(t.id)}>${icon(t.icon)}<span>${t.name}</span>${icon('arrow')}</button>`)}</div>
       </signal-sheet>
       <signal-sheet
         .open=${this.menuOpen}

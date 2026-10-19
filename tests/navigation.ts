@@ -9,7 +9,7 @@ export async function navigate(page: Page, name: string) {
     return;
   }
   const mobile = page.getByRole("navigation", { name: "Mobile navigation" });
-  if (["Climate", "Security"].includes(name)) {
+  if (["Climate", "Security", "Automations"].includes(name)) {
     await mobile.getByRole("button", { name: "More", exact: true }).click();
     await page
       .locator("#more-sheet")

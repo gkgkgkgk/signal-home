@@ -96,6 +96,7 @@ Replace entity IDs with your own. Every entity field is optional; unconfigured c
 | `favorites`  | Entity IDs rendered as capability-aware control cards                                      |
 | `cameras`    | Frigate `camera.*` entity IDs; adds a Cameras tab with live video and an event grid |
 | `graphs`     | Numeric sensor IDs or objects with `entity`, `name`, and `hours` (1–168); shown on Climate |
+| `automation_label` | Label ID marking automations for the Automations page, default `show_in_signal` |
 
 Choose appearance in Signal's settings menu. Auto uses HA's configured time zone (device time if unavailable); System follows the device's light/dark preference. Changes apply on the next minute or app resume. Old sun/moon-button preferences are retired so this release starts from the configured/default mode. Preferences do not change other HA dashboards. Standalone cards retain their own appearance configuration.
 
@@ -106,6 +107,12 @@ Install the Frigate integration and Advanced Camera Card through HACS, register 
 Notification links can select an exact recording with `?signal_review=<review-id>&signal_camera=front_door&signal_instance=frigate#signal/cameras`. This view shows the event timestamp and playback controls, with **Back to live & events** navigation. Expired or invalid links show an unavailable message rather than substituting a different recording. Playback signs the authenticated HA Frigate VOD route with the review start minus 5 seconds and end plus 5 seconds. Legacy `signal_event` notification links resolve to the containing review; they never fall back to raw object playback.
 
 Events are a simple two-column phone grid (three columns on desktop) with a thumbnail and local date/time. Each tile corresponds to one Frigate review item, with the same visit time/duration. Tap to play that visit with a 5-second lead-in and 5-second tail; Back to live & events always restores the live view and grid. There are only two modes, Live and Recorded event. Ongoing visits are labeled and load a finite range through the opening time, with an explicit refresh button. There is no recording timeline, Playback tab, or next/previous carousel. Refresh and Load more provide access to recent/older events, and the visible grid refreshes once per minute. Continuous timeline browsing remains in the separate Admin dashboard. The viewer is embedded inside Signal and is removed when navigating away, allowing it to release streams. Ordinary HA state updates preserve the active viewer. Existing dashboards without `cameras` retain their four-tab layout. Advanced Camera Card is an optional dependency for camera-enabled dashboards only.
+
+## Automations
+
+The Automations page (under **More** on phones) lists the automations you choose to share, each with an on/off switch. To share one, give it the label **Show in Signal** (label ID `show_in_signal`, or set `automation_label`) in Home Assistant. Unlabeled automations, such as internal alarm or notification plumbing, never appear.
+
+Pair automations by putting them in the same Home Assistant automation category, for example a morning lights-on and a midnight lights-off. Signal shows one switch per category, named after the category, with the paired automations listed under it. The switch turns them all on or off together, and shows "1 of 2 on" if they disagree; tapping it then turns them all on. A labeled automation with no category, or alone in its category, gets its own switch. Switching uses `automation.turn_on` / `automation.turn_off`; turning off stops a run in progress. Labels and categories are read when the page opens, and non-admin users can use the page.
 
 ## Shared lists and retention
 

@@ -46,7 +46,19 @@ let states: Record<string, Entity> = {
   }),
   "sensor.battery": state("sensor.battery", "96", {}),
   "light.demo": state("light.demo", "off", { friendly_name: "Reading light" }),
+  "automation.lights_on": state("automation.lights_on", "on", { friendly_name: "Lights on in the morning" }),
+  "automation.lights_off": state("automation.lights_off", "on", { friendly_name: "Lights off at night" }),
+  "automation.sleeping_mode": state("automation.sleeping_mode", "off", { friendly_name: "Sleeping mode, 1 AM to 5 AM" }),
+  "automation.siren": state("automation.siren", "on", { friendly_name: "Sound siren" }),
 };
+const lamps = "01LAMPSCHEDULE";
+const registry = [
+  { entity_id: "automation.lights_on", platform: "automation", labels: ["show_in_signal"], categories: { automation: lamps } },
+  { entity_id: "automation.lights_off", platform: "automation", labels: ["show_in_signal"], categories: { automation: lamps } },
+  { entity_id: "automation.sleeping_mode", platform: "automation", labels: ["show_in_signal"], categories: {} },
+  { entity_id: "automation.siren", platform: "automation", labels: [], categories: {} },
+  { entity_id: "light.demo", platform: "demo", labels: ["show_in_signal"], categories: {} },
+];
 let items: Todo[] = [
   { uid: "1", summary: "Fresh lemons", status: "needs_action" },
   { uid: "2", summary: "Oat milk", status: "needs_action" },
@@ -114,6 +126,9 @@ const hass: Hass = {
         state: String(items.filter((i) => i.status === "needs_action").length),
       };
     }
+    if (domain === "automation")
+      for (const entity of [data.entity_id].flat() as string[])
+        states[entity] = { ...states[entity], state: service === "turn_on" ? "on" : "off" };
     if (domain === "light")
       states[id] = {
         ...states[id],
@@ -137,6 +152,9 @@ const hass: Hass = {
           },
         },
       } as T;
+    if (message.type === "config/entity_registry/list") return registry as T;
+    if (message.type === "config/category_registry/list")
+      return [{ category_id: lamps, name: "Lamp schedule" }, { category_id: "01UNUSED", name: "Unused" }] as T;
     if (message.type === "history/history_during_period")
       return {
         [(message.entity_ids as string[])[0]]: [

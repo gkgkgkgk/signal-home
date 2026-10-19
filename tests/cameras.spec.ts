@@ -81,9 +81,9 @@ test('event grid opens the selected recording on a phone without timeline contro
   await expect(page.locator('advanced-camera-card')).toHaveCount(0);
 });
 
-test('unconfigured dashboards retain six tabs and invalid camera IDs are rejected', async ({ page }) => {
+test('unconfigured dashboards retain seven tabs and invalid camera IDs are rejected', async ({ page }) => {
   await page.goto('/');
-  await expect(page.getByRole('navigation', { name: 'Dashboard navigation' }).getByRole('button')).toHaveCount(6);
+  await expect(page.getByRole('navigation', { name: 'Dashboard navigation' }).getByRole('button')).toHaveCount(7);
   const result = await page.evaluate(() => {
     const card = document.querySelector('signal-home') as any;
     try { card.setConfig({ ...card.config, cameras: ['http://camera/stream'] }); return false; }
