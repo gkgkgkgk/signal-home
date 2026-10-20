@@ -318,6 +318,11 @@ state and time under a **Needs verification** label; Home and the header avoid
 claiming all doors are clear. This is a manual operational flag, not a Zigbee
 health detector. Remove it only after an open/close test reaches Home Assistant.
 
+The Security page can show the same kind of note for the alarm: set
+`alarm_note_entity` to a sensor (for example, "Switches to Sleeping at 1:00 AM").
+It appears as one small line under the mode description while the alarm is
+settled, and is hidden during arming, entry countdowns and a sounding alarm.
+
 Scheduled automation notes require a backend entity whose state contains the
 human-readable text and whose `next_change_at` attribute contains a valid
 future ISO timestamp. Missing or expired timestamps hide the note. Conditional

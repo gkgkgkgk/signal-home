@@ -59,6 +59,8 @@ export interface Config {
   alarm_entity?: string;
   alarm_sensors?: string[];
   alarm_siren?: string;
+  /** Backend note for an upcoming scheduled mode change (state text plus next_change_at), shown on Security. */
+  alarm_note_entity?: string;
   all_lights_off?: string;
   /** Label ID marking the automations listed on the Automations page; default show_in_signal. */
   automation_label?: string;

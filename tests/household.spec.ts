@@ -288,3 +288,31 @@ test("room scenes can run before first activation and notes use backend state", 
     ),
   ).toMatchObject({ domain: "scene", service: "turn_on" });
 });
+
+test("Security shows a small note before a scheduled mode change, hidden during countdowns", async ({ page }) => {
+  await setup(page);
+  const set = (alarm: any) =>
+    page.evaluate((alarm) => {
+      const c = document.querySelector("signal-home") as any;
+      c.hass = { ...c.hass, states: { ...c.hass.states,
+        "alarm_control_panel.alarmo": { entity_id: "alarm_control_panel.alarmo", last_updated: new Date().toISOString(), ...alarm },
+        "sensor.signal_alarm_mode_note": {
+          entity_id: "sensor.signal_alarm_mode_note", state: "Switches to Sleeping at 1:00 AM",
+          attributes: { next_change_at: new Date(Date.now() + 3600000).toISOString() },
+        },
+      } };
+    }, alarm);
+  await set({ state: "disarmed", attributes: { arm_mode: null } });
+  await page.evaluate(() => {
+    const c = document.querySelector("signal-home") as any;
+    c.setConfig({ ...c.config, alarm_entity: "alarm_control_panel.alarmo", alarm_note_entity: "sensor.signal_alarm_mode_note" });
+  });
+  await navigate(page, "Security");
+  const note = page.locator(".alarm-schedule-note");
+  await expect(note).toHaveText("Switches to Sleeping at 1:00 AM");
+  expect(await note.evaluate((el) => getComputedStyle(el).fontSize)).toBe("12px");
+  await page.locator(".security-mode").screenshot({ path: "test-results/alarm-note.png" });
+  await set({ state: "arming", attributes: { arm_mode: "armed_away", delay: 60 } });
+  await expect(page.getByRole("heading", { name: "Away · arming" })).toBeVisible();
+  await expect(note).toHaveCount(0);
+});

@@ -14,6 +14,7 @@ import {
   type Appearance,
 } from "./appearance";
 import { icon } from "./icons";
+import { scheduledNote } from "./automation-note";
 import {
   available,
   number,
@@ -341,6 +342,8 @@ export class SignalHome extends LitElement {
       throw new Error("Home mode must be an input_select helper.");
     if (config.alarm_entity && !/^alarm_control_panel\.[a-z0-9_]+$/.test(config.alarm_entity))
       throw new Error("Alarm entity must be a Home Assistant alarm control panel.");
+    if (config.alarm_note_entity !== undefined && !/^sensor\.[a-z0-9_]+$/.test(config.alarm_note_entity))
+      throw new Error("Alarm note must be a sensor.");
     const validAction = (action: any) => action && typeof action.name === "string" && /^(script|scene)\.[a-z0-9_]+$/.test(action.entity);
     if (config.quick_actions && (!Array.isArray(config.quick_actions) || !config.quick_actions.every(validAction)))
       throw new Error("Quick actions need a name and script or scene entity.");
@@ -1308,10 +1311,13 @@ export class SignalHome extends LitElement {
         { name: "Away", icon: "arrow", title: "Away", detail: "60-second exit", service: "alarm_arm_away", state: "armed_away" },
       ];
       const alarmOn = !!state && state !== "disarmed" && available(alarm);
+      // A scheduled change only matters while settled; countdowns and a sounding alarm speak for themselves.
+      const schedule = state === "disarmed" || state === "armed_night" || state === "armed_away" ? scheduledNote(this.state(this.config.alarm_note_entity)) : undefined;
       const alarmText = state === "triggered" ? "Triggered" : state === "pending" ? "Entry countdown" : state === "arming" ? "Arming" : alarmOn ? "Armed" : "Disarmed";
       return html`<section class="security-mode" aria-label="Alarm mode" data-alarm-state=${state || "unavailable"}>
         <div class="security-mode-head"><div><span class="eyebrow">Current mode</span><h2>${title}</h2></div><span class=${`alarm-state-badge ${alarmOn ? "on" : "off"}`}>${alarmText}</span></div>
         <p class="alarm-mode-detail" role="status">${detail}</p>
+        ${schedule ? html`<p class="alarm-schedule-note">${schedule}</p>` : nothing}
         ${countdown ? html`<div class="alarm-countdown" role="timer" aria-label=${`${remaining} seconds remaining`}><span>${state === "arming" ? "Arming" : "Before siren"}</span><strong>${remaining}s</strong><div class="alarm-progress"><span style=${`width:${progress}%`}></span></div></div>` : nothing}
         <div class="security-mode-options">${items.map(item => html`<button class=${`security-mode-option mode-${item.name.toLowerCase()} ${active === item.state ? "selected" : ""}`} aria-pressed=${active === item.state} ?disabled=${!available(alarm) || this.busy || this.hass.connection?.connected === false || (item.state !== "disarmed" && (["arming", "pending", "triggered"].includes(state || "") || item.state === state || unavailable.length > 0 || (item.state === "armed_night" && open.length > 0)))} @click=${() => this.service("alarm_control_panel", item.service, { entity_id: this.config.alarm_entity }, `${item.title} requested; waiting for alarm confirmation`)}>
           <span class="mode-icon">${icon(item.icon)}</span><strong>${item.title}</strong><small>${item.detail}</small><span class="mode-check" aria-hidden="true">${active === item.state ? icon("check") : nothing}</span>

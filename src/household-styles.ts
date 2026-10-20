@@ -16,6 +16,7 @@ export const householdStyles = css`
   .alarm-state-badge.on {color:#8a381c;background:#fbe4d4;}
   .alarm-state-badge.off {color:#32634d;background:#def0e4;}
   .alarm-mode-detail {margin:0 0 18px;color:var(--muted);font-size:14px;line-height:1.5;}
+  .alarm-schedule-note {margin:-12px 0 18px;color:var(--muted);font-size:12px;line-height:1.4;opacity:.85;}
   .alarm-countdown {display:grid;grid-template-columns:1fr auto;gap:8px 12px;margin:0 0 18px;padding:14px 16px;border-radius:16px;background:#fff0da;color:#713b1d;}
   .alarm-countdown strong {font-size:22px;line-height:1;}
   .alarm-progress {grid-column:1/-1;height:8px;overflow:hidden;border-radius:999px;background:#ead4b6;}
