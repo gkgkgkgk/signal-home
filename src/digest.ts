@@ -591,7 +591,7 @@ export class SignalDigest extends LitElement {
               const note = scheduledNote(
                 this.hass.states[room.automation_note_entity || ""],
               );
-              return note ? html`<p class="note">${note}</p>` : nothing;
+              return note ? html`<p class="note">${room.name} · ${note}</p>` : nothing;
             })
           : nothing
       }

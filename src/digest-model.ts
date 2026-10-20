@@ -184,8 +184,15 @@ export function digestRows(
   const late =
     homeHour(now, hass.config?.time_zone) >= 22 ||
     homeHour(now, hass.config?.time_zone) < 6;
+  // Outdoor rooms are lit overnight on purpose; only indoor lights earn the late-night nudge.
+  const indoorOn = new Set(
+    (config.light_rooms || [])
+      .filter((r) => !r.outdoor)
+      .flatMap((r) => r.entities)
+      .filter((id) => states[id]?.state === "on"),
+  ).size;
   const relevant =
-    on > 0 && ((config.alarm_entity
+    indoorOn > 0 && ((config.alarm_entity
       ? ["armed_night", "armed_away", "arming", "pending"].includes(mode?.state || "")
       : ["Sleeping", "Away"].includes(mode?.state || "")) || late);
   rows.push({

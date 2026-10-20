@@ -348,7 +348,8 @@ export class SignalHome extends LitElement {
       room && typeof room.id === "string" && typeof room.name === "string" &&
       Array.isArray(room.entities) && room.entities.length > 0 && room.entities.every(id => /^(light|switch)\.[a-z0-9_]+$/.test(id)) &&
       /^script\.[a-z0-9_]+$/.test(room.on_script) && /^script\.[a-z0-9_]+$/.test(room.off_script) &&
-      (!room.scenes || (Array.isArray(room.scenes) && room.scenes.every(validAction))))))
+      (!room.scenes || (Array.isArray(room.scenes) && room.scenes.every(validAction))) &&
+      (room.outdoor === undefined || typeof room.outdoor === "boolean"))))
       throw new Error("Light rooms need lamp entities and on/off scripts.");
     if (config.automation_label !== undefined && (typeof config.automation_label !== "string" || !/^[a-z0-9_]+$/.test(config.automation_label))) throw new Error("Automation label must be a Home Assistant label ID.");
     if (config.all_lights_off && !/^script\.[a-z0-9_]+$/.test(config.all_lights_off)) throw new Error("All lights off must be a script.");

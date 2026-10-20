@@ -377,3 +377,33 @@ test("automation notes require a known future change time", () => {
   note.attributes.next_change_at = new Date(now + 60000).toISOString();
   expect(scheduledNote(note, now)).toBe(note.state);
 });
+
+test("outdoor rooms lit overnight do not trigger the late-night nudge", () => {
+  const states: any = {
+    "light.porch": { entity_id: "light.porch", state: "on", attributes: {} },
+    "light.lamp": { entity_id: "light.lamp", state: "off", attributes: {} },
+    "input_select.mode": {
+      entity_id: "input_select.mode",
+      state: "Sleeping",
+      attributes: {},
+    },
+  };
+  const config: any = {
+    type: "custom:signal-home",
+    home_mode: "input_select.mode",
+    all_lights_off: "script.all_off",
+    light_rooms: [
+      { name: "Living Room", entities: ["light.lamp"] },
+      { name: "Porch", entities: ["light.porch"], outdoor: true },
+    ],
+  };
+  const hass: any = { states, config: { time_zone: "America/New_York" } };
+  const late = new Date("2026-10-03T03:00:00Z");
+  const quiet = digestRows(hass, config, {}, late).find((r) => r.id === "lights")!;
+  expect(quiet.text).toBe("1 light on in Porch");
+  expect(quiet.action).toBeUndefined();
+  expect(quiet.tone).toBeUndefined();
+  states["light.lamp"].state = "on";
+  const nudged = digestRows(hass, config, {}, late).find((r) => r.id === "lights")!;
+  expect(nudged.action).toBe("lights");
+});

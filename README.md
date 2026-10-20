@@ -245,6 +245,9 @@ light_rooms:
     off_script: script.signal_living_room_off
     # Optional backend-authored status text, not a computed next-run prediction:
     automation_note_entity: sensor.living_room_lighting_note
+    # Optional: true for outdoor lights (a porch) that stay on overnight by design.
+    # They still count as on, but never trigger Home's late-night "Turn all off" nudge.
+    # outdoor: true
     # Optional existing scripts/scenes shown only inside the room:
     scenes:
       - name: Reading
@@ -264,7 +267,7 @@ must show the alarm's confirmed state and arming errors, not infer protection
 from the requested household preference.
 
 Automation notes display backend text only when that entity also supplies a
-future `next_change_at` timestamp. No schedule is inferred from `last_triggered`,
+future `next_change_at` timestamp. On Home, each note is prefixed with its room name. No schedule is inferred from `last_triggered`,
 and Signal does not edit automation rules.
 Unconfigured notes and scenes are omitted. Current temperature stays prominent;
 HVAC activity, rather than selected mode, controls the heating/cooling/fan glow.

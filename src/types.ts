@@ -35,6 +35,8 @@ export interface LightRoom {
   on_script: string; off_script: string;
   scenes?: QuickAction[];
   automation_note_entity?: string;
+  /** Outdoor rooms (a porch) stay on overnight by design, so Home does not nag about them. */
+  outdoor?: boolean;
 }
 export interface Config {
   type: string;
