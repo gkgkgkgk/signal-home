@@ -352,6 +352,7 @@ export class SignalHome extends LitElement {
       (room.outdoor === undefined || typeof room.outdoor === "boolean"))))
       throw new Error("Light rooms need lamp entities and on/off scripts.");
     if (config.automation_label !== undefined && (typeof config.automation_label !== "string" || !/^[a-z0-9_]+$/.test(config.automation_label))) throw new Error("Automation label must be a Home Assistant label ID.");
+    if (config.sun !== undefined && typeof config.sun !== "boolean") throw new Error("Sun must be true or false.");
     if (config.all_lights_off && !/^script\.[a-z0-9_]+$/.test(config.all_lights_off)) throw new Error("All lights off must be a script.");
     if (config.doorbell && (!/^camera\.[a-z0-9_]+$/.test(config.doorbell.entity) || !/^[a-z0-9_]+$/.test(config.doorbell.camera) || (config.doorbell.instance && !/^[a-z0-9_]+$/.test(config.doorbell.instance)))) throw new Error("Doorbell needs valid camera and instance IDs.");
     this.config = { ...config };

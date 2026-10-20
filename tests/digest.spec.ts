@@ -2,6 +2,7 @@ import { test, expect } from "@playwright/test";
 import { setupDigest } from "./digest-fixture";
 import { digestRows, digestSummary } from "../src/digest-model";
 import { scheduledNote } from "../src/automation-note";
+import { HORIZON_Y, homeDayStart, nextSunEvent, onDay, skyY } from "../src/sun-model";
 
 test("quiet phone digest and confirmed five-button navigation", async ({
   page,
@@ -406,4 +407,66 @@ test("outdoor rooms lit overnight do not trigger the late-night nudge", () => {
   states["light.lamp"].state = "on";
   const nudged = digestRows(hass, config, {}, late).find((r) => r.id === "lights")!;
   expect(nudged.action).toBe("lights");
+});
+
+test("Daylight card shows HA's next sun event and places the sun on today's arc", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await setupDigest(page);
+  const card = page.locator("signal-sun");
+  await expect(card.locator(".headline")).toHaveText("Sunset 7:05 PM");
+  await expect(card.locator(".sub")).toHaveText("4h 51m of daylight left · 11h 37m today");
+  await expect(card.locator(".rail")).toContainText("↑ 7:28 AM");
+  await expect(card.locator(".rail")).toContainText("↓ 7:05 PM");
+  await expect(card.locator(".sky")).toHaveAttribute("aria-label", "Sunrise 7:28 AM, sunset 7:05 PM. The sun is up.");
+  // 2:14 PM sits past the arc's peak, above the horizon.
+  const disc = await card.locator(".disc").evaluate((el: HTMLElement) => ({ left: parseFloat(el.style.left), top: parseFloat(el.style.top), down: el.classList.contains("down") }));
+  expect(disc.down).toBe(false);
+  expect(disc.left).toBeGreaterThan(55);
+  expect(disc.left).toBeLessThan(65);
+  expect(disc.top).toBeLessThan(40);
+  await expect(card.locator("ellipse[fill='url(#twilight)']")).toHaveCount(2);
+  const width = await page.evaluate(() => document.documentElement.scrollWidth);
+  expect(width).toBeLessThanOrEqual(390);
+  await page.waitForTimeout(800);
+  await card.screenshot({ path: "test-results/daylight-day.png" });
+
+  await page.evaluate(() => {
+    const fixture = (window as any).digestFixture;
+    const card = document.querySelector("signal-home") as any;
+    const states = card.hass.states;
+    states["sun.sun"].state = "below_horizon";
+    states["sensor.sun_next_setting"].state = "2026-10-03T23:03:00+00:00";
+    fixture.publish();
+  });
+  await page.clock.setFixedTime(new Date("2026-10-03T01:30:00Z"));
+  await page.evaluate(() => {
+    const digest = (document.querySelector("signal-home") as any).shadowRoot.querySelector("signal-digest");
+    digest.now = new Date();
+  });
+  await expect(card.locator(".headline")).toHaveText("Sunrise 7:28 AM");
+  await expect(card.locator(".sub")).toHaveText("in 9h 58m · 11h 35m today");
+  await expect(card.locator(".disc")).toHaveClass(/down/);
+  await card.screenshot({ path: "test-results/daylight-night.png" });
+});
+
+test("sun times come from HA, falling back to sun.sun attributes, and land on today", () => {
+  const hass: any = {
+    states: {
+      "sun.sun": { entity_id: "sun.sun", state: "above_horizon", attributes: { next_rising: "2026-10-03T11:28:00+00:00" } },
+      "sensor.sun_next_setting": { entity_id: "sensor.sun_next_setting", state: "2026-10-02T23:05:00+00:00", attributes: {} },
+    },
+  };
+  expect(nextSunEvent(hass, "setting")).toBe(Date.parse("2026-10-02T23:05:00Z"));
+  expect(nextSunEvent(hass, "rising")).toBe(Date.parse("2026-10-03T11:28:00Z"));
+  expect(nextSunEvent(hass, "dawn")).toBeUndefined();
+  const start = homeDayStart(Date.parse("2026-10-02T18:14:00Z"), "America/New_York");
+  expect(new Date(start).toISOString()).toBe("2026-10-02T04:00:00.000Z");
+  const end = start + 86400000;
+  // Tomorrow's sunrise from HA is stepped back onto today.
+  expect(new Date(onDay(nextSunEvent(hass, "rising"), start, end)!).toISOString()).toBe("2026-10-02T11:28:00.000Z");
+  const rise = Date.parse("2026-10-02T11:28:00Z");
+  const set = Date.parse("2026-10-02T23:05:00Z");
+  expect(skyY(rise, rise, set)).toBeCloseTo(HORIZON_Y);
+  expect(skyY((rise + set) / 2, rise, set)).toBeCloseTo(HORIZON_Y - 50);
+  expect(skyY(start, rise, set)).toBeGreaterThan(HORIZON_Y);
 });

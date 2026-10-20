@@ -323,6 +323,17 @@ human-readable text and whose `next_change_at` attribute contains a valid
 future ISO timestamp. Missing or expired timestamps hide the note. Conditional
 rules without a known next change must not populate this field.
 
+### Daylight on Home
+
+Home opens with a Daylight card: today's sun arc, the sun's current place on it,
+sunrise and sunset marks on the horizon, and twilight glows from dawn and dusk. The
+headline is the next sunrise or sunset exactly as Home Assistant's sun integration
+reports it (`sensor.sun_next_rising` and `sensor.sun_next_setting`, falling back to
+`sun.sun` attributes), so it matches sun-triggered automations. HA only reports the
+*next* event, so a sunrise that already happened today is drawn from tomorrow's time,
+within a minute or two. The arc is stylized, not a measured elevation. Set `sun: false`
+to hide the card.
+
 ### Coming up on Home
 
 Home now includes a chronological agenda instead of a calendar grid. It shows

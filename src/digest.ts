@@ -10,6 +10,7 @@ import {
 import { icon } from "./icons";
 import { scheduledNote } from "./automation-note";
 import "./upcoming";
+import "./sun";
 
 export class SignalDigest extends LitElement {
   static properties = {
@@ -606,6 +607,7 @@ export class SignalDigest extends LitElement {
         <h1>${digestSummary(rows, connected)}</h1>
         ${!connected ? html`<p>Reconnect to see current conditions.</p>` : nothing}
       </header>
+      ${this.config.sun !== false ? html`<signal-sun .hass=${this.hass} .now=${this.now}></signal-sun>` : nothing}
       <div class="digest-list">
         ${repeat(
           rows,

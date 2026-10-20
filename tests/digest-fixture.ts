@@ -27,6 +27,11 @@ export async function setupDigest(page: any, active = false) {
     entity("input_select.home_mode", "Home", {
       options: ["Home", "Sleeping", "Away"],
     });
+    entity("sun.sun", "above_horizon");
+    entity("sensor.sun_next_rising", "2026-10-03T11:28:00+00:00");
+    entity("sensor.sun_next_setting", "2026-10-02T23:05:00+00:00");
+    entity("sensor.sun_next_dawn", "2026-10-03T11:01:00+00:00");
+    entity("sensor.sun_next_dusk", "2026-10-02T23:31:00+00:00");
     entity("binary_sensor.back_door", active ? "on" : "off", {
       friendly_name: "Back door",
       device_class: "door",

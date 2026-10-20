@@ -67,6 +67,8 @@ export interface Config {
   appearance?: "light" | "dark" | "auto" | "system";
   immersive?: boolean;
   upcoming?: { waste_entity?: string; hebcal_zip?: string };
+  /** Home's Daylight card, drawn from HA's sun integration; on by default. */
+  sun?: boolean;
 }
 export interface Todo {
   uid: string;
