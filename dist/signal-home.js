@@ -2715,11 +2715,13 @@ function wt(n, t) {
     return n.getHours();
   }
 }
-function ei(n, t, e, i) {
+function ei(n, t, e, i, s) {
   if (n === "system") return t;
   if (n !== "auto") return n === "dark";
-  const s = wt(e, i);
-  return s < 7 || s >= 19;
+  if (s === "above_horizon") return !1;
+  if (s === "below_horizon") return !0;
+  const a = wt(e, i);
+  return a < 7 || a >= 19;
 }
 const ce = {
   more: "M4 11h2v2H4ZM11 11h2v2h-2ZM18 11h2v2h-2Z",
@@ -2828,7 +2830,7 @@ class ii extends C {
         selector: {
           select: {
             options: [
-              { value: "auto", label: "Auto · light 7am–7pm, dark overnight" },
+              { value: "auto", label: "Auto · light while the sun is up" },
               { value: "system", label: "System · device default" },
               { value: "light", label: "Light" },
               { value: "dark", label: "Dark" }
@@ -6862,7 +6864,8 @@ class Ni extends C {
         this.appearance,
         this.media.matches,
         /* @__PURE__ */ new Date(),
-        this.hass?.config?.time_zone
+        this.hass?.config?.time_zone,
+        this.hass?.states["sun.sun"]?.state
       );
     };
   }
@@ -7858,7 +7861,7 @@ class Ni extends C {
               <option value="light">Light</option>
             </select>
             <small
-              >Auto: light 7am–7pm, dark overnight
+              >Auto: light while the sun is up, dark after sunset
               (${this.hass.config?.time_zone || "device time"}). Saved on this
               device.</small
             >

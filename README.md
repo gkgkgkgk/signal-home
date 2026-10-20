@@ -21,7 +21,7 @@ Signal is a self-contained Lovelace card with Overview, Climate, Safety, and Lis
 - Quiet loading: list placeholders only on first load; background refreshes preserve tasks. Graphs reserve their plot space, keep their existing time scale until fresh data arrives, and retain clearly labeled previous history if a refresh fails. Climate-sheet history waits until the entrance finishes; reopening reuses up to 60 seconds of cached history, held only in memory and scoped to the HA connection/user. Appearance changes do not reload graphs.
 - Device controls acknowledge accepted commands without pretending the reported device state changed. Quick-close dialogs smoothly interrupt their opening animation.
 
-- Settings-only appearance: Auto (light 7am–7pm, dark overnight in HA's home time zone), System, Dark, or Light; saved per browser/device. Auto is the default.
+- Settings-only appearance: Auto (light while HA's `sun.sun` is above the horizon, dark after sunset; falls back to light 7am–7pm in HA's home time zone when the sun entity is missing), System, Dark, or Light; saved per browser/device. Auto is the default.
 - Phone-first overview: current room temperature, weather, groceries, and home status in whole-tile touch targets. A reserved bottom dock never covers scrolling content.
 - A pinned mobile header shows a greeting (or custom address/nickname), date and home label. Content fades beneath its scrolling edge; the opaque background matches the system bars.
 - Opaque, softly sculpted surfaces and springy press feedback. Phone detail sheets slide from the bottom without shrinking, with a synchronized backdrop fade; desktop and compact confirmations use a small fade/lift. Back or Escape can interrupt the entrance without snapping. Spacious full controls remain on desktop.
@@ -85,7 +85,7 @@ Replace entity IDs with your own. Every entity field is optional; unconfigured c
 | ------------ | ------------------------------------------------------------------------------------------ |
 | `title`      | Home name, default `Home`                                                                  |
 | `greeting`   | Optional fixed greeting; otherwise follows the time of day                                 |
-| `appearance` | `auto` (default; 7am–7pm light), `system`, `light`, or `dark`                              |
+| `appearance` | `auto` (default; follows `sun.sun`), `system`, `light`, or `dark`                              |
 | `header_label` | Optional persistent address/nickname; otherwise a greeting                           |
 | `completed_retention_days` | Optional cleanup notice; use `7` only after installing the seven-day HA automation below |
 | `climate`    | Climate entity                                                                             |

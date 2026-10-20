@@ -12,6 +12,18 @@ test("time mode uses home time, with precise day/night boundaries", () => {
     expect(isDark("auto", !dark, new Date(iso), "America/New_York")).toBe(dark);
   }
 });
+test("auto follows HA's sun when available, whatever the clock says", () => {
+  const noon = new Date("2026-09-29T16:00:00Z");
+  const night = new Date("2026-09-30T03:00:00Z");
+  expect(isDark("auto", false, noon, "America/New_York", "below_horizon")).toBe(true);
+  expect(isDark("auto", false, night, "America/New_York", "above_horizon")).toBe(false);
+  // Missing or unknown sun state falls back to the 7am–7pm clock.
+  expect(isDark("auto", false, night, "America/New_York", "unavailable")).toBe(true);
+  expect(isDark("auto", false, noon, "America/New_York")).toBe(false);
+  // Explicit choices ignore the sun.
+  expect(isDark("light", true, night, "America/New_York", "below_horizon")).toBe(false);
+  expect(isDark("system", true, noon, "America/New_York", "above_horizon")).toBe(true);
+});
 test("settings expose four modes; auto updates on resume and system follows OS", async ({
   page,
 }) => {
@@ -139,4 +151,28 @@ test("failed restore retains the completed item and reports the error", async ({
   await expect(
     page.getByRole("button", { name: "Restore Oat milk" }),
   ).toBeVisible();
+});
+
+test("auto switches as soon as sun.sun changes", async ({ page }) => {
+  await page.clock.setFixedTime(new Date("2026-09-29T21:30:00Z"));
+  await page.goto("/");
+  await page.evaluate(() => {
+    const card = document.querySelector("signal-home") as any;
+    card.setConfig({ ...card.config, appearance: "auto" });
+  });
+  const app = page.locator("signal-home .app");
+  const sun = (state: string) =>
+    page.evaluate((state) => {
+      const card = document.querySelector("signal-home") as any;
+      card.hass = {
+        ...card.hass,
+        config: { ...card.hass.config, time_zone: "America/New_York" },
+        states: { ...card.hass.states, "sun.sun": { entity_id: "sun.sun", state, attributes: {} } },
+      };
+    }, state);
+  await sun("above_horizon");
+  await expect(app).not.toHaveClass(/dark/);
+  // 5:30 PM is still "day" on the old clock, but the sun has set.
+  await sun("below_horizon");
+  await expect(app).toHaveClass(/dark/);
 });

@@ -57,7 +57,7 @@ export class SignalEditor extends LitElement {
         selector: {
           select: {
             options: [
-              { value: "auto", label: "Auto · light 7am–7pm, dark overnight" },
+              { value: "auto", label: "Auto · light while the sun is up" },
               { value: "system", label: "System · device default" },
               { value: "light", label: "Light" },
               { value: "dark", label: "Dark" },

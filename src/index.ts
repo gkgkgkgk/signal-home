@@ -254,6 +254,7 @@ export class SignalHome extends LitElement {
       this.media.matches,
       new Date(),
       this.hass?.config?.time_zone,
+      this.hass?.states["sun.sun"]?.state,
     );
   };
   connectedCallback() {
@@ -1593,7 +1594,7 @@ export class SignalHome extends LitElement {
               <option value="light">Light</option>
             </select>
             <small
-              >Auto: light 7am–7pm, dark overnight
+              >Auto: light while the sun is up, dark after sunset
               (${this.hass.config?.time_zone || "device time"}). Saved on this
               device.</small
             >
