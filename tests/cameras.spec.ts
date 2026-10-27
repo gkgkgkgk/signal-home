@@ -179,6 +179,21 @@ test('malformed notification event ID is rejected without a media request',async
   expect(await page.evaluate(()=>(window as any).eventRequests)).toEqual([]);
 });
 
+ test('playback padding follows Frigate config from the padding sensor',async({page})=>{
+  await eventSetup(page);
+  await page.evaluate(()=>{
+    const c=document.querySelector('signal-home') as any;
+    const old=c.hass.callWS;
+    c.hass={...c.hass,states:{...c.hass.states,'sensor.signal_frigate_padding':{entity_id:'sensor.signal_frigate_padding',state:'ok',attributes:{cameras:{front_door:{alerts:{pre:15,post:3},detections:{pre:2,post:8}}}}}}};
+    c.hass.callWS=async(message:any)=>message.type==='frigate/reviews/get' ? [{id:'1790899603.134638-eizc84',camera:'front_door',severity:'alert',start_time:1790899603.134638,end_time:1790899654.134638,data:{objects:['person'],detections:['a']}}] : old(message);
+  });
+  await page.getByRole('button',{name:'Back to live & events'}).click();
+  await page.locator('signal-camera-grid .tile').click();
+  await expect(page.locator('ha-hls-player')).toHaveCount(1);
+  expect(await page.locator('ha-hls-player').evaluate((e:any)=>e.url)).toContain('/start/1790899588/end/1790899657/');
+  await expect(page.getByRole('region',{name:'Recorded event',exact:true})).toContainText('includes 15s before and 3s after');
+});
+
  test('one card per Frigate review and exact finite 5/5 playback boundaries',async({page})=>{
   await eventSetup(page);
   await page.evaluate(()=>{

@@ -1,7 +1,19 @@
 import { LitElement, css, html, type PropertyValues } from "lit";
 import type { Hass } from "./types";
 
-interface CameraEvent { id: string; camera: string; label?: string; data?: {objects?:string[];detections?:string[]}; start_time: number; end_time: number | null; }
+interface CameraEvent { id: string; camera: string; label?: string; severity?: string; data?: {objects?:string[];detections?:string[]}; start_time: number; end_time: number | null; }
+interface Padding { pre: number; post: number; }
+
+/** Frigate's record pre/post capture for this camera and review severity, published by
+ *  HA's `sensor.signal_frigate_padding` so playback always matches Frigate's config.
+ *  Falls back to 5s/5s (the configured value when this was written) if it's missing. */
+export const PADDING_SENSOR = "sensor.signal_frigate_padding";
+function eventPadding(hass: Hass | undefined, camera: string, severity?: string): Padding {
+  const cameras = hass?.states?.[PADDING_SENSOR]?.attributes?.cameras as Record<string, Record<string, Partial<Padding>>> | undefined;
+  const value = cameras?.[camera]?.[severity === "alert" ? "alerts" : "detections"];
+  const valid = (n: unknown): n is number => typeof n === "number" && Number.isFinite(n) && n >= 0 && n <= 300;
+  return valid(value?.pre) && valid(value?.post) ? { pre: value.pre, post: value.post } : { pre: 5, post: 5 };
+}
 
 /** Resolves only the requested event. Never substitutes a newer event or live video. */
 export class SignalCameraEvent extends LitElement {
@@ -23,6 +35,7 @@ export class SignalCameraEvent extends LitElement {
   private user?: string;
   private generation = 0;
   private playerTimer?: ReturnType<typeof setTimeout>;
+  private padding: Padding = { pre: 5, post: 5 };
 
   static styles = css`
     :host { display:block; min-width:0; }
@@ -66,9 +79,10 @@ export class SignalCameraEvent extends LitElement {
       const event = Array.isArray(events) ? events.find(e => e.camera === this.camera && (this.kind === "review" ? e.id === this.eventId : e.data?.detections?.includes(this.eventId))) : undefined;
       if (!event) throw new Error("event_missing");
       this.event = event;
-      const begin = Math.floor(event.start_time - 5);
+      const padding = this.padding = eventPadding(this.hass, this.camera, event.severity);
+      const begin = Math.floor(event.start_time - padding.pre);
       // An ongoing visit is a finite recording through now, refreshed explicitly.
-      const end = event.end_time == null ? Math.floor(Date.now()/1000) : Math.floor(event.end_time + 5);
+      const end = event.end_time == null ? Math.floor(Date.now()/1000) : Math.floor(event.end_time + padding.post);
       if (!Number.isFinite(begin) || !Number.isFinite(end) || end <= begin) throw new Error("invalid_media");
       const media = {url:`/api/frigate/${this.instance}/vod/${this.camera}/start/${begin}/end/${end}/index.m3u8`};
       const signed = await this.hass.callWS<{path: string}>({ type: "auth/sign_path", path: media.url, expires: 3600 });
@@ -93,7 +107,7 @@ export class SignalCameraEvent extends LitElement {
   render() {
     const title = this.event?.data?.objects?.some(o=>o.startsWith("doorbell")) ? "Doorbell ring" : this.event?.data?.objects?.includes("person") ? "Person detected" : "Recorded event";
     return html`<section class="panel" aria-label="Recorded event">
-      <div class="heading"><span class="badge">${this.event?.end_time === null ? "Visit in progress · Recorded footage" : "Recorded event"}</span><h2>${title}</h2><p><time>${this.date()}</time> · ${this.camera.replaceAll("_", " ")}</p>${this.event?.end_time != null ? html`<p>${Math.round(this.event.end_time-this.event.start_time)}-second visit · includes 5s before and 5s after</p>` : ""}</div>
+      <div class="heading"><span class="badge">${this.event?.end_time === null ? "Visit in progress · Recorded footage" : "Recorded event"}</span><h2>${title}</h2><p><time>${this.date()}</time> · ${this.camera.replaceAll("_", " ")}</p>${this.event?.end_time != null ? html`<p>${Math.round(this.event.end_time-this.event.start_time)}-second visit · includes ${this.padding.pre}s before and ${this.padding.post}s after</p>` : ""}</div>
       ${this.loading ? html`<div class="notice" role="status"><strong>Opening this recording…</strong><p>Loading the event from your notification.</p></div>` : this.error ? html`<div class="notice" role="alert"><strong>Recording unavailable</strong><p>${this.error}</p><button @click=${this.load}>Try again</button></div>` : html`<div class="player"><ha-hls-player .hass=${this.hass} .url=${this.url} .controls=${true} .autoPlay=${true} .muted=${true} .playsInline=${true} .allowExoPlayer=${false} .aspectRatio=${4/3}></ha-hls-player></div>${this.event?.end_time === null ? html`<div class="footer"><button @click=${this.load}>Refresh recording</button></div>` : ""}`}
     </section>`;
   }
